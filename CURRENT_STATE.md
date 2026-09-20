@@ -8,99 +8,76 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-c54c2aa  test(ai): cover medium agent, card counting and relative strength
+5d9fbf4  docs: correct the cancellation diagnosis and separate average from worst case
 ```
 
-Everything below was verified against that commit on **2026-09-20** with
-Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
+Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 
 ---
 
 ## Current Milestone
 
-**M0 — Repository & Foundation**: IN PROGRESS (M0.2 and M0.3 done; ci_scripts and lint config outstanding)
-**M1 — GameCore / Rules**: DONE
-**M2 — Complete Move Engine**: IN PROGRESS (only M2.10, the replay move log, is left)
-**M3 — AI**: IN PROGRESS (M3.1, M3.2, M3.3, M3.5 done; M3.4 implemented and being tuned)
+| Milestone | Status |
+|---|---|
+| M0 — Repository & Foundation | **DONE** |
+| M1 — GameCore / Rules | **DONE** |
+| M2 — Complete Move Engine | **DONE** |
+| M3 — AI | **DONE** |
+| **M4 — Gameplay UI (iPad / iPhone)** | **NEXT — not started** |
 
-M1 was completed ahead of the remaining M0 tooling work, because the rules
-engine is testable with `swift test` alone and does not need the Xcode project.
+Everything up to and including M3 lives in `KeezlyCore`, which is testable with
+`swift test` alone. M4 is the first milestone that is mostly app-layer work.
 
 ---
 
 ## Completed
 
-### Repository and app project (M0, partial)
-- Git repository initialised, `main` tracking `origin/main`.
-- Secret-safe `.gitignore` (keys, profiles, `.env`, certificates, local signing
-  config, local device mapping).
-- **Xcode project** generated from `project.yml` via XcodeGen and committed.
-  Bundle ids `de.gcng.keezly` / `.tests` / `.uitests`, iOS 17.0 deployment
-  target, `MARKETING_VERSION 1.0.0`, iPhone **and** iPad, Stage Manager
-  compatible, shared `Keezly` scheme covering app, unit and UI tests.
-- **App shell**: `KeezlyApp` + `RootView`. Deliberately inert scaffolding — no
-  buttons that do nothing. M4.1 replaces it with the real menu and board.
-- **Signing**: `DEVELOPMENT_TEAM` lives only in the git-ignored
-  `Config/Local.xcconfig`; `Config/Local.xcconfig.example` documents it.
-- **fastlane** via Bundler (Ruby 4.0.5 pinned in `.tool-versions`, fastlane
-  2.240.1 pinned in `Gemfile.lock`). Lanes: `tests`, `ui_tests`, `device_smoke`,
-  `device_iphone`, `device_ipad`, `device_gate`, `qa`, `release_check`.
+### Repository and app project (M0)
+- Xcode project generated from `project.yml` via XcodeGen and committed.
+  Bundle ids `de.gcng.keezly` / `.tests` / `.uitests`, iOS 17.0 target,
+  iPhone **and** iPad, Stage Manager compatible, shared `Keezly` scheme.
+- App shell (`KeezlyApp`, `RootView`) — deliberately inert scaffolding, no
+  buttons that do nothing. M4.1 replaces it.
+- Versioning lives in `Config/Keezly.xcconfig`, **not** `project.yml`: a build
+  setting on the project overrides any xcconfig and would silently defeat the
+  CI build-number override.
+- Signing team only in the git-ignored `Config/Local.xcconfig` (DEC-013).
+- fastlane via Bundler (Ruby 4.0.5 pinned, fastlane 2.240.1 via `Gemfile.lock`).
+  Lanes: `tests`, `ui_tests`, `lint`, `qa`, `release_check`, `asc_check`,
+  `device_smoke`, `device_iphone`, `device_ipad`, `device_gate`.
+- `ci_scripts/` for Xcode Cloud; the build-number override is verified end to
+  end (`CI_BUILD_NUMBER=42` → `CFBundleVersion 42`; absent → 1).
+- SwiftLint is the enforced gate (clean under `--strict`); SwiftFormat runs an
+  allowlist (DEC-016).
 
-### KeezlyCore (M1, M2 partial) — IMPLEMENTED + TESTED
-- **Deterministic randomness**: `SeededGenerator` (SplitMix64), serialisable
-  single-`UInt64` state, own Fisher–Yates shuffle so deal order does not depend
-  on stdlib internals.
-- **Parametric board**: `BoardGraph` for 2–6 seats, 16 track squares per seat
-  (4 seats → the classic 64+16+16 = 96 positions). Seat-relative *progress*
-  coordinate; forward paths, backward paths, home lane.
-- **Cards**: 13 ranks × one rank-set per seat (2 seats → 26 cards, 6 → 78).
-  Suits exist for display only; no rule reads them.
-- **Rules**: `RuleSet` with presets Classic / Tournament / House Rules, and six
-  named variant options (see `RULE_VARIANTS.md`).
-- **State**: immutable `GameState` with pawns, hands, deck, discard, dealer,
-  deal cycle, folded/resigned seats, RNG, revision counter, result.
-- **Move engine**: all thirteen cards, including
-  - Ace = enter *or* +1, King = enter (or +13 as a house rule), Queen = +12
-  - Four = exactly 4 backward, never into or out of home
-  - Jack = swap with another seat's unprotected track pawn
-  - Seven = every legal one- or two-leg split, including the §17 hand-off where
-    the first leg finishes your own pawns and the rest is spent on a partner's
-  - protected start squares as absolute blockades
-  - exact home entry, no jumping over pawns already home
-  - friendly capture (Classic) and its `landingForbidden` alternative
-- **Turn flow**: 5/4/4 deal cycle, dealer rotation, forced move, automatic
-  folding of dead hands while passing the turn, victory for teams and
-  free-for-all, resignation policy (team forfeits / FFA player removed).
-- **Generator/reducer parity**: the reducer accepts exactly what the generator
-  offers; both go through one `MoveResolver`.
-- **Versioned serialisation**: `GameStateEnvelope` carries `schemaVersion`,
-  `engineVersion`, `rulesVersion` and an FNV-1a checksum. A payload from a newer
-  schema, a damaged payload, or one over a transport limit is refused with a
-  typed `SerializationError` — never partially restored. A played-out six-player
-  state encodes to **4527 bytes**, about 7 % of Game Center's 64 KiB budget.
-- **Byte-stable encoding**: `GameState` has a hand-written `Codable` that sorts
-  its seat sets, because Swift's `Set` iteration order is salted per process and
-  would otherwise make every checksum comparison unreliable.
-- **AI agents** (M3.2–M3.5): `EasyAgent` (weighted random over a tiny feature
-  set), `MediumAgent` (heuristic scoring of the *resulting* position, with a
-  risk term driven by card counting), `HardAgent` (information-set sampling plus
-  time-boxed rollouts), and a headless `MatchSimulator` that checks every action
-  against `GameStateInvariant` and reports failing seeds for exact replay.
-  Measured over team matches: Medium beats Easy 97.5%, Hard beats Easy 97.5%,
-  Hard beats Medium 67.5%.
-- **Card counting is real**: once all four Queens are in the discard pile, a
-  pawn twelve squares ahead of an opponent stops being scored as exposed.
-  A distance of eleven is never threatening, because no card travels eleven.
-- **Seat fairness measured**: 1600 matches with identical agents across 2, 3, 4
-  and 6 seats show win shares within ±2 standard errors of uniform — no seat is
-  structurally favoured (§9).
-- **AI information boundary** (M3.1, extended by DEC-015): `PlayerObservation` is the only thing an
-  agent ever receives. It carries the observer's own hand, all pawn positions,
-  the discard pile, per-seat card *counts*, teams, phase and the legal moves —
-  and has no route to another hand, the draw pile or the RNG. `AIAgent`'s
-  signature enforces this. Card counting stays available through `unseenCards`.
-  **Verified by mutation test**: injecting `state.hands` into the observation
-  makes the boundary test fail, so the guarantee is actually checked.
+### Rules engine (M1, M2)
+- Deterministic `SeededGenerator` (SplitMix64), state inside `GameState`.
+- Parametric `BoardGraph` for 2–6 seats; 4 seats → the classic 64+16+16.
+- 13 ranks × one rank-set per seat; no rule reads a suit.
+- All thirteen cards including complete Seven-split enumeration and the §17
+  partner hand-off; protected start squares; exact home entry; friendly fire.
+- 5/4/4 deal cycle, dealer rotation, forced move, automatic folding of dead
+  hands, team and free-for-all victory, resignation policy.
+- `GameStateEnvelope`: schema/engine/rules versions plus an FNV-1a checksum;
+  refuses a newer schema, a damaged payload or an oversized one with typed
+  errors. Byte-stable encoding (hand-written `Codable`, DEC-009).
+  A six-player state is **4527 bytes** — ~7% of Game Center's 64 KiB budget.
+- `MatchRecord` / `MatchRecorder`: a match is its seed plus its actions, so
+  replay reproduces every state **and every event**. A 765-action six-player
+  record is 122 KB.
+
+### AI (M3)
+- `PlayerObservation` is the only thing an agent receives (DEC-014), extended
+  with move previews and a stable key (DEC-015). Differential + mutation tested.
+- `EasyAgent` — weighted random over five features, wide jitter.
+- `MediumAgent` + `PositionEvaluator` — scores the resulting position; the risk
+  term uses card counting from the public discard pile.
+- `HardAgent` — information-set sampling from `unseenCards` plus time-boxed,
+  cancellable rollouts.
+- `MatchSimulator` + `GameStateInvariant` — headless matches, every action
+  checked, failures carry their seed for exact replay.
+
+Measured results and sample sizes: `AI.md`.
 
 ---
 
@@ -112,109 +89,78 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Not Implemented Yet
 
-- Xcode project, app target, shared schemes — the app does not build at all.
-- Agent cancellation under load is not yet demonstrated by a test (M3.6).
-- All UI, all localisation, all audio/haptics, app icon.
-- Game Center, persistence/autosave, statistics, replay, tutorial, rulebook.
-- Fastlane, ci_scripts, Xcode Cloud, screenshot harness.
+- **All gameplay UI** — the app builds and launches but cannot play a game.
+- Pass & play, autosave, statistics, match history, replay playback UI.
+- Game Center of any kind.
+- Tutorial, rulebook, hints, accessibility work.
+- Localisation, audio, haptics, app icon, artwork.
+- Screenshot harness; Xcode Cloud workflows.
 
 ---
 
 ## Tests
 
-Run with `cd Packages/KeezlyCore && swift test`.
+`cd Packages/KeezlyCore && swift test` — **136 tests, 0 failures**, ~90 s.
 
-| Suite | Tests | Status |
-|---|---|---|
-| BoardGraph | 9 | passed |
-| Card rules | 26 | passed |
-| Game flow | 16 | passed |
-| Invariants | 6 | passed |
-| Serialization | 11 | passed |
-| AI observation boundary | 11 | passed |
-| **Total** | **79** | **79 passed, 0 failed** — 6.6 s |
-
-App-level tests, run through the Xcode project on a simulator:
-
-| Destination | Tests | Status |
-|---|---|---|
-| iPhone 17, iOS 27.0 | 7 | **7 passed, 0 failed** |
-| iPad Pro 13" (M5), iOS 27.0 | 7 | **7 passed, 0 failed** |
-
-Four Swift Testing functions (engine linked into the app, a full match played
-inside the iOS runtime, serialisation round trip, bundle identifiers) plus three
-XCUITests (launch, rotation, launch performance). Build is warning-free.
-
-Several tests are parameterised over seat counts 2–6 or over card ranks, so the
-number of executed cases is higher than the number of test functions.
-
-The invariant suite plays **221 complete matches** to a finished result:
-125 across seat counts 2–6, 32 free-for-all on 4 and 6 seats, and 64 across
-eight rule-variant configurations. After every single applied action it asserts
-pawn/card conservation, no duplicate occupancy, pawns never leaving home, and
-monotonic revisions.
-
-| Other test tracks | Status |
+| Suite | Tests |
 |---|---|
-| UI tests | NOT RUN — no app target exists |
-| AI simulation harness | NOT RUN — no AI exists |
-| Screenshot runs | NOT RUN — no harness exists |
-| Xcode Cloud | NOT RUN — not configured |
+| BoardGraph | 9 |
+| Card rules | 26 |
+| Game flow | 16 |
+| Invariants | 6 |
+| Serialization | 11 |
+| Match record | 7 |
+| AI observation boundary | 15 |
+| Easy agent | 7 |
+| Medium agent | 9 |
+| Hard agent | 12 |
+| AI strength | 8 |
+| Simulation harness | 10 |
+
+Many are parameterised over seat counts or card ranks, so executed cases exceed
+test-function count. The invariant suite alone plays 221 complete matches.
+
+Two gated suites, excluded from the default run on purpose:
+
+| Gate | Command | Why |
+|---|---|---|
+| Extended simulation | `KEEZLY_EXTENDED_SIM=1 swift test` | Large AI samples and seat-fairness runs take minutes |
+| Timing | `KEEZLY_TIMING_TESTS=1 swift test` | Wall-clock bounds measure scheduler queueing under a parallel run (see ISS-005) |
+
+| App-level | Result |
+|---|---|
+| iPhone 17 simulator, iOS 27.0 | 7/7 |
+| iPad Pro 13" (M5) simulator, iOS 27.0 | 7/7 |
+| Physical iPhone 17 Pro, iOS 27.0 | 11/11 |
 
 ---
 
 ## Device Verification
 
-Recorded per environment; these are never merged into one number (§167, §175).
+Recorded per environment; never merged (§167, §175).
 
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
 | Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
-| Xcode Cloud | NOT RUN — not configured | — | — |
 | Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (11/11) | 2026-09-20 | `705497c` |
-| Physical iPad | **BLOCKED** — no iPad paired (MAN-10) | — | — |
+| Physical iPad | **BLOCKED** — none paired (MAN-10) | — | — |
+| Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
-### Device availability, checked 2026-09-20
+Device availability is re-checked with `./scripts/devices.sh` before every
+device run, never trusted from this file — it changed mid-session once already.
 
-`./scripts/devices.sh list` → exit 0.
-
-| Role | Device | OS | Connection | Developer Mode | Usable |
-|---|---|---|---|---|---|
-| `PRIMARY_IPHONE` | iPhone 17 Pro (iPhone18,1) | 27.0 (24A437) | wired, tunnel connected | enabled | **yes — build and tests verified** |
-| `PRIMARY_IPAD` | — | — | — | — | **none paired** |
-
-An earlier check the same day found no physical devices at all; the iPhone was
-connected afterwards. Device availability is therefore re-checked before every
-device run rather than trusted from this file (§157).
-
-**Resolved.** The account owner chose the signing team (the one holding the
-Apple Distribution certificates), authorised device registration, and both the
-device build and the device test run succeeded:
-
-- `xcodebuild build` for the physical iPhone — **Build Succeeded**, no warnings
-- `bundle exec fastlane device_iphone` — **11 tests, 0 failures**, 261 s
-
-The team id lives only in the git-ignored `Config/Local.xcconfig` (DEC-013).
-
-Note for anyone reading `devicectl` output directly: it lists simulators too,
-and a booted simulator reports as `connected`. The only reliable discriminator
-is `hardwareProperties.reality`, which is what `scripts/devices.sh` filters on.
-
-Simulators available: iOS 27.0, 26.5 and 26.3 runtimes covering iPhone 18 Pro /
-18 Pro Max / 17 / 17e / Air / 16e and iPad Pro 13" (M5), iPad Pro 11" (M5),
-iPad mini (A17 Pro), iPad Air 13"/11" (M4 and M3), iPad (A16).
-
-Full strategy: `docs/DEVICE_TESTING.md`. Game Center matrix:
-`docs/GAME_CENTER_DEVICE_TESTS.md`.
+`devicectl` lists simulators too, and a booted simulator reports as
+`connected`; the only reliable discriminator is `hardwareProperties.reality`.
 
 ---
 
 ## Known Problems
 
-None open. See `KNOWN_ISSUES.md` for the register (currently empty) and for the
-two closed items from this session.
+None open. `KNOWN_ISSUES.md` holds five closed entries, including ISS-005,
+which records a **misdiagnosis** worth remembering: a green performance test on
+a position the code short-circuits out of proves nothing.
 
 ---
 
@@ -222,10 +168,11 @@ two closed items from this session.
 
 | Risk | Note |
 |---|---|
-| Seven-split combinatorics | Generating all split sequences copies the state per candidate leg. Fast enough now, but the Hard AI will call it inside rollouts. Measure before optimising. |
-| Rule-source contradictions | Tournament rules are not yet verified against a primary source, so the Tournament preset currently equals Classic. Open questions are listed in `RULE_VARIANTS.md` rather than guessed. |
-| `allowExtraLap` semantics | The "extra lap" house rule is implemented as an explicit route choice. This is an interpretation, documented as DEC-005; it needs a play-test before 1.0.0. |
-| Two signing teams | The keychain holds certificates for two Apple Developer teams. Picking the wrong one would mean re-provisioning later and could split App Store Connect records. Resolved by MAN-03. |
+| Tournament preset unverified | It currently equals Classic because no primary rule source has been checked. Open questions listed in `RULE_VARIANTS.md` rather than guessed. |
+| `allowExtraLap` interpretation | Implemented as an explicit route choice (DEC-005); needs a play-test before 1.0.0. |
+| Match record size | 122 KB per six-player match. Fine individually; `MATCH HISTORY` (M9.2) needs a retention policy or a more compact encoding. |
+| Hard search size unproven | Three configurations were indistinguishable at 30 matches each. The smallest ships; settling it needs a few hundred matches per configuration. |
+| Default suite runtime | ~90 s and growing. If it passes a couple of minutes, split the AI strength runs out of the default run. |
 
 ---
 
@@ -233,69 +180,63 @@ two closed items from this session.
 
 | # | Action | Status |
 |---|---|---|
-| MAN-01 | Decide the bundle identifier | **DONE** — `de.gcng.keezly` (DEC-011) |
-| MAN-02 | Create the App Store Connect app record for `de.gcng.keezly` | **OPEN — confirmed empirically**: the API lists 14 app records and this bundle id is not among them. Now the top blocker for TestFlight and Game Center. |
-| MAN-03 | Apple Developer team for signing | **DONE** — team chosen, recorded in the git-ignored `Config/Local.xcconfig`, device registered, device build verified |
-| MAN-04 | Authorise GitHub ↔ Xcode Cloud and enable Xcode Cloud | OPEN |
-| MAN-05 | Enable the Game Center capability for the bundle id | OPEN |
+| MAN-01 | Bundle identifier | **DONE** — `de.gcng.keezly` (DEC-011) |
+| MAN-02 | App Store Connect app record for `de.gcng.keezly` | **OPEN — top blocker.** Confirmed empirically: the API lists 14 records and this bundle id is not among them |
+| MAN-03 | Apple Developer signing team | **DONE** — in the git-ignored `Config/Local.xcconfig`, device build verified |
+| MAN-04 | Authorise GitHub ↔ Xcode Cloud, enable Xcode Cloud | OPEN — depends on MAN-02 |
+| MAN-05 | Enable Game Center for the bundle id | OPEN — depends on MAN-02 |
 | MAN-06 | Create Game Center leaderboards and achievements | OPEN |
 | MAN-07 | Configure TestFlight testers | OPEN |
-| MAN-08 | App Store Connect API key | **DONE & VERIFIED** — key file and credential env live outside the repository; `bundle exec fastlane asc_check` authenticates successfully |
-| MAN-09 | Pair a physical iPhone with this Mac | **DONE** — iPhone 17 Pro, iOS 27.0, wired, Developer Mode enabled (verified 2026-09-20) |
-| MAN-10 | Pair a physical iPad, same steps — required for the iPad quality gate | OPEN |
-| MAN-11 | Provide a second Apple Account signed into Game Center, for multi-device online tests | OPEN |
-| MAN-12 | Pair a second physical device for Game Center multi-device tests (an iPad would cover MAN-10 as well) | OPEN |
+| MAN-08 | App Store Connect API key | **DONE & VERIFIED** — outside the repo; `fastlane asc_check` authenticates |
+| MAN-09 | Pair a physical iPhone | **DONE** — iPhone 17 Pro, Developer Mode on |
+| MAN-10 | Pair a physical iPad | OPEN — blocks the iPad gate |
+| MAN-11 | Second Apple Account in Game Center | OPEN |
+| MAN-12 | Second physical device for Game Center tests | OPEN |
 
-None of these can be completed from here. They are not blockers for the work
-queued next.
-
-MAN-10 blocks the iPad gate in `RELEASE_CHECKLIST.md`; MAN-10/11/12 block every
-case in `docs/GAME_CENTER_DEVICE_TESTS.md`. MAN-02 blocks TestFlight, Game
-Center configuration and Xcode Cloud. None of them blocks the next engineering
-step (M3.1), but the device gates may not stay `BLOCKED` in a 1.0.0 release
-candidate (§178).
+MAN-02 blocks TestFlight, Game Center configuration and Xcode Cloud. It blocks
+none of the work queued next.
 
 ---
 
 ## Decisions That Must Not Be Re-opened
 
-See `DECISIONS.md` for the reasoning. In short:
-
-- DEC-001 — `KeezlyCore` stays free of SwiftUI, GameKit and persistence.
-- DEC-002 — project memory lives at the repository root; `docs/` holds detail.
-- DEC-003 — all randomness goes through `SeededGenerator`; no direct stdlib RNG.
-- DEC-004 — `MoveGenerator` is the only authority on legality; the reducer
-  re-uses it rather than re-checking rules independently.
-- DEC-005 — rule variation is expressed as named `RuleSet` options, never as
-  ad-hoc booleans inside the generator.
-- DEC-007 — the Xcode project is generated by XcodeGen from `project.yml` and
-  the generated `.xcodeproj` is committed, so Xcode Cloud can build it.
-
----
-
-## Relevant Files For The Next Step
-
-- `Packages/KeezlyCore/Sources/KeezlyCore/Serialization/` — empty; the next
-  work lands here.
-- `Packages/KeezlyCore/Sources/KeezlyCore/Models/GameState.swift` — the type to
-  wrap in a versioned envelope.
-- `project.yml` — does not exist yet; needed for the app target.
+`DECISIONS.md` has the reasoning. In short: DEC-001 `KeezlyCore` stays
+framework-free · DEC-002 memory at the root · DEC-003 all randomness seeded ·
+DEC-004 the generator is the only authority on legality · DEC-005 rule variants
+as named options · DEC-006 turn-based GameKit · DEC-007 XcodeGen, project
+committed · DEC-008 Xcode Cloud archives, fastlane automates locally ·
+DEC-009 byte-stable `Codable` · DEC-010 three version numbers, decoding refuses
+· DEC-011 `de.gcng.keezly` · DEC-012 Bundler-pinned fastlane · DEC-013 signing
+team never committed · DEC-014 agents get an observation, never the state ·
+DEC-015 previews widen the boundary deliberately · DEC-016 SwiftLint gates,
+SwiftFormat allowlists.
 
 ---
 
 ## Next Steps (concrete)
 
-1. **M3.2 — the Easy agent.** Weighted random choice over
-   `observation.legalMoves`, avoiding the obviously catastrophic (knocking out
-   your own partner when an alternative exists, giving up a home-lane pawn)
-   while staying deliberately suboptimal. It is the first consumer of
-   `PlayerObservation` and will show whether that type carries enough to play
-   well — if something is missing, add it there and re-run the differential
-   tests, never widen the boundary casually.
-2. **M3.5 — the headless simulation harness**, so agent strength can be
-   measured over thousands of matches before Medium and Hard are written.
-3. **M0.4 — `ci_scripts/`.** `ci_post_clone.sh` (log toolchain versions, set up
-   Bundler), `ci_pre_xcodebuild.sh` (derive `CFBundleVersion` from
-   `CI_BUILD_NUMBER`), `ci_post_xcodebuild.sh` (collect result bundles). Check
-   what Ruby the current Xcode Cloud image ships before writing the first one.
-4. **M0.5 — SwiftLint / SwiftFormat configuration**, wired into the `qa` lane.
+**M4 — Gameplay UI.** The first milestone whose work is mostly outside
+`KeezlyCore`. Order matters here, because each step is verifiable on its own:
+
+1. **M4.1 — design system.** Spacing, typography, materials, motion, and
+   player identity. Player identity must be colour **plus** a symbol or shape:
+   colour alone fails colour-blind players (§42).
+2. **M4.2 — board geometry and rendering.** A `BoardLayout` in the app layer
+   that maps `BoardPosition` to coordinates. `KeezlyCore` must stay free of
+   geometry (DEC-001), so this is a new app-layer type, parametric over
+   2–6 seats like the board itself. Verify by screenshotting every seat count
+   on an iPad simulator.
+3. **M4.6 before M4.5** — the event-driven animation pipeline and input
+   locking, because the interaction flow is built on top of it and retrofitting
+   the lock is how double-applied moves happen (§63).
+4. **M4.5 — card interaction**, including the Jack target picker and the Seven
+   sequence builder. The engine already generates only complete, playable
+   Seven sequences, so the builder can offer exactly the legal continuations
+   and never strand a player mid-split (§38).
+5. **M4.3 / M4.4 — adaptive layouts.** iPad landscape first: it is the primary
+   product surface, not a scaled-up phone (§4).
+6. **M4.7 — pointer, trackpad and keyboard** on iPad.
+
+A `MatchSession` (`@Observable`) is needed early: it owns the `GameState`,
+drives AI turns off the main actor, records to `MatchRecord`, and publishes the
+event stream the views animate.
