@@ -16,6 +16,8 @@ enum Fixture {
         rules: RuleSet = .keezlyClassic,
         pawns: [PawnID: BoardPosition] = [:],
         hands: [Int: [CardRank]] = [:],
+        discard: [Card] = [],
+        deck: [Card] = [],
         currentSeat: Int = 0,
         dealer: Int? = nil,
         seed: UInt64 = 1
@@ -46,10 +48,11 @@ enum Fixture {
             configuration: configuration,
             pawns: pawnStates,
             hands: builtHands,
-            // Rule tests never draw; an empty deck makes an accidental deal
-            // fail loudly instead of silently changing the fixture.
-            deck: Deck(cards: []),
-            discardPile: [],
+            // Rule tests never draw, so the deck defaults to empty: an
+            // accidental deal then fails loudly instead of quietly rewriting
+            // the fixture's hands.
+            deck: Deck(cards: deck),
+            discardPile: discard,
             dealer: Seat(dealer ?? (seatCount - 1)),
             currentSeat: Seat(currentSeat),
             deal: DealState(),
