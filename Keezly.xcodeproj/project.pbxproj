@@ -1,0 +1,603 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ED8C1FD416E628043CC4D29 /* Assets.xcassets */; };
+		24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */; };
+		5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5E0E46A1D3857966A001B9EC /* KeezlyCore */; };
+		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
+		813DD1386E7D98D2C9006EAC /* LaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5741C72A907AEF603B8937 /* LaunchTests.swift */; };
+		8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36B25AB04A78E23D9B845676 /* KeezlyCore */; };
+		E2304885CB459B1B1D626328 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC0E53379721916E392C04F /* RootView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BBABEBB1B3D0697EA0DBCED9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 784777F62F21585E6F1BD7C8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 91B35560A39444FB3F9F0F48;
+			remoteInfo = Keezly;
+		};
+		F763B134BC90EB00792B7AC8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 784777F62F21585E6F1BD7C8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 91B35560A39444FB3F9F0F48;
+			remoteInfo = Keezly;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2DC0E53379721916E392C04F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
+		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		88398C0B7DDDF6AFF83579CA /* Keezly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Keezly.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyApp.swift; sourceTree = "<group>"; };
+		A5C6FD419A3ADB18AB0D704C /* KeezlyCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = KeezlyCore; path = Packages/KeezlyCore; sourceTree = SOURCE_ROOT; };
+		AC5CC86597A4A00C17A31B2D /* KeezlyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntegrationTests.swift; sourceTree = "<group>"; };
+		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7B6F33DA538A8B721AC4505A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB076D9A1A9441CF97D4C35F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2E2B37B50B5C1DAD597F802A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F0415EB1E80EF7024AD4013E /* Keezly */,
+				F0D320AC28DFBE7EFAED871D /* KeezlyTests */,
+				D502E80E6F1AC84285F49A69 /* KeezlyUITests */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		826A3F1418E2A0712B696398 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				A5C6FD419A3ADB18AB0D704C /* KeezlyCore */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		98BDA923BD179CAB61072B5F = {
+			isa = PBXGroup;
+			children = (
+				2E2B37B50B5C1DAD597F802A /* App */,
+				826A3F1418E2A0712B696398 /* Packages */,
+				EA2F00AFF036415A01093C8A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D502E80E6F1AC84285F49A69 /* KeezlyUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6A5741C72A907AEF603B8937 /* LaunchTests.swift */,
+			);
+			path = KeezlyUITests;
+			sourceTree = "<group>";
+		};
+		EA2F00AFF036415A01093C8A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				88398C0B7DDDF6AFF83579CA /* Keezly.app */,
+				AC5CC86597A4A00C17A31B2D /* KeezlyTests.xctest */,
+				E67D8019D88234311D0379BB /* KeezlyUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F0415EB1E80EF7024AD4013E /* Keezly */ = {
+			isa = PBXGroup;
+			children = (
+				6ED8C1FD416E628043CC4D29 /* Assets.xcassets */,
+				F01639F69FA03230480F3F8B /* Info.plist */,
+				8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */,
+				2DC0E53379721916E392C04F /* RootView.swift */,
+			);
+			path = Keezly;
+			sourceTree = "<group>";
+		};
+		F0D320AC28DFBE7EFAED871D /* KeezlyTests */ = {
+			isa = PBXGroup;
+			children = (
+				AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */,
+			);
+			path = KeezlyTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		037EAE2C4CCCE35A1FC4F780 /* KeezlyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9B2CC3122374A910B0D1895 /* Build configuration list for PBXNativeTarget "KeezlyUITests" */;
+			buildPhases = (
+				AE6EF1C31BA089EEF0DE6FB1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				88C0CC043982CD6C1B4879BD /* PBXTargetDependency */,
+			);
+			name = KeezlyUITests;
+			packageProductDependencies = (
+			);
+			productName = KeezlyUITests;
+			productReference = E67D8019D88234311D0379BB /* KeezlyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		3487FDDB8305F31E34C29676 /* KeezlyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F103BF45C1966622F2C6C12 /* Build configuration list for PBXNativeTarget "KeezlyTests" */;
+			buildPhases = (
+				67FC2A67F8D2FB3FC42E52F7 /* Sources */,
+				AB076D9A1A9441CF97D4C35F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5DE1E34BC6047ECC1CCD0020 /* PBXTargetDependency */,
+			);
+			name = KeezlyTests;
+			packageProductDependencies = (
+				5E0E46A1D3857966A001B9EC /* KeezlyCore */,
+			);
+			productName = KeezlyTests;
+			productReference = AC5CC86597A4A00C17A31B2D /* KeezlyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		91B35560A39444FB3F9F0F48 /* Keezly */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1379DBC3AA857E317692AFBD /* Build configuration list for PBXNativeTarget "Keezly" */;
+			buildPhases = (
+				71D3C4166793B37A37F9A4FE /* Sources */,
+				F157A1921D80E2639AB5F595 /* Resources */,
+				7B6F33DA538A8B721AC4505A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Keezly;
+			packageProductDependencies = (
+				36B25AB04A78E23D9B845676 /* KeezlyCore */,
+			);
+			productName = Keezly;
+			productReference = 88398C0B7DDDF6AFF83579CA /* Keezly.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		784777F62F21585E6F1BD7C8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					037EAE2C4CCCE35A1FC4F780 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = 91B35560A39444FB3F9F0F48;
+					};
+					3487FDDB8305F31E34C29676 = {
+						ProvisioningStyle = Automatic;
+					};
+					91B35560A39444FB3F9F0F48 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 425AA23589D6CB4980C90E48 /* Build configuration list for PBXProject "Keezly" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 98BDA923BD179CAB61072B5F;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				74E9408E2E2862F6B1F6FD93 /* XCLocalSwiftPackageReference "Packages/KeezlyCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EA2F00AFF036415A01093C8A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				91B35560A39444FB3F9F0F48 /* Keezly */,
+				3487FDDB8305F31E34C29676 /* KeezlyTests */,
+				037EAE2C4CCCE35A1FC4F780 /* KeezlyUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F157A1921D80E2639AB5F595 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		67FC2A67F8D2FB3FC42E52F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71D3C4166793B37A37F9A4FE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */,
+				E2304885CB459B1B1D626328 /* RootView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AE6EF1C31BA089EEF0DE6FB1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				813DD1386E7D98D2C9006EAC /* LaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5DE1E34BC6047ECC1CCD0020 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 91B35560A39444FB3F9F0F48 /* Keezly */;
+			targetProxy = BBABEBB1B3D0697EA0DBCED9 /* PBXContainerItemProxy */;
+		};
+		88C0CC043982CD6C1B4879BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 91B35560A39444FB3F9F0F48 /* Keezly */;
+			targetProxy = F763B134BC90EB00792B7AC8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3111A91645EEA021A4D78513 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = App/Keezly/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Keezly;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.gcng.keezly;
+				PRODUCT_NAME = Keezly;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		315EB7B322CE58F2F91E6688 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.gcng.keezly.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Keezly;
+			};
+			name = Release;
+		};
+		3C962E83C7B9295E242483FF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		5EDF99A07D146AEC57799CF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.gcng.keezly.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keezly.app/Keezly";
+			};
+			name = Release;
+		};
+		97F130ACFEA85D8E4DF1F3FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.gcng.keezly.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keezly.app/Keezly";
+			};
+			name = Debug;
+		};
+		A4DF2CB8BB41A33B91B9B7E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = App/Keezly/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Keezly;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.gcng.keezly;
+				PRODUCT_NAME = Keezly;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B6ACA5208AB0BCCA50C696C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.gcng.keezly.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Keezly;
+			};
+			name = Debug;
+		};
+		FDC8BE5422461C5419556C51 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1379DBC3AA857E317692AFBD /* Build configuration list for PBXNativeTarget "Keezly" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4DF2CB8BB41A33B91B9B7E4 /* Debug */,
+				3111A91645EEA021A4D78513 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		425AA23589D6CB4980C90E48 /* Build configuration list for PBXProject "Keezly" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDC8BE5422461C5419556C51 /* Debug */,
+				3C962E83C7B9295E242483FF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8F103BF45C1966622F2C6C12 /* Build configuration list for PBXNativeTarget "KeezlyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97F130ACFEA85D8E4DF1F3FF /* Debug */,
+				5EDF99A07D146AEC57799CF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E9B2CC3122374A910B0D1895 /* Build configuration list for PBXNativeTarget "KeezlyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6ACA5208AB0BCCA50C696C3 /* Debug */,
+				315EB7B322CE58F2F91E6688 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		74E9408E2E2862F6B1F6FD93 /* XCLocalSwiftPackageReference "Packages/KeezlyCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/KeezlyCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		36B25AB04A78E23D9B845676 /* KeezlyCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeezlyCore;
+		};
+		5E0E46A1D3857966A001B9EC /* KeezlyCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeezlyCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 784777F62F21585E6F1BD7C8 /* Project object */;
+}
