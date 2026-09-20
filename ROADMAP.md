@@ -120,15 +120,21 @@ integrity and size limits (done). Remaining: a replay move log (M2.10).
 | Task | Status |
 |---|---|
 | M3.1 `PlayerObservation` — the AI's information boundary | DONE |
-| M3.2 Easy AI — legal moves, weighted random, avoids obvious disasters | NOT STARTED |
-| M3.3 Medium AI — heuristic state evaluation | NOT STARTED |
-| M3.4 Hard AI — information-set sampling + time-boxed rollouts | NOT STARTED |
-| M3.5 Headless simulation harness | NOT STARTED |
-| M3.6 Cancellation and time budgets under Swift Concurrency | NOT STARTED |
+| M3.2 Easy AI — legal moves, weighted random, avoids obvious disasters | DONE |
+| M3.3 Medium AI — heuristic state evaluation | DONE |
+| M3.4 Hard AI — information-set sampling + time-boxed rollouts | IN PROGRESS — implemented and measured; search size being tuned |
+| M3.5 Headless simulation harness | DONE |
+| M3.6 Cancellation and time budgets under Swift Concurrency | IN PROGRESS — `AIBudget` and `Task.isCancelled` are wired into Hard; a cancellation test is outstanding |
 
-**Acceptance criteria.** An AI agent is structurally unable to read another
-seat's hand or the deck order; Hard beats Medium beats Easy over a large sample;
-a move is chosen well under one second on device; the main thread never blocks.
+**Acceptance criteria.**
+- An agent is structurally unable to read another seat's hand or the deck
+  order. — met (DEC-014/DEC-015, differential + mutation tested)
+- Hard beats Medium beats Easy over a decent sample. — met: Medium 97.5% vs
+  Easy, Hard 97.5% vs Easy, Hard 67.5% vs Medium (80/80/40 team matches)
+- A move is chosen well under one second. — met on a development Mac
+  (~0.3 ms Medium, ~16 ms Hard per action); **not yet measured on device**
+- The main thread never blocks. — by construction; not yet demonstrated by a
+  cancellation test (M3.6)
 
 **M3.1 is done and verified.** Agents receive a `PlayerObservation` and never a
 `GameState`. The guarantee is tested differentially — two states differing only

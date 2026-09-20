@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-c4c28d9  test(ai): prove hidden information cannot reach an observation
+c54c2aa  test(ai): cover medium agent, card counting and relative strength
 ```
 
 Everything below was verified against that commit on **2026-09-20** with
@@ -21,7 +21,7 @@ Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 **M0 — Repository & Foundation**: IN PROGRESS (M0.2 and M0.3 done; ci_scripts and lint config outstanding)
 **M1 — GameCore / Rules**: DONE
 **M2 — Complete Move Engine**: IN PROGRESS (only M2.10, the replay move log, is left)
-**M3 — AI**: IN PROGRESS (M3.1 done; no agent implemented yet)
+**M3 — AI**: IN PROGRESS (M3.1, M3.2, M3.3, M3.5 done; M3.4 implemented and being tuned)
 
 M1 was completed ahead of the remaining M0 tooling work, because the rules
 engine is testable with `swift test` alone and does not need the Xcode project.
@@ -81,7 +81,20 @@ engine is testable with `swift test` alone and does not need the Xcode project.
 - **Byte-stable encoding**: `GameState` has a hand-written `Codable` that sorts
   its seat sets, because Swift's `Set` iteration order is salted per process and
   would otherwise make every checksum comparison unreliable.
-- **AI information boundary** (M3.1): `PlayerObservation` is the only thing an
+- **AI agents** (M3.2–M3.5): `EasyAgent` (weighted random over a tiny feature
+  set), `MediumAgent` (heuristic scoring of the *resulting* position, with a
+  risk term driven by card counting), `HardAgent` (information-set sampling plus
+  time-boxed rollouts), and a headless `MatchSimulator` that checks every action
+  against `GameStateInvariant` and reports failing seeds for exact replay.
+  Measured over team matches: Medium beats Easy 97.5%, Hard beats Easy 97.5%,
+  Hard beats Medium 67.5%.
+- **Card counting is real**: once all four Queens are in the discard pile, a
+  pawn twelve squares ahead of an opponent stops being scored as exposed.
+  A distance of eleven is never threatening, because no card travels eleven.
+- **Seat fairness measured**: 1600 matches with identical agents across 2, 3, 4
+  and 6 seats show win shares within ±2 standard errors of uniform — no seat is
+  structurally favoured (§9).
+- **AI information boundary** (M3.1, extended by DEC-015): `PlayerObservation` is the only thing an
   agent ever receives. It carries the observer's own hand, all pawn positions,
   the discard pile, per-seat card *counts*, teams, phase and the legal moves —
   and has no route to another hand, the draw pile or the RNG. `AIAgent`'s
@@ -100,8 +113,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 ## Not Implemented Yet
 
 - Xcode project, app target, shared schemes — the app does not build at all.
-- AI agents of any strength (the observation boundary exists; Easy/Medium/Hard
-  do not).
+- Agent cancellation under load is not yet demonstrated by a test (M3.6).
 - All UI, all localisation, all audio/haptics, app icon.
 - Game Center, persistence/autosave, statistics, replay, tutorial, rulebook.
 - Fastlane, ci_scripts, Xcode Cloud, screenshot harness.
