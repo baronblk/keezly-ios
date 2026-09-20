@@ -19,6 +19,7 @@
 		8309DF26E59769918673891D /* BoardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD74967519D049BB59C5FA /* BoardLayout.swift */; };
 		8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36B25AB04A78E23D9B845676 /* KeezlyCore */; };
 		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
+		A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF95D494649C4F6D223A28C /* MatchSession.swift */; };
 		E2304885CB459B1B1D626328 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC0E53379721916E392C04F /* RootView.swift */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +56,7 @@
 		AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerIdentity.swift; sourceTree = "<group>"; };
 		DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnView.swift; sourceTree = "<group>"; };
 		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EBF95D494649C4F6D223A28C /* MatchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSession.swift; sourceTree = "<group>"; };
 		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,6 +109,14 @@
 			path = Packages;
 			sourceTree = "<group>";
 		};
+		8FC222912D478002951C1887 /* Session */ = {
+			isa = PBXGroup;
+			children = (
+				EBF95D494649C4F6D223A28C /* MatchSession.swift */,
+			);
+			path = Session;
+			sourceTree = "<group>";
+		};
 		98BDA923BD179CAB61072B5F = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +167,7 @@
 			children = (
 				32DC8061A42E668F5ABC3EE2 /* Board */,
 				C2CE7554DBA3AF25B7905141 /* DesignSystem */,
+				8FC222912D478002951C1887 /* Session */,
 				6ED8C1FD416E628043CC4D29 /* Assets.xcassets */,
 				F01639F69FA03230480F3F8B /* Info.plist */,
 				8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */,
@@ -309,6 +320,7 @@
 				49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */,
 				24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */,
 				A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */,
+				A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */,
 				74690CFDE17AFB4D550A4628 /* PawnView.swift in Sources */,
 				8078C5050C02ADBFE8E93567 /* PlayerIdentity.swift in Sources */,
 				E2304885CB459B1B1D626328 /* RootView.swift in Sources */,
