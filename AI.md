@@ -162,7 +162,22 @@ how does this tend to turn out? Information-set sampling:
 5. play the best candidate
 
 The agent still never knows a real opponent card; it reasons about a
-distribution. It must not "signal" a partner through anything but public play.
+distribution. Sampled hands come only from `unseenCards`, which is why card
+counting sharpens Hard as a deal progresses: the space of plausible worlds
+narrows with every card played.
+
+Search size, as shipped:
+
+| Parameter | Value | Why |
+|---|---|---|
+| `candidateLimit` | 6 | A single Seven can offer dozens of splits; rolling out every one would spend the budget on obvious mistakes. |
+| `samplesPerCandidate` | 8 | Worlds sampled per candidate. |
+| `rolloutPlies` | 8 | How far each world is played forward. |
+| `rolloutWeight` | 0.45 | How heavily the rollout average counts against the static score. |
+
+Rollouts use a cheaper policy than Medium — the position terms without the risk
+model — because a rollout runs hundreds of times per decision and exists to
+show which candidate *tends* to end well, not to play beautifully.
 
 ---
 
@@ -193,6 +208,77 @@ randomised matches today and checks invariants after every action.
 
 ## Results
 
-No simulations have been run. This section will hold measured win rates, match
-lengths and known weaknesses once the agents exist. Until then it stays empty
-rather than holding estimates (§151).
+Measured, not estimated. Every number below comes from a simulation that ran;
+the commands are in `Tests/KeezlyCoreTests/AIStrengthTests.swift`.
+
+### Relative strength
+
+Four-seat team matches, the named agent's team against the other's.
+
+| Match-up | Win rate | Matches | Notes |
+|---|---:|---:|---|
+| Medium vs Easy | **97.5%** | 80 | Heuristic play dominates weighted-random play |
+| Hard vs Easy | **97.5%** | 40 | |
+| Hard vs Medium | **67.5%** | 40 | A clear but not crushing edge, which is the intent |
+| Easy vs Easy | 41.3% | 80 | Baseline; within noise of even |
+
+Test assertions sit well below these values (Medium > 0.70 against Easy, Hard
+> 0.60 against Medium) so ordinary variance cannot redden the suite.
+
+### Seat fairness
+
+1600 matches with *identical* agents on every seat, free-for-all, so any
+imbalance would be the board or the turn order rather than the agents (§9).
+
+| Seats | Win share per seat | Expected |
+|---|---|---|
+| 2 | 0.510 / 0.490 | 0.500 |
+| 3 | 0.328 / 0.338 / 0.335 | 0.333 |
+| 4 | 0.240 / 0.268 / 0.235 / 0.258 | 0.250 |
+| 6 | 0.160 / 0.193 / 0.158 / 0.152 / 0.142 / 0.195 | 0.167 |
+
+Every share is within two standard errors of uniform. **No seat is
+structurally favoured.**
+
+### Speed
+
+Per applied action, on an Apple-silicon development Mac:
+
+| Agent | Time per action |
+|---|---|
+| Easy | ~0.2 ms |
+| Medium | ~0.3 ms |
+| Hard | ~16–19 ms |
+
+Hard finishes far inside its 700 ms interactive budget, so the budget is not
+currently the binding constraint. **Not yet measured on device** — that is
+tracked in `ROADMAP.md`.
+
+### Search-size tuning — inconclusive
+
+Three Hard configurations were run against Medium, 30 matches each:
+
+| Configuration | Win rate | Time per action |
+|---|---:|---:|
+| `c6 s8 p8` (shipped) | 63.3% | 19 ms |
+| `c8 s20 p14` | 56.7% | 96 ms |
+| `c6 s16 p24` | 66.7% | 99 ms |
+
+At 30 matches the standard error is about 9 points, so all three are
+indistinguishable — while the larger searches cost five times the time. The
+smallest configuration ships. This is **not** evidence that more search cannot
+help; it is evidence that this sample cannot tell. Settling it needs a few
+hundred matches per configuration, which belongs in an extended run rather than
+in the default suite.
+
+### Known weaknesses
+
+- Medium plans exactly one move ahead and models opponents only through the
+  static risk term.
+- Hard's rollout policy is greedy and shallow; it does not model an opponent
+  deliberately blocking.
+- Neither agent reasons about the Seven's split structure beyond the position
+  each split produces.
+- Team play is handled implicitly, by counting a partner's pawns as the agent's
+  own. There is no explicit co-operation or signalling model — and per §21
+  there must never be one based on hidden information.
