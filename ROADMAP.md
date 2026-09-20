@@ -12,7 +12,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M1 | GameCore / Rules | **DONE** |
 | M2 | Complete Move Engine | **DONE** |
 | M3 | AI (Easy / Medium / Hard) | **DONE** |
-| M4 | Gameplay UI — iPad / iPhone | NOT STARTED |
+| M4 | Gameplay UI — iPad / iPhone | IN PROGRESS |
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
 | M6 | Game Center Multiplayer | NOT STARTED |
 | M7 | Tutorial / Rulebook / Accessibility | NOT STARTED |
@@ -151,21 +151,27 @@ leak and watching them fail. See `AI.md`.
 
 ---
 
-## M4 — Gameplay UI (iPad / iPhone) — NOT STARTED
+## M4 — Gameplay UI (iPad / iPhone) — IN PROGRESS
 
 | Task | Status |
 |---|---|
-| M4.1 Design system — spacing, type, materials, motion, player identity | NOT STARTED |
-| M4.2 Board rendering from `BoardGraph` topology | NOT STARTED |
+| M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
+| M4.2 Board rendering from `BoardGraph` topology | DONE |
 | M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | NOT STARTED |
 | M4.4 iPhone layout — portrait and both landscape orientations | NOT STARTED |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | NOT STARTED |
-| M4.6 Event-driven animation pipeline with input locking | NOT STARTED |
+| M4.6 Event-driven animation pipeline with input locking | IN PROGRESS — `MatchSession` holds the state, locks input and runs agents off the main actor; the animation playback itself is outstanding |
 | M4.7 Pointer, trackpad and full keyboard access on iPad | NOT STARTED |
+
+| M4.8 Centre of the board — draw pile, discard, turn and deal status | NOT STARTED |
 
 **Acceptance criteria.** The iPad layout is designed for the large display, not
 scaled up; a pawn can never appear to move on its own or a move be applied
 twice; animations visualise events and never drive state.
+
+**Board form.** A squared ring with straight runs and soft corners, generated
+from our own curve — the traditional shape, not anyone's artwork (DEC-017).
+Verified visually on an iPad simulator in light and dark appearance.
 
 ---
 
