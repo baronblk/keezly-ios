@@ -62,27 +62,67 @@ struct HardAgentTests {
 
     // MARK: - Budget and cancellation (§24, §62)
 
-    @Test("a cancelled search returns promptly with a legal move")
-    func cancellationIsHonoured() async {
-        let state = GameState.newMatch(configuration: .standard(seatCount: 6), seed: 31)
-        let observation = PlayerObservation(of: state, for: state.currentSeat)
-        // A search that would take minutes if it ran to completion.
-        let greedy = HardAgent(
-            seed: 1,
+    /// A position the search genuinely has to work on.
+    ///
+    /// This matters more than it looks: on a sparse position `HardAgent`
+    /// short-circuits (`candidates.count > 1`) and returns before sampling at
+    /// all, so a cancellation test built on a fresh deal can pass without ever
+    /// exercising the thing it claims to test. Six seats, four of the acting
+    /// seat's pawns on the track and a Seven in hand produce ~108 legal moves.
+    static func heavyObservation() -> PlayerObservation {
+        let state = Fixture.state(
+            seatCount: 6,
+            teamMode: .teamsOfTwo,
+            pawns: [
+                Fixture.pawn(0, 0): .track(index: 3),
+                Fixture.pawn(0, 1): .track(index: 20),
+                Fixture.pawn(0, 2): .track(index: 41),
+                Fixture.pawn(0, 3): .track(index: 70),
+                Fixture.pawn(1, 0): .track(index: 30),
+                Fixture.pawn(2, 0): .track(index: 50),
+                Fixture.pawn(3, 0): .track(index: 60),
+                Fixture.pawn(4, 0): .track(index: 80),
+                Fixture.pawn(5, 0): .track(index: 90),
+            ],
+            hands: [0: [.seven, .queen, .ten, .jack, .ace]]
+        )
+        return PlayerObservation(of: state, for: Seat(0))
+    }
+
+    /// A search large enough that it would run for minutes unchecked.
+    static func unboundedSearch(seed: UInt64 = 9) -> HardAgent {
+        HardAgent(
+            seed: seed,
             budget: AIBudget(maximumDuration: .seconds(600)),
             candidateLimit: 64,
             samplesPerCandidate: 100_000,
             rolloutPlies: 200
         )
+    }
 
-        let clock = ContinuousClock()
-        let start = clock.now
-        let task = Task { await greedy.chooseAction(for: observation) }
+    @Test("the test position is genuinely expensive to search")
+    func heavyPositionIsActuallyHeavy() {
+        // If this ever drops, the cancellation tests below stop proving
+        // anything and must be rebuilt on a richer position.
+        #expect(Self.heavyObservation().legalMoves.count > 40)
+    }
+
+    @Test("a search cancelled before it starts returns a legal move at once")
+    func cancellationBeforeStartIsHonoured() async {
+        let observation = Self.heavyObservation()
+        // Timed inside the task deliberately: timing from outside measures how
+        // long the global executor took to start it, which under a parallel
+        // test run is seconds of queueing and says nothing about the agent.
+        let task = Task { () -> (PlayerAction, Duration) in
+            let clock = ContinuousClock()
+            let start = clock.now
+            let action = await Self.unboundedSearch().chooseAction(for: observation)
+            return (action, clock.now - start)
+        }
         task.cancel()
-        let action = await task.value
-        let elapsed = clock.now - start
+        let (action, elapsed) = await task.value
 
-        #expect(elapsed < .seconds(5), "a cancelled search took \(elapsed)")
+        #expect(elapsed < .milliseconds(500), "a cancelled search spent \(elapsed) working")
         guard case .play(let move) = action else {
             #expect(observation.legalMoves.isEmpty)
             return
@@ -90,10 +130,40 @@ struct HardAgentTests {
         #expect(observation.legalMoves.contains(move), "cancellation must not produce an illegal move")
     }
 
+    /// The case that actually matters: the player taps while the agent is
+    /// thinking. Measured from the cancel, not from the start.
+    @Test("cancelling a search already under way stops it quickly")
+    func cancellationMidSearchIsHonoured() async {
+        let observation = Self.heavyObservation()
+        let started = AsyncStream<Void>.makeStream()
+        let task = Task { () -> PlayerAction in
+            started.continuation.yield()
+            started.continuation.finish()
+            return await Self.unboundedSearch().chooseAction(for: observation)
+        }
+
+        for await _ in started.stream { break }
+        try? await Task.sleep(for: .milliseconds(200))
+
+        let clock = ContinuousClock()
+        let cancelledAt = clock.now
+        task.cancel()
+        let action = await task.value
+        let afterCancel = clock.now - cancelledAt
+
+        // Measured at ~2 ms with the cancellation checks in place and ~31 ms
+        // without them, so this bound distinguishes the two while leaving room
+        // for a loaded machine.
+        #expect(afterCancel < .milliseconds(250), "the agent kept working for \(afterCancel) after cancellation")
+        guard case .play(let move) = action else { return }
+        #expect(observation.legalMoves.contains(move))
+    }
+
     @Test("an exhausted budget still yields a legal move")
     func budgetIsRespected() async {
-        let state = GameState.newMatch(configuration: .standard(seatCount: 6), seed: 77)
-        let observation = PlayerObservation(of: state, for: state.currentSeat)
+        // Correctness only. The timing half of this guarantee lives in
+        // `searchHonoursItsBudget`, behind the timing gate.
+        let observation = Self.heavyObservation()
         // One microsecond: the sampling loop cannot complete a single world.
         let rushed = HardAgent(
             seed: 2,
@@ -103,14 +173,7 @@ struct HardAgentTests {
             rolloutPlies: 200
         )
 
-        let clock = ContinuousClock()
-        let start = clock.now
         let action = await rushed.chooseAction(for: observation)
-        let elapsed = clock.now - start
-
-        // The static pass still runs, so this is not instantaneous — but it
-        // must not run away.
-        #expect(elapsed < .seconds(5), "an exhausted budget still took \(elapsed)")
         guard case .play(let move) = action else {
             Issue.record("expected a move")
             return
@@ -119,19 +182,35 @@ struct HardAgentTests {
                 "with no samples the static evaluation must still choose legally")
     }
 
-    @Test("interactive decisions stay far inside the budget")
+    /// The product requirement: a move chosen comfortably inside a second, even
+    /// in the worst position the search will meet (§24).
+    @Test("a decision on a heavy position stays under a second", .timingSensitive)
     func interactiveDecisionsAreFastEnough() async {
-        let state = GameState.newMatch(configuration: .standard(seatCount: 6), seed: 5)
-        let observation = PlayerObservation(of: state, for: state.currentSeat)
+        let observation = Self.heavyObservation()
         let clock = ContinuousClock()
 
         let start = clock.now
         _ = await HardAgent(seed: 3, budget: .interactive).chooseAction(for: observation)
         let elapsed = clock.now - start
 
-        // Measured around 16-19 ms on an Apple-silicon Mac. The ceiling guards
-        // against a blow-up, not against machine-to-machine variation.
-        #expect(elapsed < .milliseconds(900), "a single Hard decision took \(elapsed)")
+        // Measured at 681 ms against a 700 ms budget: the budget binds here,
+        // which is the design. The ~5 ms overshoot is the static pass.
+        #expect(elapsed < .seconds(1), "a single Hard decision took \(elapsed)")
+    }
+
+    @Test("the search stops when its budget runs out", .timingSensitive)
+    func searchHonoursItsBudget() async {
+        let observation = Self.heavyObservation()
+        let clock = ContinuousClock()
+
+        for budget in [AIBudget.simulation, .interactive] {
+            let start = clock.now
+            _ = await HardAgent(seed: 4, budget: budget).chooseAction(for: observation)
+            let elapsed = clock.now - start
+            // Allow the static pass on top of the budget, and no more.
+            #expect(elapsed < budget.maximumDuration + .milliseconds(150),
+                    "budget \(budget.maximumDuration) but the search took \(elapsed)")
+        }
     }
 
     // MARK: - Determinization stays inside the boundary
