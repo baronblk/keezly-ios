@@ -183,8 +183,18 @@ platform :ios do
     device_ipad
   end
 
+  desc "Static checks: SwiftLint and SwiftFormat"
+  lane :lint do
+    Dir.chdir(REPO_ROOT) do
+      sh("swiftlint lint --strict --quiet --config .swiftlint.yml")
+      sh("swiftformat --lint .")
+    end
+    UI.success("static checks passed")
+  end
+
   desc "The whole local quality gate"
   lane :qa do
+    lint
     run_core_tests
     build_app(
       project: PROJECT, scheme: SCHEME,
@@ -228,6 +238,13 @@ platform :ios do
     # App icon must be a real icon, not an empty slot.
     icon_dir = File.join(REPO_ROOT, "App/Keezly/Assets.xcassets/AppIcon.appiconset")
     results["App icon present"] = !Dir.glob(File.join(icon_dir, "*.png")).empty?
+
+    # Static checks. --strict turns SwiftLint warnings into failures, which is
+    # the right bar for a release candidate even though it is not for a work
+    # in progress.
+    results["Static checks"] = system(
+      "cd #{REPO_ROOT} && swiftlint lint --strict --quiet --config .swiftlint.yml && swiftformat --lint ."
+    )
 
     # Simulator gate.
     begin
