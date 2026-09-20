@@ -59,4 +59,21 @@ final class DesignReviewScreenshots: XCTestCase {
     func testFourPlayerPortrait() {
         capture(name: "four-players-portrait", seats: 4, seed: 2026, orientation: .portrait)
     }
+
+    // MARK: - Phone
+
+    @MainActor
+    func testPhonePortrait() {
+        capture(name: "phone-four-players-portrait", seats: 4, seed: 2026, orientation: .portrait)
+    }
+
+    @MainActor
+    func testPhoneLandscape() {
+        capture(name: "phone-four-players-landscape", seats: 4, seed: 2026, orientation: .landscapeLeft)
+    }
+
+    @MainActor
+    func testPhoneSixPlayers() {
+        capture(name: "phone-six-players-portrait", seats: 6, seed: 77, orientation: .portrait)
+    }
 }

@@ -622,6 +622,52 @@
           }
         }
       }
+    },
+    "seat.dealer.short": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "G"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D"
+          }
+        }
+      }
+    },
+    "seat.status %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld cards, %lld pawns home"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Karten, %lld Figuren im Ziel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld kaarten, %lld pionnen thuis"
+          }
+        }
+      }
     }
   }
 }
