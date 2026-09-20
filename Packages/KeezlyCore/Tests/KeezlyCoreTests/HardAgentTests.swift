@@ -29,15 +29,41 @@ struct HardAgentTests {
         }
     }
 
-    @Test("the same position always yields the same move")
+    /// Hard is reproducible **when its budget does not bind**.
+    ///
+    /// This is a real limit, not a test artefact. The search is time-boxed, so
+    /// on a position heavy enough to exhaust the budget the number of completed
+    /// samples depends on how busy the machine is — and a different sample
+    /// count is a different average. The seeded generator makes the *sampling*
+    /// reproducible; the clock does not.
+    ///
+    /// The budget here is deliberately far larger than the work, so the search
+    /// always runs to completion and the guarantee is exact.
+    @Test("the same position always yields the same move when the search completes")
     func decisionsAreReproducible() async {
         let state = GameState.newMatch(configuration: .standard(seatCount: 4), seed: 2_718)
         let observation = PlayerObservation(of: state, for: state.currentSeat)
-        let agent = Self.agent(seed: 11)
+        let agent = HardAgent(seed: 11, budget: AIBudget(maximumDuration: .seconds(120)))
 
         var chosen: [String] = []
         for _ in 0..<4 { chosen.append(String(describing: await agent.chooseAction(for: observation))) }
         #expect(Set(chosen).count == 1, "sampling must be driven by the seeded generator, not by wall-clock timing")
+    }
+
+    /// The other half of the same fact, stated explicitly so nobody later
+    /// "fixes" the reproducibility test by widening a tolerance: with a budget
+    /// that cuts the search short, identical inputs may legitimately produce
+    /// different moves.
+    @Test("a budget-limited search may legitimately vary", .timingSensitive)
+    func budgetLimitedSearchNeedNotBeReproducible() async {
+        let observation = Self.heavyObservation()
+        let agent = HardAgent(seed: 11, budget: AIBudget(maximumDuration: .milliseconds(12)))
+
+        var chosen: Set<String> = []
+        for _ in 0..<12 { chosen.insert(String(describing: await agent.chooseAction(for: observation))) }
+        // Not an assertion that it *must* vary — only that varying is allowed
+        // and does not indicate a broken generator.
+        #expect(!chosen.isEmpty)
     }
 
     @Test("it takes an obvious capture")
