@@ -167,8 +167,9 @@ An earlier check the same day found no physical devices at all; the iPhone was
 connected afterwards. Device availability is therefore re-checked before every
 device run rather than trusted from this file (§157).
 
-**Resolved.** Team `KZFCCDV6A8` was chosen by the account owner, device
-registration was authorised, and the device build and test run both succeeded:
+**Resolved.** The account owner chose the signing team (the one holding the
+Apple Distribution certificates), authorised device registration, and both the
+device build and the device test run succeeded:
 
 - `xcodebuild build` for the physical iPhone — **Build Succeeded**, no warnings
 - `bundle exec fastlane device_iphone` — **11 tests, 0 failures**, 261 s
