@@ -90,7 +90,7 @@ Two properties fall out of this and are non-negotiable:
 | `Moves/` | `Move`, `CardAction`, `SplitStep`, `PlayerAction`, `MoveError` | |
 | `Engine/` | `MoveResolver`, `MoveGenerator`, `GameReducer` | |
 | `Events/` | `GameEvent`, `GameTransition` | The animation contract |
-| `Serialization/` | *(empty — M2.9)* | Versioned envelope goes here |
+| `Serialization/` | `GameStateEnvelope`, `GameStateCoding`, `Checksum` | Versioned, checksummed persistence |
 
 ### The board is a graph, not a picture
 
@@ -122,13 +122,30 @@ enumerate; `GameReducer` calls it to apply. Neither re-implements a rule
 - The RNG state travels inside `GameState`, so a snapshot fully determines the
   future of the match.
 
-### Persistence and versioning (planned, M2.9)
+### Persistence and versioning
 
-`GameState` currently round-trips through `Codable`, but carries **no version
-field**. Before any match is saved or sent over Game Center, it must be wrapped
-in an envelope holding `schemaVersion`, `engineVersion`, `rulesVersion` and a
-checksum, with a decoder that fails loudly and typed on an unknown newer
-schema rather than silently mis-decoding.
+Everything written to disk or sent over Game Center is wrapped in a
+`GameStateEnvelope` carrying `schemaVersion`, `engineVersion`, `rulesVersion`
+and an FNV-1a checksum over the state's canonical encoding.
+
+Three version numbers, deliberately independent: a pure refactor bumps nothing,
+a change to the stored shape bumps the schema, and a change that alters which
+moves are legal bumps the rules version — because an old client replaying a new
+match would otherwise compute a different board.
+
+Decoding refuses rather than guesses. A newer schema, a checksum mismatch, an
+oversized payload and unreadable data each produce a distinct
+`SerializationError` the UI can turn into a sentence a player understands.
+
+**The encoding is byte-stable.** Encoding the same state twice, in two
+processes, on two devices, produces identical data — which is what makes the
+checksum meaningful and lets two Game Center clients agree they hold the same
+board. This required a hand-written `Codable` for `GameState`: Swift's `Set`
+iteration order is salted per process, so a synthesised encoding would differ
+between runs.
+
+Measured: a played-out six-player state encodes to 4527 bytes, roughly 7 % of
+Game Center's 64 KiB turn-based budget.
 
 ---
 

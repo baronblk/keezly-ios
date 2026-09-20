@@ -202,3 +202,67 @@ fastlane is better at repeatable local QA and the screenshot matrix.
 
 **Consequences.** A developer can still build, test, screenshot and QA entirely
 locally without Xcode Cloud — that is a requirement, not a side effect.
+
+---
+
+## DEC-009 — `GameState` has a hand-written, byte-stable `Codable`
+
+- **Date:** 2026-09-20
+- **Topic:** Serialisation determinism
+- **Status:** ACCEPTED
+
+**Context.** Saved matches and Game Center payloads are checksummed so a
+damaged or mismatched state is caught rather than silently used. A checksum is
+only meaningful if encoding the same state always produces the same bytes.
+
+Swift's synthesised `Codable` does not give that here: `GameState` holds
+`Set<Seat>` for folded and resigned seats, and `Set` iteration order is salted
+per process. Two launches of the same build would have produced different bytes
+and therefore different checksums for an identical board.
+
+**Decision.** `GameState` implements `encode(to:)` and `init(from:)` by hand,
+writing both seat sets as sorted arrays. The shared encoder uses `.sortedKeys`.
+`GameStateCoding` is the single entry point, so nothing can accidentally encode
+with a differently configured encoder.
+
+**Reasoning.** It makes "the same state ⇒ the same bytes" a property we test
+directly, which in turn makes the checksum, online state comparison and replay
+verification trustworthy.
+
+**Alternatives rejected.** Storing the sets as sorted arrays in the type itself
+(loses set semantics at every use site, and the ordering guarantee would then
+depend on every mutation site being careful); checksumming a normalised
+projection instead of the real encoding (two representations to keep in sync).
+
+**Consequences.** Any new stored property on `GameState` must be added to the
+hand-written coder, and anything order-dependent must be sorted there.
+`SerializationTests.setsEncodeDeterministically` fails loudly if this is missed.
+
+---
+
+## DEC-010 — Three independent version numbers, and decoding refuses rather than guesses
+
+- **Date:** 2026-09-20
+- **Topic:** Save/transport compatibility
+- **Status:** ACCEPTED
+
+**Decision.** `GameStateEnvelope` carries `schemaVersion` (stored shape),
+`engineVersion` (informational, for diagnostics) and `rulesVersion` (semantics
+that affect which moves are legal). Decoding a payload whose `schemaVersion` is
+newer than this build understands throws
+`SerializationError.unsupportedSchemaVersion` instead of decoding on a
+best-effort basis.
+
+**Reasoning.** Partially understanding a newer match is how a board silently
+ends up wrong — the single worst failure mode for a turn-based game synced
+across devices. A refusal is recoverable and explainable to the player; a
+quietly mis-read board is not.
+
+The three numbers are separate because they change for different reasons: a
+pure refactor bumps none, a stored-shape change bumps the schema, and a rule
+change bumps the rules version because an old client replaying a new match
+would compute a different board even from correctly decoded data.
+
+**Consequences.** Every error case needs a player-readable message; the UI must
+handle "this match was saved by a newer version of Keezly" without losing the
+user's other matches.

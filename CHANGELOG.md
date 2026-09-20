@@ -34,9 +34,17 @@ Versioning.
   entry, home ordering, friendly capture, and own-pawn blocking.
 - **Determinism**: all randomness runs through a serialisable SplitMix64
   generator whose state lives inside the game state, so any match is reproducible.
-- **Test suite**: 57 tests covering the board for every seat count, one test per
-  card rank, game flow, and randomised self-play that plays 221 complete matches
-  while asserting state invariants after every single action.
+- **Versioned save format**: matches are wrapped in a `GameStateEnvelope`
+  carrying a schema version, engine version, rules version and checksum. A match
+  saved by a newer version of Keezly, a damaged save, or one too large for its
+  transport is reported clearly instead of being partly restored.
+- **Byte-stable encoding** so two devices can prove they hold the same board.
+- **Device testing tooling**: `scripts/devices.sh` finds the physical iPhones
+  and iPads paired with the development Mac and maps them onto stable roles,
+  without ever storing a device name or identifier in the repository.
+- **Test suite**: 68 tests covering the board for every seat count, one test per
+  card rank, game flow, serialisation, and randomised self-play that plays 221
+  complete matches while asserting state invariants after every single action.
 - **Project memory**: `PROJECT_HANDOUT.md`, `CURRENT_STATE.md`, `ROADMAP.md`,
   `DECISIONS.md`, `ARCHITECTURE.md`, `RULES.md`, `RULE_VARIANTS.md`,
   `KNOWN_ISSUES.md` and this changelog.

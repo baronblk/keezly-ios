@@ -95,7 +95,7 @@ rule and complete seven-split enumeration.
 | M2.6 Home entry — exact count, no jumping, strict ordering option | DONE |
 | M2.7 Team continuation — playing a finished partner's pawns | DONE |
 | M2.8 No-legal-move handling — forced move and hand fold | DONE |
-| M2.9 Versioned state serialisation (`schemaVersion`, `engineVersion`) | NOT STARTED |
+| M2.9 Versioned state serialisation (`schemaVersion`, `engineVersion`) | DONE |
 | M2.10 Move log / replay record separate from `GameState` | NOT STARTED |
 
 **Acceptance criteria.**
@@ -105,10 +105,13 @@ rule and complete seven-split enumeration.
 - Randomised self-play finishes without corrupting state for every seat count
   and every rule variant. — met (221 matches)
 - A saved match survives an engine refactor, or fails loudly with a typed
-  version error. — **not met**, M2.9 outstanding.
+  version error. — met
+- A six-player state fits comfortably within Game Center's payload limit. —
+  met (4527 bytes measured)
 
 **Test requirements.** One test per card rank (done); property/fuzz self-play
-(done); a pinned-encoding serialisation test (outstanding).
+(done); serialisation round trip, byte stability, version refusal, checksum
+integrity and size limits (done). Remaining: a replay move log (M2.10).
 
 ---
 

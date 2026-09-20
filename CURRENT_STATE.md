@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-64931ef  test(core): cover board, card rules, game flow and state invariants
+1bb9109  test(core): cover serialization round trip, versioning and size limits
 ```
 
 Everything below was verified against that commit on **2026-09-20** with
@@ -20,7 +20,7 @@ Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 
 **M0 — Repository & Foundation**: IN PROGRESS
 **M1 — GameCore / Rules**: DONE
-**M2 — Complete Move Engine**: IN PROGRESS
+**M2 — Complete Move Engine**: IN PROGRESS (only M2.10, the replay move log, is left)
 
 M1 was completed ahead of the remaining M0 tooling work, because the rules
 engine is testable with `swift test` alone and does not need the Xcode project.
@@ -61,6 +61,14 @@ engine is testable with `swift test` alone and does not need the Xcode project.
   free-for-all, resignation policy (team forfeits / FFA player removed).
 - **Generator/reducer parity**: the reducer accepts exactly what the generator
   offers; both go through one `MoveResolver`.
+- **Versioned serialisation**: `GameStateEnvelope` carries `schemaVersion`,
+  `engineVersion`, `rulesVersion` and an FNV-1a checksum. A payload from a newer
+  schema, a damaged payload, or one over a transport limit is refused with a
+  typed `SerializationError` — never partially restored. A played-out six-player
+  state encodes to **4527 bytes**, about 7 % of Game Center's 64 KiB budget.
+- **Byte-stable encoding**: `GameState` has a hand-written `Codable` that sorts
+  its seat sets, because Swift's `Set` iteration order is salted per process and
+  would otherwise make every checksum comparison unreliable.
 
 ---
 
@@ -73,8 +81,6 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 ## Not Implemented Yet
 
 - Xcode project, app target, shared schemes — the app does not build at all.
-- Versioned state serialisation (`schemaVersion` / `engineVersion` envelope).
-  `GameState` is `Codable` and round-trips, but has **no version field yet**.
 - AI of any strength; `PlayerObservation` boundary does not exist.
 - All UI, all localisation, all audio/haptics, app icon.
 - Game Center, persistence/autosave, statistics, replay, tutorial, rulebook.
@@ -92,7 +98,8 @@ Run with `cd Packages/KeezlyCore && swift test`.
 | Card rules | 26 | passed |
 | Game flow | 16 | passed |
 | Invariants | 6 | passed |
-| **Total** | **57** | **57 passed, 0 failed** — 6.8 s |
+| Serialization | 11 | passed |
+| **Total** | **68** | **68 passed, 0 failed** — 6.8 s |
 
 Several tests are parameterised over seat counts 2–6 or over card ranks, so the
 number of executed cases is higher than the number of test functions.
@@ -220,19 +227,12 @@ See `DECISIONS.md` for the reasoning. In short:
 
 ## Next Steps (concrete)
 
-1. **M2.9 — versioned state serialisation.** Add
-   `Serialization/GameStateEnvelope.swift` holding `schemaVersion`,
-   `engineVersion`, `rulesVersion`, the encoded `GameState` and a checksum, plus
-   a decode path that rejects an unknown newer `schemaVersion` with a typed
-   error instead of throwing a raw `DecodingError`. Cover it with a test that
-   pins the encoding of a fixed seed so future refactors cannot silently break
-   saved matches.
-2. **M0.2 — Xcode project.** Write `project.yml` for an app target `Keezly`
+1. **M0.2 — Xcode project.** Write `project.yml` for an app target `Keezly`
    (iPhone + iPad, iOS 17 deployment target, `MARKETING_VERSION = 1.0.0`)
    depending on the local `KeezlyCore` package, generate with `xcodegen`, mark
    the scheme shared, and commit the generated `.xcodeproj`.
-3. **M0.3 — fastlane skeleton.** Decide the Ruby toolchain first (see Risks),
+2. **M0.3 — fastlane skeleton.** Decide the Ruby toolchain first (see Risks),
    then `Gemfile` + `fastlane/Fastfile` with the `tests` lane wrapping
    `swift test`, so there is a single reproducible command before any UI exists.
-4. **M3.1 — `PlayerObservation`.** Define the AI's information boundary before
+3. **M3.1 — `PlayerObservation`.** Define the AI's information boundary before
    writing any AI, so no agent can ever read another seat's hand.

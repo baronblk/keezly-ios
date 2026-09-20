@@ -72,8 +72,24 @@ Before every upload: `encodedData.count <= match.matchDataMaximumSize`. If the
 full history would not fit, the envelope carries the current state plus a
 compact move log, and long-term history is kept locally instead.
 
-This depends on M2.9 (versioned serialisation), which does not exist yet —
-`GameState` is `Codable` today but carries no version field.
+### What already exists
+
+M2.9 is **done**. `GameStateEnvelope` in `KeezlyCore` already provides the
+`schemaVersion` / `engineVersion` / `rulesVersion` / `stateChecksum` /
+`publicGameState` part of the design above, refuses a newer schema and a
+checksum mismatch with typed errors, and enforces a byte limit:
+
+```swift
+let data = try GameStateEnvelope.encode(state, maximumBytes: match.matchDataMaximumSize)
+```
+
+Measured payload size: a played-out **six-player** state encodes to **4527
+bytes** — roughly 7 % of Game Center's 64 KiB turn-based budget. There is ample
+headroom for `turnRevision`, `participantMapping` and a compact move log, so the
+"fall back to state + move log" contingency is unlikely to be needed.
+
+Still outstanding for M6.4: `turnRevision`, `participantMapping`, `moveLog`
+(which needs M2.10) and the GameKit adapter itself.
 
 ---
 
