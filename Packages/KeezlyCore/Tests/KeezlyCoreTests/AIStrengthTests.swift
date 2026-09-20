@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §25 — every claim about relative agent strength is backed by a simulation
 /// that actually ran. No assertion here demands that a stronger agent wins

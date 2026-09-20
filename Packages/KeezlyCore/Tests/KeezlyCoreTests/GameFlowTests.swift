@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §12, §13, §30 — dealing, the forced-move rule, and how matches end.
 @Suite("Game flow")
@@ -191,8 +191,14 @@ struct GameFlowTests {
                 pawns[Fixture.pawn(seat, slot)] = .home(seat: Seat(seat), slot: slot)
             }
         }
-        var state = Fixture.state(seatCount: 4, teamMode: .teamsOfTwo, pawns: pawns, hands: [1: [.ace]], currentSeat: 1)
-        state.setResult(GameReducer.evaluateVictory(in: state)!)
+        var state = Fixture.state(
+            seatCount: 4, teamMode: .teamsOfTwo, pawns: pawns, hands: [1: [.ace]], currentSeat: 1
+        )
+        guard let decided = GameReducer.evaluateVictory(in: state) else {
+            Issue.record("the fixture should already be a win for team 0")
+            return
+        }
+        state.setResult(decided)
 
         #expect(throws: MoveError.matchAlreadyFinished) {
             try GameReducer.apply(.foldHand(seat: Seat(1)), to: state)
@@ -205,7 +211,11 @@ struct GameFlowTests {
     @Test("playing out of turn is rejected")
     func outOfTurnIsRejected() {
         let state = Fixture.state(seatCount: 4, hands: [0: [.ace], 1: [.ace]], currentSeat: 0)
-        let move = Move(seat: Seat(1), card: Fixture.card(.ace, seat: 1), action: .enterFromWaiting(pawn: Fixture.pawn(1, 0)))
+        let move = Move(
+            seat: Seat(1),
+            card: Fixture.card(.ace, seat: 1),
+            action: .enterFromWaiting(pawn: Fixture.pawn(1, 0))
+        )
         #expect(throws: MoveError.self) {
             try GameReducer.apply(.play(move), to: state)
         }

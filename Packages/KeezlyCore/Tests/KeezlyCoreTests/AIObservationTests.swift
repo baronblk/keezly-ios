@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §21 — the computer opponents must be structurally unable to cheat.
 ///
@@ -149,7 +149,11 @@ struct AIObservationTests {
             for: Seat(0)
         )
         let b = PlayerObservation(
-            of: state(opponentHands: [[.jack], [.king], [.two]], deck: Deck.standard(seatCount: 4).cards.reversed(), seed: 987),
+            of: state(
+                opponentHands: [[.jack], [.king], [.two]],
+                deck: Deck.standard(seatCount: 4).cards.reversed(),
+                seed: 987
+            ),
             for: Seat(0)
         )
 

@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §11, §64 — one focused test per card, plus the blocking and capture rules
 /// they interact with. Board references assume the four-seat board:

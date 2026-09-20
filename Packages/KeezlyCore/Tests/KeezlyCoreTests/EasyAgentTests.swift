@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §22 — Easy must be weak but not broken, and reproducible from a seed.
 @Suite("Easy agent")

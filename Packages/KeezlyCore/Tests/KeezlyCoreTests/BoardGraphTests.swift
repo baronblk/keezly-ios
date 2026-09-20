@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §9 — the parametric board must be fair and closed for every table size.
 @Suite("BoardGraph")

@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §20, §28, §29 — a saved or transmitted match must survive a refactor, or
 /// fail loudly. It must never be read back *almost* correctly.

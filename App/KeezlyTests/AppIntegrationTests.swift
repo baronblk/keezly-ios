@@ -1,7 +1,7 @@
 import Foundation
-import Testing
 @testable import Keezly
 import KeezlyCore
+import Testing
 
 /// App-level integration: proves the rules engine is actually linked into the
 /// app and behaves identically inside the iOS runtime, not only under

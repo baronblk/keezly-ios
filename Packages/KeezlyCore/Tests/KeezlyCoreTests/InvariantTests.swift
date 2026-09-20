@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §65 — deterministic randomised self-play. These do not check that a
 /// particular rule is right; they check that the engine can never get into a
@@ -43,7 +43,8 @@ struct InvariantTests {
 
         // A finished match offers nothing further.
         if state.isFinished {
-            #expect(MoveGenerator.legalMoves(in: state, for: state.currentSeat).isEmpty, "\(context): finished match still has moves")
+            #expect(MoveGenerator.legalMoves(in: state, for: state.currentSeat).isEmpty,
+                    "\(context): finished match still has moves")
         }
     }
 

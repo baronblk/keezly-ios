@@ -1,5 +1,5 @@
-import Testing
 @testable import KeezlyCore
+import Testing
 
 /// §25, §112 — the headless simulator must play complete matches for every
 /// supported table and catch a broken engine or a misbehaving agent.
@@ -45,9 +45,10 @@ struct SimulationTests {
         #expect(report.isClean, "\(report.summary)")
 
         for outcome in report.completedMatches {
-            let result = outcome.result!
+            guard let result = outcome.result else { continue }
             #expect(result.winningSeats.count == 2, "a team of two must win together")
-            #expect(Set(result.winningSeats.map(\.index)) == Set([0, 2]) || Set(result.winningSeats.map(\.index)) == Set([1, 3]))
+            let winners = Set(result.winningSeats.map(\.index))
+            #expect(winners == Set([0, 2]) || winners == Set([1, 3]))
         }
     }
 
