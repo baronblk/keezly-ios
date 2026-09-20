@@ -28,6 +28,31 @@ struct AIStrengthTests {
 
     // MARK: - Fast assertions
 
+    @Test("Hard clearly outplays Easy")
+    func hardBeatsEasy() async {
+        let (rate, report) = await Self.teamDuel(
+            { HardAgent(seed: UInt64(150 + $0), budget: .simulation) },
+            { EasyAgent(seed: UInt64(250 + $0)) },
+            count: 24, firstSeed: 11_000
+        )
+        #expect(report.isClean, "\(report.summary)")
+        // Measured at 0.975 over 40 matches.
+        #expect(rate > 0.70, "Hard won only \(rate) of \(report.completedMatches.count) matches")
+    }
+
+    @Test("Hard measurably outplays Medium")
+    func hardBeatsMedium() async {
+        let (rate, report) = await Self.teamDuel(
+            { HardAgent(seed: UInt64(160 + $0), budget: .simulation) },
+            { MediumAgent(seed: UInt64(260 + $0)) },
+            count: 24, firstSeed: 12_000
+        )
+        #expect(report.isClean, "\(report.summary)")
+        // Measured at 0.675 over 40 matches and 0.633 over 30. The bar allows
+        // for the wide variance of a 24-match sample.
+        #expect(rate > 0.50, "Hard won only \(rate) of \(report.completedMatches.count) matches")
+    }
+
     @Test("Medium clearly outplays Easy")
     func mediumBeatsEasy() async {
         let (rate, report) = await Self.teamDuel(
