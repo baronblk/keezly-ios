@@ -242,7 +242,11 @@ structurally favoured.**
 
 ### Speed
 
-Per applied action, on an Apple-silicon development Mac:
+On an Apple-silicon development Mac. Two numbers matter for Hard and they are
+very different, so both are given.
+
+**Average per action across a simulated match**, with the 50 ms simulation
+budget the strength runs use:
 
 | Agent | Time per action |
 |---|---|
@@ -250,9 +254,39 @@ Per applied action, on an Apple-silicon development Mac:
 | Medium | ~0.3 ms |
 | Hard | ~16–19 ms |
 
-Hard finishes far inside its 700 ms interactive budget, so the budget is not
-currently the binding constraint. **Not yet measured on device** — that is
-tracked in `ROADMAP.md`.
+The average is low because most positions are sparse: with only one legal move
+Hard returns before sampling at all, and with a handful it finishes long before
+the budget.
+
+**Worst case on a deliberately heavy position** — six seats, four of the acting
+seat's pawns on the track, a Seven in hand, 108 legal moves:
+
+| Budget | Time taken |
+|---|---:|
+| `.simulation` (50 ms) | 55 ms |
+| `.interactive` (700 ms) | **681 ms** |
+
+Here the budget *is* the binding constraint, which is the design: Hard spends
+what it is given and stops. The ~5 ms overshoot is the static evaluation pass,
+which runs before sampling begins. The product requirement — comfortably under
+one second — is met at the worst case, not merely on average.
+
+**Not yet measured on device.** Tracked in `ROADMAP.md`.
+
+### Cancellation
+
+Measured on the same heavy position, time the agent keeps working after its
+task is cancelled:
+
+| | After cancel |
+|---|---:|
+| with the cancellation checks | ~2 ms |
+| without them | ~31 ms |
+
+Both are acceptable for a UI, but the checks are cheap and the difference is
+real, so they stay. The checks sit in three places: the static evaluation loop,
+the sampling loop, and inside the rollout playout — the last being the longest
+stretch of uninterrupted work an agent does.
 
 ### Search-size tuning — inconclusive
 

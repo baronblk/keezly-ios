@@ -16,32 +16,56 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ## Closed
 
-### ISS-005 — A cancelled Hard search kept running to the end of its rollout
+### ISS-005 — Cancellation latency in the Hard agent
 
-- **Status:** VERIFIED
-- **Severity:** Major (responsiveness)
+- **Status:** VERIFIED (and the original diagnosis was **wrong** — see below)
+- **Severity:** Minor
 - **Component:** `KeezlyCore` / AI
-- **Description:** `HardAgent` checked `Task.isCancelled` between candidates and
-  between samples, but `RolloutPolicy.playOut` — the longest uninterrupted
-  stretch of work an agent does — checked nothing. A cancelled search therefore
-  finished whatever playout was in flight before noticing.
-- **Reproduction:** `HardAgentTests.cancellationIsHonoured` with a deliberately
-  oversized search (64 candidates, 100 000 samples, 200 plies): cancelling
-  immediately still took **5.2 seconds** to return.
-- **Expected:** a cancelled search returns promptly with a legal move (§62).
-- **Actual:** it returned only after the current rollout completed.
-- **Fix:** check `Task.isCancelled` inside the playout loop, and stop sampling
-  after a rollout that was cut short rather than averaging in a truncated
-  result.
-- **Effect:** the Hard agent suite went from 7.4 s to 1.4 s.
-- **Related files:** `Sources/KeezlyCore/AI/RolloutPolicy.swift`,
-  `Sources/KeezlyCore/AI/HardAgent.swift`
-- **Related tests:** `HardAgentTests.cancellationIsHonoured`,
-  `HardAgentTests.budgetIsRespected`
-- **Note:** the test passed on an earlier run and failed on a later one — the
-  timing depended on how much of the task ran before `cancel()` landed. A
-  responsiveness guarantee asserted with a generous bound is worth having
-  precisely because it catches this kind of thing eventually.
+
+**What was observed.** `HardAgentTests.cancellationIsHonoured` failed
+intermittently, reporting that a cancelled search took 5.2 seconds to return.
+It passed when run alone and failed in the full suite.
+
+**The first diagnosis was wrong.** It was attributed to `RolloutPolicy.playOut`
+not checking `Task.isCancelled`, and checks were added. The failure persisted.
+
+**The actual cause of the failure** was the measurement, not the agent. The
+test timed the task from *outside*, so the five seconds were the global
+executor queueing the task under a parallel test run — not the agent working.
+Two things made this hard to see:
+
+1. The test positions were fresh deals, where the acting seat often has one or
+   two legal moves. `HardAgent` short-circuits on `candidates.count > 1` and
+   returns before sampling at all, so the search under test never actually ran.
+2. Removing *every* cancellation check left the measurement unchanged, which is
+   what finally showed the test was not exercising what it claimed.
+
+**What was real.** On a position that genuinely loads the search — six seats,
+four pawns out, a Seven in hand, 108 legal moves — the cancellation checks do
+matter, though less dramatically than first thought:
+
+| | Time spent working after cancel |
+|---|---:|
+| with the checks | ~2 ms |
+| without them | ~31 ms |
+
+**Resolution.**
+- The cancellation checks stay: cheap, and a measured ~16× improvement.
+- The tests were rebuilt on the heavy position, timed *inside* the task, with
+  `heavyPositionIsActuallyHeavy` guarding that the position stays expensive so
+  the guarantee cannot quietly stop being tested.
+- `AI.md` now separates average-case from worst-case timing, because quoting
+  the ~16 ms average alone was misleading: on a heavy position Hard uses its
+  full 700 ms budget.
+
+**Lesson recorded here on purpose:** a green performance test on a position the
+code short-circuits out of proves nothing. The mutation check — remove the
+mechanism, see whether the test notices — is what caught it.
+
+**Related files:** `Sources/KeezlyCore/AI/RolloutPolicy.swift`,
+`Sources/KeezlyCore/AI/HardAgent.swift`, `Sources/KeezlyCore/AI/MovePreview.swift`
+**Related tests:** `HardAgentTests.cancellationMidSearchIsHonoured`,
+`.cancellationBeforeStartIsHonoured`, `.heavyPositionIsActuallyHeavy`
 
 ### ISS-004 — Apple Developer team ids were committed to documentation
 
