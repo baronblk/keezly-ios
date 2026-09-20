@@ -81,7 +81,8 @@ public struct SimulationReport: Sendable {
         if !isClean {
             lines.append("failing seeds: \(failingSeeds.map(String.init).joined(separator: ", "))")
             for outcome in failures.prefix(3) {
-                lines.append("  seed \(outcome.seed): \(outcome.failure!)")
+                guard let failure = outcome.failure else { continue }
+                lines.append("  seed \(outcome.seed): \(failure)")
             }
         }
         return lines.joined(separator: "\n")

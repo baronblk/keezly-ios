@@ -93,7 +93,8 @@ public enum GameReducer {
             // of the second depends on the board the first leaves behind (§17).
             return steps.flatMap { step -> [GameEvent] in
                 let candidates = MoveResolver.resolveAdvance(pawn: step.pawn, steps: step.steps, in: state)
-                guard let resolution = candidates.first(where: { matches(step.route, $0, in: state) }) else { return [] }
+                guard let resolution = candidates.first(where: { matches(step.route, $0, in: state) })
+                else { return [] }
                 return MoveResolver.apply(resolution, to: &state)
             }
         }
@@ -216,7 +217,8 @@ public enum GameReducer {
         // Two deal rounds without anyone being able to act would mean the rule
         // engine is broken; the bound stops that from becoming a hang (§62).
         for _ in 0..<3 {
-            if seatTheTurnPassesTo(in: &state, events: &events, from: state.configuration.nextSeat(after: state.currentSeat)) {
+            let next = state.configuration.nextSeat(after: state.currentSeat)
+            if seatTheTurnPassesTo(in: &state, events: &events, from: next) {
                 return
             }
             startNextDealRound(in: &state, events: &events)

@@ -38,7 +38,7 @@ public struct MediumAgent: AIAgent, Sendable {
                 let unit = Double(generator.next() % 2_000_001) / 1_000_000 - 1.0
                 score += unit * weights.jitter
             }
-            if best == nil || score > best!.score {
+            if score > (best?.score ?? -.infinity) {
                 best = (candidate.move, score)
             }
         }

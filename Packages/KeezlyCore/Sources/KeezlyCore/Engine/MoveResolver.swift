@@ -248,7 +248,11 @@ public enum MoveResolver {
 
     /// Applies a Jack swap. Swaps are not captures: both pawns stay in play.
     @discardableResult
-    static func applySwap(_ resolution: StepResolution, other otherID: PawnID, to state: inout GameState) -> [GameEvent] {
+    static func applySwap(
+        _ resolution: StepResolution,
+        other otherID: PawnID,
+        to state: inout GameState
+    ) -> [GameEvent] {
         let otherOrigin = state.pawn(otherID).position
         state.setPosition(resolution.destination, for: resolution.pawn)
         state.setPosition(resolution.origin, for: otherID)
