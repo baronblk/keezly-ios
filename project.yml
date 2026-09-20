@@ -27,8 +27,9 @@ packages:
 
 settings:
   base:
-    MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # MARKETING_VERSION and CURRENT_PROJECT_VERSION deliberately live in
+    # Config/Keezly.xcconfig, not here: a setting declared on the project wins
+    # over any xcconfig, which would defeat the CI build-number override.
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
     # Warnings are signal, not noise: the quality gate requires a build with no

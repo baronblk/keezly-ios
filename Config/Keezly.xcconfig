@@ -6,4 +6,16 @@
 
 // Optional include: builds work without it (simulator), and a developer who
 // needs device signing drops their team id into Local.xcconfig.
+// Versioning lives here rather than in project.yml. Build settings declared
+// directly on the project override any xcconfig, so a CURRENT_PROJECT_VERSION
+// in the manifest would silently beat the value ci_pre_xcodebuild.sh writes —
+// and the first real cloud build would ship build number 1 forever.
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
+
 #include? "Local.xcconfig"
+
+// Optional include: written by ci_pre_xcodebuild.sh so CFBundleVersion follows
+// the Xcode Cloud build number (§105). Absent locally, where the committed
+// CURRENT_PROJECT_VERSION applies instead.
+#include? "BuildNumber.xcconfig"
