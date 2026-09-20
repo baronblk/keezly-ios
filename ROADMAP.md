@@ -8,9 +8,9 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 
 | Milestone | Title | Status |
 |---|---|---|
-| M0 | Repository & Foundation | IN PROGRESS |
+| M0 | Repository & Foundation | **DONE** |
 | M1 | GameCore / Rules | **DONE** |
-| M2 | Complete Move Engine | IN PROGRESS |
+| M2 | Complete Move Engine | **DONE** |
 | M3 | AI (Easy / Medium / Hard) | **DONE** |
 | M4 | Gameplay UI — iPad / iPhone | NOT STARTED |
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
@@ -24,7 +24,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 
 ---
 
-## M0 — Repository & Foundation — IN PROGRESS
+## M0 — Repository & Foundation — DONE
 
 **Goal.** A repository that any developer or CI system can clone, build and
 test reproducibly, with the project memory in place from day one.
@@ -35,7 +35,7 @@ test reproducibly, with the project memory in place from day one.
 | M0.2 Xcode project via XcodeGen (`project.yml`), shared scheme, committed `.xcodeproj` | DONE |
 | M0.3 Bundler + fastlane skeleton with a `tests` lane | DONE |
 | M0.4 `ci_scripts/` (`ci_post_clone.sh`, `ci_pre_xcodebuild.sh`, `ci_post_xcodebuild.sh`) | DONE |
-| M0.5 SwiftLint / SwiftFormat configuration | NOT STARTED |
+| M0.5 SwiftLint / SwiftFormat configuration | DONE — see DEC-016 |
 | M0.6 Project memory documents | DONE |
 | M0.7 Xcode Cloud compatibility check (no absolute paths, no local-only config) | DONE — see `docs/XCODE_CLOUD_SETUP_CHECKLIST.md` |
 
@@ -80,7 +80,7 @@ MAN-03, the signing team decision.
 
 ---
 
-## M2 — Complete Move Engine — IN PROGRESS
+## M2 — Complete Move Engine — DONE
 
 **Goal.** Every card, every blocking rule, every table size, with the forced-move
 rule and complete seven-split enumeration.
@@ -96,7 +96,7 @@ rule and complete seven-split enumeration.
 | M2.7 Team continuation — playing a finished partner's pawns | DONE |
 | M2.8 No-legal-move handling — forced move and hand fold | DONE |
 | M2.9 Versioned state serialisation (`schemaVersion`, `engineVersion`) | DONE |
-| M2.10 Move log / replay record separate from `GameState` | NOT STARTED |
+| M2.10 Move log / replay record separate from `GameState` | DONE |
 
 **Acceptance criteria.**
 - Generator and reducer agree on legality for every generated move. — met
@@ -111,7 +111,10 @@ rule and complete seven-split enumeration.
 
 **Test requirements.** One test per card rank (done); property/fuzz self-play
 (done); serialisation round trip, byte stability, version refusal, checksum
-integrity and size limits (done). Remaining: a replay move log (M2.10).
+integrity and size limits (done); replay fidelity — a replayed match reproduces
+every state *and every event* (done).
+
+**Verification.** `swift test` — 133 tests, 0 failures, at commit `f2da1ce`.
 
 ---
 
@@ -227,7 +230,7 @@ and mocked tests can proceed without them (§142).
 |---|---|
 | M9.1 Local statistics | NOT STARTED |
 | M9.2 Match history with sensible bounds | NOT STARTED |
-| M9.3 Replay (play/pause/step/speed) built on the event stream | NOT STARTED |
+| M9.3 Replay (play/pause/step/speed) built on the event stream | PARTIAL — the engine side is done (`MatchRecord`); the playback UI waits on M4 |
 | M9.4 Achievements (`docs/GAME_CENTER_ACHIEVEMENTS.md`) | NOT STARTED |
 | M9.5 Leaderboards (`docs/GAME_CENTER_LEADERBOARDS.md`) | NOT STARTED |
 

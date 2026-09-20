@@ -48,6 +48,13 @@ Versioning.
   played and how many cards each opponent holds. There is no route from an
   agent to another player's hand or to the shuffled deck, so a computer
   opponent cannot cheat even by accident.
+- **Computer opponents** at three genuinely different strengths. Easy plays
+  plausibly but improvably; Medium weighs each move by the position it produces
+  and keeps track of which cards have been played; Hard additionally imagines
+  many plausible deals and prefers the move that tends to end well. None of
+  them can see another player's cards.
+- **Replay**: finished matches can be played back exactly, move by move,
+  because the engine is deterministic.
 - **Device testing tooling**: `scripts/devices.sh` finds the physical iPhones
   and iPads paired with the development Mac and maps them onto stable roles,
   without ever storing a device name or identifier in the repository.
