@@ -31,6 +31,14 @@ Full unit and integration tests: rules engine plus app-level tests on a simulato
 
 XCUITests on an iPhone and an iPad simulator
 
+### ios asc_check
+
+```sh
+[bundle exec] fastlane ios asc_check
+```
+
+Verify App Store Connect credentials and whether the app record exists
+
 ### ios device_smoke
 
 ```sh

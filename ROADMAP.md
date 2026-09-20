@@ -248,10 +248,10 @@ and mocked tests can proceed without them (§142).
 | M11.8 Simulator/orientation/localisation UI test matrix | NOT STARTED |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
 | M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
-| M11.11 Physical iPhone quality gate | BLOCKED — signing team undecided (MAN-03); iPhone 17 Pro is connected and ready |
+| M11.11 Physical iPhone quality gate | PARTIAL — build, install, launch, rotation verified on an iPhone 17 Pro; gameplay items wait on M4 |
 | M11.12 Physical iPad quality gate | BLOCKED — no iPad paired (MAN-10) |
 | M11.13 Game Center multi-device verification | BLOCKED — MAN-10/11 + M6 |
-| M11.14 Real-hardware performance and long-run test | BLOCKED — MAN-03/10 |
+| M11.14 Real-hardware performance and long-run test | BLOCKED — needs gameplay (M4) |
 
 **Device testing is part of the strategy, not an optional manual extra** (§156,
 §180). `scripts/devices.sh` addresses devices by role and never persists a name

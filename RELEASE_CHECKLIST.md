@@ -40,16 +40,16 @@ as work lands, not reconstructed at the end.
 ### Physical device gates (§170)
 
 These are mandatory. A release candidate may **not** ship with them `BLOCKED`
-(§178). Current status: **BLOCKED — no physical device is paired with this Mac**
-(MAN-09, MAN-10).
+(§178).
 
-**Physical iPhone**
+**Physical iPhone** — iPhone 17 Pro, iOS 27.0. Install, launch and rotation are
+verified (11/11 tests, 2026-09-20); the gameplay items wait on M4.
 
-- [ ] Install · [ ] Launch · [ ] New game · [ ] 2-player match · [ ] AI opponent
+- [x] Install · [x] Launch · [ ] New game · [ ] 2-player match · [ ] AI opponent
 - [ ] Card interaction · [ ] Jack swap · [ ] Seven split · [ ] Capture · [ ] Home entry
-- [ ] Rotation · [ ] Background and resume · [ ] Haptics · [ ] Audio · [ ] Game Center
+- [x] Rotation · [ ] Background and resume · [ ] Haptics · [ ] Audio · [ ] Game Center
 
-**Physical iPad**
+**Physical iPad** — no iPad paired (MAN-10), so this gate is BLOCKED.
 
 - [ ] Install · [ ] Launch · [ ] Landscape · [ ] Portrait · [ ] Large board layout
 - [ ] 4-player match · [ ] 6-player match · [ ] Team match · [ ] AI opponent
@@ -65,12 +65,15 @@ These are mandatory. A release candidate may **not** ship with them `BLOCKED`
 
 ### Gate summary (§178)
 
-| Gate | Result |
-|---|---|
-| Simulator | NOT RUN |
-| Physical iPhone | BLOCKED |
-| Physical iPad | BLOCKED |
-| Game Center real device | BLOCKED |
+| Gate | Result | Evidence |
+|---|---|---|
+| Simulator | PASS (partial scope) | 7/7 on iPhone 17 and iPad Pro 13" (M5), iOS 27.0 |
+| Physical iPhone | PASS (partial scope) | 11/11 on iPhone 17 Pro, iOS 27.0 |
+| Physical iPad | BLOCKED | no iPad paired (MAN-10) |
+| Game Center real device | BLOCKED | not implemented (M6) |
+
+"Partial scope" means the gate ran everything that exists today. It cannot be
+called complete until the gameplay items above are implemented and re-run.
 
 ### Gameplay completeness
 

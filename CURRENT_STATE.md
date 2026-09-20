@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-705497c  chore: move signing team into a git-ignored local xcconfig
+4eca268  feat(fastlane): wire app store connect api key from outside the repo
 ```
 
 Everything below was verified against that commit on **2026-09-20** with
@@ -150,7 +150,7 @@ Recorded per environment; these are never merged into one number (§167, §175).
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
 | Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
 | Xcode Cloud | NOT RUN — not configured | — | — |
-| Physical iPhone | **BLOCKED** — signing team undecided (MAN-03), device itself is ready | — | — |
+| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (11/11) | 2026-09-20 | `705497c` |
 | Physical iPad | **BLOCKED** — no iPad paired (MAN-10) | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
@@ -160,19 +160,20 @@ Recorded per environment; these are never merged into one number (§167, §175).
 
 | Role | Device | OS | Connection | Developer Mode | Usable |
 |---|---|---|---|---|---|
-| `PRIMARY_IPHONE` | iPhone 17 Pro (iPhone18,1) | 27.0 (24A437) | wired, tunnel connected | enabled | yes |
+| `PRIMARY_IPHONE` | iPhone 17 Pro (iPhone18,1) | 27.0 (24A437) | wired, tunnel connected | enabled | **yes — build and tests verified** |
 | `PRIMARY_IPAD` | — | — | — | — | **none paired** |
 
 An earlier check the same day found no physical devices at all; the iPhone was
 connected afterwards. Device availability is therefore re-checked before every
 device run rather than trusted from this file (§157).
 
-**The physical iPhone is ready; what blocks a device build is signing, not
-hardware.** Two teams exist in the keychain — one with Apple Development
-certificates, one with Apple Distribution — and choosing between them is a
-decision for the account owner, not a guess (MAN-03). Building would also
-register the device with that team and create a provisioning profile, which is
-a change to an Apple Developer account and needs explicit consent.
+**Resolved.** Team `KZFCCDV6A8` was chosen by the account owner, device
+registration was authorised, and the device build and test run both succeeded:
+
+- `xcodebuild build` for the physical iPhone — **Build Succeeded**, no warnings
+- `bundle exec fastlane device_iphone` — **11 tests, 0 failures**, 261 s
+
+The team id lives only in the git-ignored `Config/Local.xcconfig` (DEC-013).
 
 Note for anyone reading `devicectl` output directly: it lists simulators too,
 and a booted simulator reports as `connected`. The only reliable discriminator
@@ -210,25 +211,26 @@ two closed items from this session.
 | # | Action | Status |
 |---|---|---|
 | MAN-01 | Decide the bundle identifier | **DONE** — `de.gcng.keezly` (DEC-011) |
-| MAN-02 | Create the App Store Connect app record | OPEN |
-| MAN-03 | Choose the Apple Developer team for signing (`DUA2W54W2Y` has Apple Development certs, `KZFCCDV6A8` has Apple Distribution) and put it in `Config/Local.xcconfig`. Also consent to registering the iPhone with that team. | **OPEN — now the top blocker** |
+| MAN-02 | Create the App Store Connect app record for `de.gcng.keezly` | **OPEN — confirmed empirically**: the API lists 14 app records and this bundle id is not among them. Now the top blocker for TestFlight and Game Center. |
+| MAN-03 | Apple Developer team for signing | **DONE** — team chosen, recorded in the git-ignored `Config/Local.xcconfig`, device registered, device build verified |
 | MAN-04 | Authorise GitHub ↔ Xcode Cloud and enable Xcode Cloud | OPEN |
 | MAN-05 | Enable the Game Center capability for the bundle id | OPEN |
 | MAN-06 | Create Game Center leaderboards and achievements | OPEN |
 | MAN-07 | Configure TestFlight testers | OPEN |
-| MAN-08 | Provide an App Store Connect API key (outside the repo) | OPEN |
+| MAN-08 | App Store Connect API key | **DONE & VERIFIED** — key file and credential env live outside the repository; `bundle exec fastlane asc_check` authenticates successfully |
 | MAN-09 | Pair a physical iPhone with this Mac | **DONE** — iPhone 17 Pro, iOS 27.0, wired, Developer Mode enabled (verified 2026-09-20) |
 | MAN-10 | Pair a physical iPad, same steps — required for the iPad quality gate | OPEN |
 | MAN-11 | Provide a second Apple Account signed into Game Center, for multi-device online tests | OPEN |
+| MAN-12 | Pair a second physical device for Game Center multi-device tests (an iPad would cover MAN-10 as well) | OPEN |
 
 None of these can be completed from here. They are not blockers for the work
 queued next.
 
-MAN-09 and MAN-10 block the physical-device gates in `RELEASE_CHECKLIST.md` and
-every case in `docs/GAME_CENTER_DEVICE_TESTS.md`. Since no app target exists
-yet, they are not blocking today's work either — but they must be resolved
-before a 1.0.0 release candidate, because those gates may not stay `BLOCKED`
-(§178).
+MAN-10 blocks the iPad gate in `RELEASE_CHECKLIST.md`; MAN-10/11/12 block every
+case in `docs/GAME_CENTER_DEVICE_TESTS.md`. MAN-02 blocks TestFlight, Game
+Center configuration and Xcode Cloud. None of them blocks the next engineering
+step (M3.1), but the device gates may not stay `BLOCKED` in a 1.0.0 release
+candidate (§178).
 
 ---
 

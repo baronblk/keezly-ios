@@ -52,6 +52,8 @@ fastlane/
 | `ui_tests` | XCUITests on an iPhone and an iPad simulator | working |
 | `qa` | The whole local quality gate: engine tests, build, unit tests, UI tests | working |
 | `release_check` | Release-candidate gate, reporting each sub-gate separately | working |
+| `asc_check` | Verify App Store Connect credentials and whether the app record exists | working |
+| `device_smoke` / `device_iphone` / `device_ipad` / `device_gate` | Physical-device gates, resolved by role | working |
 | `screenshots` | The complete App Store screenshot matrix | M11.5 |
 | `screenshots_verify` | Verify completeness and emit an HTML preview | M11.5 |
 
