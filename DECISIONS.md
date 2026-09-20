@@ -603,3 +603,37 @@ construction. The tradition is the inspiration; the geometry is ours.
 **Consequence.** The board's rim is wider than before, so the playing area is
 about six percent smaller in the same space. That is the price of a frame that
 can hold a border, and it was paid deliberately.
+
+---
+
+## DEC-020 — The keyboard is decided in pure logic, not in the view
+
+- **Date:** 2026-09-20
+- **Topic:** iPad input
+- **Status:** ACCEPTED
+
+**Context.** M4.7 asks for pointer, trackpad and full keyboard access. The
+obvious implementation scatters `onKeyPress` handlers through the view tree,
+where none of it can be tested — and a hardware keyboard turns out to be the
+one input this project cannot reproduce automatically at all.
+
+**Decision.** The entire keyboard contract lives in two pure types:
+
+- `FocusRing` — everything reachable right now, in bands (hand, pieces,
+  squares), built from the same facts `PlayPlanner` works from.
+- `PlayKeyboard` — a function from (key, focus, ring) to an intent.
+
+The view holds a `@FocusState` and does nothing but apply intents. Every rule
+worth having — that unplayable cards are skipped, that squares are walked in a
+stable order, that stale focus recovers, that escape always works, that every
+legal move is reachable — is a unit test.
+
+**Focus is not selection.** Selection is a choice the engine will act on; focus
+is where the keyboard happens to be. Keeping them separate is what stops
+keyboard support from quietly changing the game.
+
+**The consequence we accepted.** Because the logic is pure, the untestable part
+shrinks to one question: does iOS deliver the key press? That question is left
+explicitly unanswered rather than assumed — the UI tests that need real keys
+**skip**, and `RELEASE_CHECKLIST.md` carries the hardware gate as NOT VERIFIED.
+A green test that exercised nothing would be worse than a recorded gap (§177).

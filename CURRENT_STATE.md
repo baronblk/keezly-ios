@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-8c9fa43  feat(board): give the classic wood board a quiet dutch ornament
+dfa323d  feat(ipad): add pointer and keyboard interaction with visible focus
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -41,6 +41,7 @@ Three different questions, never merged into one answer (§167):
 | **DESIGN IMPLEMENTED** | It exists in code |
 | **SIMULATOR VERIFIED** | It was built and tested on a simulator |
 | **PHYSICAL DEVICE VERIFIED** | It was built and tested on real hardware |
+| **NOT VERIFIED — HARDWARE NOT AVAILABLE** | Built, but the equipment to test it does not exist here. Never counted as a pass |
 
 ### Design status (DEC-018, DEC-019)
 
@@ -73,6 +74,25 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**Pointer and keyboard are implemented (M4.7, DEC-020).** Cards lift under the
+pointer, squares highlight, arrows walk the hand and the board, return acts and
+escape cancels — with a focus ring drawn in black and white so it does not
+depend on colour. What can be verified here has been:
+
+| Claim | Status |
+|---|---|
+| The keyboard's decision logic | **TESTED** — 16 unit tests, including that every legal move is reachable |
+| Focus lands on a playable card, ring is visible, touch players see no ring | **SIMULATOR VERIFIED** |
+| Pointer effects are attached only to live elements | IMPLEMENTED — a pointer is needed to see them |
+| A key press actually arrives | **NOT VERIFIED — HARDWARE NOT AVAILABLE** |
+
+The last row is the honest one. iOS hands a view focus only when a hardware
+keyboard or Full Keyboard Access is present; a simulator booted by `xcodebuild`
+has neither, and this Xcode installation ships no `Simulator.app` to attach one
+to. The three UI tests that need real keys **skip** rather than pass
+(`KeyboardPlayTests`), so the gap is visible in every test run instead of being
+papered over.
 
 **The board carries a quiet Dutch identity (DEC-019).** A running border of
 tulips and lozenges engraved into the rim, a medallion framing the cards, a
@@ -207,7 +227,7 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (58/58) | 2026-09-20 | `8c9fa43` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (75/78, 3 skipped — no keyboard, ISS-010) | 2026-09-20 | `dfa323d` |
 | Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (58/58) — `fastlane device_iphone` | 2026-09-20 | `8c9fa43` |
 | Physical iPad (A16), iOS 27.0 | **PASSED** (58/58) — `fastlane device_ipad`, first real-hardware run | 2026-09-20 | `8c9fa43` |
 | Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
@@ -284,12 +304,13 @@ SwiftFormat allowlists.
 fixtures, the Dutch ornament pass and **both** hardware gates are done. What is
 left, in order:
 
-1. **Pointer, trackpad and keyboard on iPad (M4.7).**
-2. **Main menu and table configuration**, which is what lets a player choose
+1. **ISS-009** — landscape captures come out rotated. It blocks App Store
+   screenshots, so it is fixed at its cause before the screenshot milestone.
+2. **A two-player board review** — the middle has never been looked at for
+   crowding, and the medallion is deliberately absent there.
+3. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
-3. **M5 — pass & play and autosave.**
-4. **Landscape captures come out rotated** (ISS-009). Harmless for a design
-   review, but they cannot be submitted as App Store screenshots as they are.
+4. **M5 — pass & play and autosave.**
 
 Blocked and not startable: anything behind the App Store Connect record
 (MAN-02), and Game Center multi-device (MAN-11/12).

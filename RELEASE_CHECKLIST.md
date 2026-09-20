@@ -73,6 +73,22 @@ nobody has made.
 - [ ] Multitasking where supported · [ ] Background and resume · [ ] Game Center
 - [ ] Performance — launch time, frame smoothness, memory, energy, thermals
 
+**Physical iPad + external keyboard** — NOT VERIFIED, HARDWARE NOT AVAILABLE.
+No external keyboard exists for this iPad, and no simulator here can stand in
+for one. To be carried out when a keyboard becomes available; until then this
+gate is neither passed nor waived.
+
+- [ ] Arrow keys walk the hand and the board · [ ] Return plays · [ ] Escape cancels
+- [ ] Full Keyboard Access reaches every action · [ ] Focus ring visible throughout
+- [ ] Tab traversal order is sensible · [ ] No action needs a pointer
+
+**Physical iPad + pointer or trackpad** — NOT VERIFIED, HARDWARE NOT AVAILABLE.
+The pointer effects are implemented and attached only to live elements, but
+nothing here has a pointer to test them with.
+
+- [ ] Cards lift under the pointer · [ ] Squares highlight · [ ] Pointer never
+      promises an illegal move
+
 **Long-run test (§172)**
 
 - [ ] Several complete matches back to back, varying player counts, with AI,

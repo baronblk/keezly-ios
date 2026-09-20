@@ -262,6 +262,45 @@ The presenter holds its own copy of the pawn positions and has no access to
 
 ---
 
+## Pointer and keyboard (M4.7, DEC-020)
+
+Touch stays the complete way to play. The pointer and the keyboard are added
+without taking anything from it (§46).
+
+**Focus is not selection.** Selection is what the player has chosen and the
+engine will act on. Focus is only where the keyboard is pointing. Conflating
+the two is how keyboard support ends up changing the game by accident.
+
+| Key | What it does |
+|---|---|
+| Left / right | Walks the current band — the hand, the pieces, or the squares — wrapping at its ends |
+| Up / down | Crosses between those bands |
+| Return / space | Acts on what is focused |
+| Escape | Cancels, exactly as tapping a chosen card again does (§37) |
+
+**Only live things are reachable.** A card with no legal move is shown so the
+player can see why they are stuck, but the keyboard steps over it — a dead end
+a pointer user never meets. Squares are walked in a fixed order — round the
+track, then home, then the waiting area — because a `Set` has none, and without
+one the keyboard would wander differently on every render.
+
+**The focus ring is black and white**, two concentric strokes, so it reads on
+the cream of a card and on the wood of the board, and so it never depends on
+colour (§42). A focused card comes forward, or its neighbour would cover the
+ring.
+
+**The pointer lifts what can be acted on** and highlights squares. It is
+attached only where a tap would do something: a pointer that lifts a card the
+engine will refuse is a promise the game cannot keep.
+
+**What is verified, and what is not.** The decision logic is pure and unit
+tested. Focus behaviour is simulator-verified. Whether a key press arrives is
+**not verified**: iOS gives a view focus only when a hardware keyboard or Full
+Keyboard Access is present, and neither a keyboardless simulator nor this
+machine can supply one. The tests that need real keys skip rather than pass.
+
+---
+
 ## Interaction
 
 The flow is card → pawn → square (§36). Illegal targets are never offered:

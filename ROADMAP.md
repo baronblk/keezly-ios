@@ -161,7 +161,7 @@ leak and watching them fail. See `AI.md`.
 | M4.4 iPhone layout — portrait and both landscape orientations | DONE — phones get their own compact and short-landscape layouts; reviewed on the smallest, standard and largest iPhones, in both orientations, at 4 and 6 seats |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
 | M4.6 Event-driven animation pipeline with input locking | DONE — `BoardPresenter` plays events one at a time, reorders a capture behind the move that caused it, honours Reduce Motion, and settles on the true position on any interruption |
-| M4.7 Pointer, trackpad and full keyboard access on iPad | NOT STARTED |
+| M4.7 Pointer, trackpad and full keyboard access on iPad | **IMPLEMENTED** — pointer effects, a shared focus model, arrow/return/escape control and a visible focus ring. Logic unit-tested; focus behaviour simulator-verified; key *delivery* NOT VERIFIED, no keyboard available (see CURRENT_STATE) |
 
 | M4.8 Centre of the board — draw pile, discard, turn and deal status | DONE |
 | M4.9 Classic Wood material, round milled holes, pawn silhouettes, real playing cards (DEC-018) | DONE |

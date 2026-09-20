@@ -13,10 +13,51 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 | # | Summary | Severity |
 |---|---|---|
 | ISS-009 | Landscape captures come out rotated | Minor (tooling) |
+| ISS-010 | No hardware keyboard or pointer available to verify M4.7 end to end | Verification gap |
+| ISS-011 | Commit `1d46410` carries a message that does not match its content | Cosmetic (history) |
 
 ---
 
 ## Closed
+
+### ISS-011 — A commit message that does not match its content
+
+- **Status:** OPEN (accepted; history will not be rewritten)
+- **Severity:** Cosmetic
+- **Component:** Repository history
+- **Description:** Commit `1d46410`, "docs: record the iphone pass, the
+  animation pipeline and a fresh device gate", contains only a regenerated
+  `fastlane/README.md`. A patch script had aborted on a stale anchor before
+  writing the documentation, and the commit was made without checking what had
+  actually changed. The real documentation landed in `7022d9f`.
+- **Impact:** None on the product. It makes that one commit misleading to read.
+- **Decision:** The history stays as it is. Rewriting a pushed commit to tidy a
+  message is a worse trade than a recorded blemish.
+- **Prevention:** Patch scripts now report which anchors they failed to find,
+  and a documentation commit is checked with `git show --stat` before pushing.
+
+### ISS-010 — M4.7 cannot be verified end to end here
+
+- **Status:** OPEN — blocked on equipment, not on code
+- **Severity:** Verification gap (no known defect)
+- **Component:** App / iPad input, test tooling
+- **Description:** Pointer, trackpad and keyboard support is implemented and its
+  logic is unit tested, but three things cannot be exercised on this machine:
+  iOS only grants focus when a hardware keyboard or Full Keyboard Access is
+  present; a simulator booted by `xcodebuild` has no keyboard attached; and this
+  Xcode installation contains no `Simulator.app` to attach one through. No
+  pointer or trackpad is available for the physical iPad either.
+- **Reproduction:** `xcodebuild test -only-testing:KeezlyUITests/KeyboardPlayTests`
+  — three tests skip with the reason.
+- **Expected:** Arrow keys move focus in a running app.
+- **Actual:** Focus stays where it is; no key event arrives.
+- **Why it is not a defect:** the same code path is exercised by
+  `PlayFocusTests`, and the focus state itself is verified on the simulator by
+  forcing focus through the `-KEEZLY_FOCUS` launch argument. What is unproven is
+  Apple's delivery of the key press, not Keezly's response to it.
+- **Resolution:** carry out the hardware gate when a keyboard and a pointer are
+  available. Recorded in `RELEASE_CHECKLIST.md` as NOT VERIFIED — HARDWARE NOT
+  AVAILABLE, never as a pass.
 
 ### ISS-009 — Landscape captures come out rotated
 

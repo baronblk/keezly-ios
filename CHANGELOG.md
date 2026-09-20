@@ -73,6 +73,11 @@ Versioning.
   can also fast-forward a match to a situation worth photographing — a playable
   Jack, a Seven halfway through its split — which the opening deal can never
   show, because those cards need pieces already on the track.
+- **Pointer and keyboard control on iPad.** Cards lift under the pointer,
+  squares highlight, and the whole game can be driven from the keyboard: arrows
+  move, return plays, escape cancels. The focus ring is drawn in black and
+  white so it never depends on colour. Touch is unchanged and remains complete
+  on its own.
 - **A quiet Dutch identity on the board**: a tulip-and-lozenge border engraved
   into the rim, a medallion framing the cards, a chevron at the end of each home
   lane, and a single orange keystone. Ornament, not illustration — from playing
