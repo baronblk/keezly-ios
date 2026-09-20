@@ -6,6 +6,14 @@ import SwiftUI
 /// Colour, mark, how many cards are left, who deals, and who is on turn — and
 /// nothing else. No debug information, no scores that do not exist yet.
 struct SeatStatusView: View {
+    // Chrome text follows the reader's setting (§53). Card ranks and pips
+    // deliberately do not: they scale with the card they are printed on, and a
+    // rank that outgrew its card would be less readable, not more.
+    @ScaledMetric(relativeTo: .subheadline) private var nameSize: CGFloat = 14
+    @ScaledMetric(relativeTo: .caption) private var detailSize: CGFloat = 12
+    @ScaledMetric(relativeTo: .caption2) private var badgeSize: CGFloat = 10
+    @ScaledMetric(relativeTo: .subheadline) private var markSize: CGFloat = 40
+
     let seat: Seat
     let role: SeatRole
     let cardCount: Int
@@ -13,10 +21,9 @@ struct SeatStatusView: View {
     let isDealer: Bool
     let isOnTurn: Bool
     let isPartner: Bool
-    var compact = false
 
     private var identity: PlayerIdentity { PlayerIdentity.identity(for: seat) }
-    private var size: CGFloat { compact ? 30 : 40 }
+    private var size: CGFloat { markSize }
 
     var body: some View {
         HStack(spacing: Keezly.Spacing.small) {
@@ -37,18 +44,22 @@ struct SeatStatusView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
                     Text(LocalizedStringKey(identity.nameKey))
-                        .font(.system(size: compact ? 12 : 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: nameSize, weight: .semibold, design: .rounded))
                         .foregroundStyle(Keezly.Palette.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                     if isPartner {
                         Text("seat.partner")
-                            .font(.system(size: compact ? 9 : 10, weight: .semibold, design: .rounded))
+                            .font(.system(size: badgeSize, weight: .semibold, design: .rounded))
+                            .lineLimit(1)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
                             .background(Capsule().fill(identity.color.opacity(0.22)))
                     }
                     if isDealer {
                         Text("seat.dealer")
-                            .font(.system(size: compact ? 9 : 10, weight: .bold, design: .rounded))
+                            .font(.system(size: badgeSize, weight: .bold, design: .rounded))
+                            .lineLimit(1)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
                             .background(Capsule().fill(Keezly.Palette.cardInk.opacity(0.12)))
@@ -59,9 +70,11 @@ struct SeatStatusView: View {
                     Label("\(cardCount)", systemImage: "rectangle.on.rectangle")
                     Label("\(pawnsHome)/\(pawnsPerSeat)", systemImage: "house")
                 }
-                .font(.system(size: compact ? 10 : 12, design: .rounded))
+                .font(.system(size: detailSize, design: .rounded))
                 .foregroundStyle(Keezly.Palette.secondaryText)
                 .labelStyle(.titleAndIcon)
+                .lineLimit(1)
+                .fixedSize()
             }
         }
         .padding(.horizontal, Keezly.Spacing.small)
@@ -73,6 +86,76 @@ struct SeatStatusView: View {
                 .opacity(isOnTurn ? 1 : 0.65)
         )
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// A seat on a phone.
+///
+/// Not the panel with the name squeezed smaller — a different component. Six
+/// panels across a phone forced the names to wrap and pushed the whole layout
+/// wider than the screen, which clipped the board. The chip drops the name
+/// entirely: colour and mark already identify the seat, and they identify it
+/// the same way on the board, so nothing is lost (§42).
+struct SeatChip: View {
+    /// Follows the reader's text size, within reason: a chip may grow, but six
+    /// of them still have to fit across a phone, so the mark is capped.
+    @ScaledMetric(relativeTo: .caption2) private var countSize: CGFloat = 10
+    @ScaledMetric(relativeTo: .caption2) private var chipSize: CGFloat = 30
+
+    let seat: Seat
+    let cardCount: Int
+    let pawnsHome: Int
+    let isDealer: Bool
+    let isOnTurn: Bool
+    let isPartner: Bool
+
+    private var identity: PlayerIdentity { PlayerIdentity.identity(for: seat) }
+
+    var body: some View {
+        VStack(spacing: 2) {
+            ZStack {
+                Circle().fill(identity.color.opacity(0.24))
+                MarkShape(mark: identity.mark)
+                    .fill(identity.color)
+                    .frame(width: 15, height: 15)
+
+                if isDealer {
+                    Text("seat.dealer.short")
+                        .font(.system(size: 8, weight: .black, design: .rounded))
+                        .foregroundStyle(Keezly.Palette.cardInk)
+                        .padding(2)
+                        .background(Circle().fill(Keezly.Palette.cardFace))
+                        .offset(x: 12, y: -11)
+                }
+            }
+            .frame(width: min(chipSize, 42), height: min(chipSize, 42))
+            .overlay(Circle().strokeBorder(isOnTurn ? identity.color : .clear, lineWidth: 2.5))
+            .overlay(alignment: .bottomLeading) {
+                if isPartner {
+                    Circle()
+                        .strokeBorder(identity.color, lineWidth: 2)
+                        .frame(width: 8, height: 8)
+                        .background(Circle().fill(Keezly.Palette.cardFace))
+                        .offset(x: -2, y: 2)
+                }
+            }
+
+            Text(verbatim: "\(cardCount) · \(pawnsHome)/\(pawnsPerSeat)")
+                .font(.system(size: min(countSize, 14), weight: .medium, design: .rounded))
+                .foregroundStyle(Keezly.Palette.secondaryText)
+                .lineLimit(1)
+                .fixedSize()
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: Keezly.Radius.small, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .opacity(isOnTurn ? 1 : 0.6)
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(LocalizedStringKey(identity.nameKey))
+        .accessibilityValue("seat.status \(cardCount) \(pawnsHome)")
     }
 }
 
@@ -99,7 +182,6 @@ struct SeatColumn: View {
                     isDealer: state.dealer == seat,
                     isOnTurn: state.currentSeat == seat,
                     isPartner: localSeat.map { state.configuration.areAllied($0, seat) && $0 != seat } ?? false,
-                    compact: compact
                 )
             }
             Spacer(minLength: 0)

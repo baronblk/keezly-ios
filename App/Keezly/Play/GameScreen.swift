@@ -25,7 +25,14 @@ struct GameScreen: View {
 
     private var isCompact: Bool { horizontalSizeClass == .compact }
     /// Cards are larger on iPad: the big display is the point, not a bonus (§4).
-    private var handCardWidth: CGFloat { isCompact ? 72 : 112 }
+    /// A square board on a tall phone screen is limited by width, which leaves
+    /// height to spare. It goes to the cards, because a card that can be read
+    /// is worth more than empty table (§45).
+    private var handCardWidth: CGFloat { isCompact ? 92 : 112 }
+
+    /// Cards in the short landscape layout, where they share the width with the
+    /// board rather than having a band of their own.
+    private var shortHandCardWidth: CGFloat { 74 }
     private var layout: BoardLayout { BoardLayout(board: session.state.board) }
 
     /// The interaction state, rebuilt from the session every render so it can
@@ -47,7 +54,13 @@ struct GameScreen: View {
             ZStack {
                 theme.table.ignoresSafeArea()
 
-                if isCompact {
+                // Chosen by the space actually available, not by size class
+                // alone. A phone in landscape reports a regular width on some
+                // models, and stacking a board above a hand there left the
+                // board the size of a postage stamp.
+                if proxy.size.height < Self.shortHeightThreshold {
+                    shortLayout(size: proxy.size)
+                } else if isCompact {
                     compactLayout(size: proxy.size)
                 } else {
                     wideLayout(size: proxy.size)
@@ -61,16 +74,49 @@ struct GameScreen: View {
 
     // MARK: - Layouts
 
+    /// Below this height there is no room to put a hand under a board and keep
+    /// the board worth looking at. A phone in landscape is the case.
+    static let shortHeightThreshold: CGFloat = 520
+
     /// Phone-shaped: the board leads, the hand sits under it within thumb reach,
     /// and the opponents are a single compact row (§5).
     private func compactLayout(size: CGSize) -> some View {
         VStack(spacing: Keezly.Spacing.small) {
             opponentStrip
-            board.frame(maxHeight: .infinity)
+            board
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             sevenProgress
             hand(availableWidth: size.width - Keezly.Spacing.regular * 2)
         }
         .padding(Keezly.Spacing.small)
+        // Nothing inside may push the layout wider than the screen: that is
+        // what clipped the board on a six-player phone table.
+        .frame(width: size.width)
+        .clipped()
+    }
+
+    /// Short and wide — a phone in landscape. The board takes the whole
+    /// height, and the hand moves beside it rather than under it, because
+    /// height is the scarce dimension here and the board is what needs it (§5).
+    private func shortLayout(size: CGSize) -> some View {
+        let boardSide = max(200, size.height - Keezly.Spacing.regular)
+        let sideWidth = max(160, size.width - boardSide - Keezly.Spacing.medium * 2)
+
+        return HStack(spacing: Keezly.Spacing.medium) {
+            board
+                .frame(width: boardSide, height: boardSide)
+
+            VStack(spacing: Keezly.Spacing.small) {
+                opponentStrip
+                Spacer(minLength: 0)
+                sevenProgress
+                hand(availableWidth: sideWidth)
+                Spacer(minLength: 0)
+            }
+            .frame(width: sideWidth)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, Keezly.Spacing.small)
     }
 
     /// iPad-shaped, and especially landscape: the board takes the height it can
@@ -82,7 +128,10 @@ struct GameScreen: View {
         // left after the hand. Whatever width that leaves goes to the seat
         // panels rather than sitting empty either side of a centred board.
         let handHeight = handCardWidth * 1.45 + handCardWidth * 0.3
-        let boardSide = max(240, size.height - handHeight - Keezly.Spacing.section)
+        // Never let the board shrink below most of the smaller screen edge: a
+        // board that has been squeezed out of the way is no longer a board.
+        let floor = min(size.width, size.height) * 0.8
+        let boardSide = max(floor, size.height - handHeight - Keezly.Spacing.section)
         let sideWidth = max(210, (size.width - boardSide) / 2 - Keezly.Spacing.large)
         let opponents = session.state.configuration.seats.filter { $0 != session.localSeat }
         let split = (opponents.count + 1) / 2
@@ -109,23 +158,26 @@ struct GameScreen: View {
         .padding(Keezly.Spacing.regular)
     }
 
+    /// Opponents on a phone: fixed-size chips that cannot push the layout
+    /// wider than the screen. Five of them across a phone was what clipped the
+    /// board before.
     private var opponentStrip: some View {
         HStack(spacing: Keezly.Spacing.tight) {
             ForEach(session.state.configuration.seats.filter { $0 != session.localSeat }, id: \.self) { seat in
-                SeatStatusView(
+                SeatChip(
                     seat: seat,
-                    role: session.roles[seat.index],
                     cardCount: session.state.hand(of: seat).count,
                     pawnsHome: session.state.pawns(of: seat).count(where: \.isHome),
                     isDealer: session.state.dealer == seat,
                     isOnTurn: session.state.currentSeat == seat,
                     isPartner: session.localSeat.map {
                         session.state.configuration.areAllied($0, seat) && $0 != seat
-                    } ?? false,
-                    compact: true
+                    } ?? false
                 )
             }
         }
+        .frame(maxWidth: .infinity)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     @ViewBuilder
@@ -184,7 +236,7 @@ struct GameScreen: View {
                     cards: session.state.hand(of: seat).cards,
                     playable: planner.playableCards,
                     selected: selectedCard,
-                    cardWidth: handCardWidth,
+                    cardWidth: availableWidth < 300 ? shortHandCardWidth : handCardWidth,
                     availableWidth: availableWidth,
                     onSelect: select(card:)
                 )
@@ -278,13 +330,16 @@ struct GameScreen: View {
 
 /// How much of a Seven is left to spend (§38).
 private struct SevenProgress: View {
+    @ScaledMetric(relativeTo: .subheadline) private var textScale: CGFloat = 1
+
     let remaining: Int
     let isCompact: Bool
 
     var body: some View {
         HStack(spacing: Keezly.Spacing.small) {
             Text("seven.remaining \(remaining)")
-                .font(.system(size: isCompact ? 14 : 17, weight: .semibold, design: .rounded))
+                .font(.system(size: (isCompact ? 14 : 17) * textScale, weight: .semibold, design: .rounded))
+                .lineLimit(1)
             HStack(spacing: 3) {
                 ForEach(0..<7, id: \.self) { index in
                     Capsule()
