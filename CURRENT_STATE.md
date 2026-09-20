@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-1bb9109  test(core): cover serialization round trip, versioning and size limits
+705497c  chore: move signing team into a git-ignored local xcconfig
 ```
 
 Everything below was verified against that commit on **2026-09-20** with
@@ -18,7 +18,7 @@ Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 
 ## Current Milestone
 
-**M0 — Repository & Foundation**: IN PROGRESS
+**M0 — Repository & Foundation**: IN PROGRESS (M0.2 and M0.3 done; ci_scripts and lint config outstanding)
 **M1 — GameCore / Rules**: DONE
 **M2 — Complete Move Engine**: IN PROGRESS (only M2.10, the replay move log, is left)
 
@@ -29,10 +29,21 @@ engine is testable with `swift test` alone and does not need the Xcode project.
 
 ## Completed
 
-### Repository (M0, partial)
+### Repository and app project (M0, partial)
 - Git repository initialised, `main` tracking `origin/main`.
-- Secret-safe `.gitignore` (keys, profiles, `.env`, certificates).
-- Directory skeleton for app, package, fastlane, ci_scripts, docs, brand assets.
+- Secret-safe `.gitignore` (keys, profiles, `.env`, certificates, local signing
+  config, local device mapping).
+- **Xcode project** generated from `project.yml` via XcodeGen and committed.
+  Bundle ids `de.gcng.keezly` / `.tests` / `.uitests`, iOS 17.0 deployment
+  target, `MARKETING_VERSION 1.0.0`, iPhone **and** iPad, Stage Manager
+  compatible, shared `Keezly` scheme covering app, unit and UI tests.
+- **App shell**: `KeezlyApp` + `RootView`. Deliberately inert scaffolding — no
+  buttons that do nothing. M4.1 replaces it with the real menu and board.
+- **Signing**: `DEVELOPMENT_TEAM` lives only in the git-ignored
+  `Config/Local.xcconfig`; `Config/Local.xcconfig.example` documents it.
+- **fastlane** via Bundler (Ruby 4.0.5 pinned in `.tool-versions`, fastlane
+  2.240.1 pinned in `Gemfile.lock`). Lanes: `tests`, `ui_tests`, `device_smoke`,
+  `device_iphone`, `device_ipad`, `device_gate`, `qa`, `release_check`.
 
 ### KeezlyCore (M1, M2 partial) — IMPLEMENTED + TESTED
 - **Deterministic randomness**: `SeededGenerator` (SplitMix64), serialisable
@@ -101,6 +112,17 @@ Run with `cd Packages/KeezlyCore && swift test`.
 | Serialization | 11 | passed |
 | **Total** | **68** | **68 passed, 0 failed** — 6.8 s |
 
+App-level tests, run through the Xcode project on a simulator:
+
+| Destination | Tests | Status |
+|---|---|---|
+| iPhone 17, iOS 27.0 | 7 | **7 passed, 0 failed** |
+| iPad Pro 13" (M5), iOS 27.0 | 7 | **7 passed, 0 failed** |
+
+Four Swift Testing functions (engine linked into the app, a full match played
+inside the iOS runtime, serialisation round trip, bundle identifiers) plus three
+XCUITests (launch, rotation, launch performance). Build is warning-free.
+
 Several tests are parameterised over seat counts 2–6 or over card ranks, so the
 number of executed cases is higher than the number of test functions.
 
@@ -125,25 +147,36 @@ Recorded per environment; these are never merged into one number (§167, §175).
 
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
-| Simulator — iPhone | NOT RUN — no app target exists | — | — |
-| Simulator — iPad | NOT RUN — no app target exists | — | — |
+| Simulator — iPhone 17, iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
 | Xcode Cloud | NOT RUN — not configured | — | — |
-| Physical iPhone | **BLOCKED** — no device paired | — | — |
-| Physical iPad | **BLOCKED** — no device paired | — | — |
-| Game Center multi-device | **BLOCKED** — no devices, no implementation | — | — |
+| Physical iPhone | **BLOCKED** — signing team undecided (MAN-03), device itself is ready | — | — |
+| Physical iPad | **BLOCKED** — no iPad paired (MAN-10) | — | — |
+| Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
 ### Device availability, checked 2026-09-20
 
-`./scripts/devices.sh list` → exit 3, **no physical iPhone or iPad is paired
-with this Mac.** Verified three ways rather than assumed (§157):
+`./scripts/devices.sh list` → exit 0.
 
-- `xcrun devicectl list devices` → 7 entries, every one
-  `hardwareProperties.reality = "simulated"`
-- `xcrun xctrace list devices` → only the host Mac under "Devices"
-- `~/Library/MobileDevice/Provisioning Profiles/` → empty
+| Role | Device | OS | Connection | Developer Mode | Usable |
+|---|---|---|---|---|---|
+| `PRIMARY_IPHONE` | iPhone 17 Pro (iPhone18,1) | 27.0 (24A437) | wired, tunnel connected | enabled | yes |
+| `PRIMARY_IPAD` | — | — | — | — | **none paired** |
 
-This is a device-availability state, **not a Keezly defect** (§166). Everything
-not blocked by it continues (§142).
+An earlier check the same day found no physical devices at all; the iPhone was
+connected afterwards. Device availability is therefore re-checked before every
+device run rather than trusted from this file (§157).
+
+**The physical iPhone is ready; what blocks a device build is signing, not
+hardware.** Two teams exist in the keychain — one with Apple Development
+certificates, one with Apple Distribution — and choosing between them is a
+decision for the account owner, not a guess (MAN-03). Building would also
+register the device with that team and create a provisioning profile, which is
+a change to an Apple Developer account and needs explicit consent.
+
+Note for anyone reading `devicectl` output directly: it lists simulators too,
+and a booted simulator reports as `connected`. The only reliable discriminator
+is `hardwareProperties.reality`, which is what `scripts/devices.sh` filters on.
 
 Simulators available: iOS 27.0, 26.5 and 26.3 runtimes covering iPhone 18 Pro /
 18 Pro Max / 17 / 17e / Air / 16e and iPad Pro 13" (M5), iPad Pro 11" (M5),
@@ -168,7 +201,7 @@ two closed items from this session.
 | Seven-split combinatorics | Generating all split sequences copies the state per candidate leg. Fast enough now, but the Hard AI will call it inside rollouts. Measure before optimising. |
 | Rule-source contradictions | Tournament rules are not yet verified against a primary source, so the Tournament preset currently equals Classic. Open questions are listed in `RULE_VARIANTS.md` rather than guessed. |
 | `allowExtraLap` semantics | The "extra lap" house rule is implemented as an explicit route choice. This is an interpretation, documented as DEC-005; it needs a play-test before 1.0.0. |
-| Ruby version for fastlane | System Ruby is 2.6.10, too old for a modern Bundler-based fastlane. Homebrew `ruby@4.0` and `mise` are available; the choice is not made yet. |
+| Two signing teams | The keychain holds certificates for two Apple Developer teams. Picking the wrong one would mean re-provisioning later and could split App Store Connect records. Resolved by MAN-03. |
 
 ---
 
@@ -176,15 +209,15 @@ two closed items from this session.
 
 | # | Action | Status |
 |---|---|---|
-| MAN-01 | Decide the bundle identifier | OPEN |
+| MAN-01 | Decide the bundle identifier | **DONE** — `de.gcng.keezly` (DEC-011) |
 | MAN-02 | Create the App Store Connect app record | OPEN |
-| MAN-03 | Select the Apple Developer team for signing | OPEN |
+| MAN-03 | Choose the Apple Developer team for signing (`DUA2W54W2Y` has Apple Development certs, `KZFCCDV6A8` has Apple Distribution) and put it in `Config/Local.xcconfig`. Also consent to registering the iPhone with that team. | **OPEN — now the top blocker** |
 | MAN-04 | Authorise GitHub ↔ Xcode Cloud and enable Xcode Cloud | OPEN |
 | MAN-05 | Enable the Game Center capability for the bundle id | OPEN |
 | MAN-06 | Create Game Center leaderboards and achievements | OPEN |
 | MAN-07 | Configure TestFlight testers | OPEN |
 | MAN-08 | Provide an App Store Connect API key (outside the repo) | OPEN |
-| MAN-09 | Pair a physical iPhone with this Mac (cable or wireless), unlock it, trust the computer, enable Developer Mode | OPEN |
+| MAN-09 | Pair a physical iPhone with this Mac | **DONE** — iPhone 17 Pro, iOS 27.0, wired, Developer Mode enabled (verified 2026-09-20) |
 | MAN-10 | Pair a physical iPad, same steps — required for the iPad quality gate | OPEN |
 | MAN-11 | Provide a second Apple Account signed into Game Center, for multi-device online tests | OPEN |
 
@@ -227,12 +260,18 @@ See `DECISIONS.md` for the reasoning. In short:
 
 ## Next Steps (concrete)
 
-1. **M0.2 — Xcode project.** Write `project.yml` for an app target `Keezly`
-   (iPhone + iPad, iOS 17 deployment target, `MARKETING_VERSION = 1.0.0`)
-   depending on the local `KeezlyCore` package, generate with `xcodegen`, mark
-   the scheme shared, and commit the generated `.xcodeproj`.
-2. **M0.3 — fastlane skeleton.** Decide the Ruby toolchain first (see Risks),
-   then `Gemfile` + `fastlane/Fastfile` with the `tests` lane wrapping
-   `swift test`, so there is a single reproducible command before any UI exists.
-3. **M3.1 — `PlayerObservation`.** Define the AI's information boundary before
-   writing any AI, so no agent can ever read another seat's hand.
+1. **M3.1 — `PlayerObservation`.** Define the AI's information boundary before
+   writing any agent code, so "the AI cannot cheat" is enforced by the type
+   system rather than by discipline. It must expose the acting seat's own hand,
+   all pawn positions, the discard pile, per-seat card counts, teams and phase —
+   and offer no route whatsoever to another seat's hand or to the deck order.
+   This is unblocked and is the next thing to build.
+2. **M0.4 — `ci_scripts/`.** `ci_post_clone.sh` (log toolchain versions, set up
+   Bundler), `ci_pre_xcodebuild.sh` (derive `CFBundleVersion` from
+   `CI_BUILD_NUMBER`), `ci_post_xcodebuild.sh` (collect result bundles). Check
+   what Ruby the current Xcode Cloud image ships before writing the first one.
+3. **M0.5 — SwiftLint / SwiftFormat configuration**, wired into the `qa` lane.
+4. **Once MAN-03 is answered — the physical iPhone gate.** Put the team into
+   `Config/Local.xcconfig`, then `bundle exec fastlane device_iphone`. The
+   device is already connected and Developer Mode is on, so this should run as
+   soon as signing is settled.

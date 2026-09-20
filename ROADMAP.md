@@ -32,15 +32,15 @@ test reproducibly, with the project memory in place from day one.
 | Task | Status |
 |---|---|
 | M0.1 Git repository, structure, secret-safe `.gitignore` | DONE |
-| M0.2 Xcode project via XcodeGen (`project.yml`), shared scheme, committed `.xcodeproj` | NOT STARTED |
-| M0.3 Bundler + fastlane skeleton with a `tests` lane | NOT STARTED |
+| M0.2 Xcode project via XcodeGen (`project.yml`), shared scheme, committed `.xcodeproj` | DONE |
+| M0.3 Bundler + fastlane skeleton with a `tests` lane | DONE |
 | M0.4 `ci_scripts/` (`ci_post_clone.sh`, `ci_pre_xcodebuild.sh`, `ci_post_xcodebuild.sh`) | NOT STARTED |
 | M0.5 SwiftLint / SwiftFormat configuration | NOT STARTED |
 | M0.6 Project memory documents | DONE |
 | M0.7 Xcode Cloud compatibility check (no absolute paths, no local-only config) | NOT STARTED |
 
-**Dependencies.** M0.3 depends on choosing a Ruby toolchain (system Ruby 2.6.10
-is too old). M0.4 and M0.7 depend on M0.2.
+**Dependencies.** M0.4 and M0.7 depend on M0.2 (done). Device builds depend on
+MAN-03, the signing team decision.
 
 **Acceptance criteria.**
 - `xcodegen generate` produces a project that builds for iPhone and iPad.
@@ -247,11 +247,11 @@ and mocked tests can proceed without them (§142).
 | M11.7 Large-scale AI simulation in CI | NOT STARTED |
 | M11.8 Simulator/orientation/localisation UI test matrix | NOT STARTED |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
-| M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | NOT STARTED |
-| M11.11 Physical iPhone quality gate | BLOCKED — no device paired (MAN-09) |
-| M11.12 Physical iPad quality gate | BLOCKED — no device paired (MAN-10) |
-| M11.13 Game Center multi-device verification | BLOCKED — MAN-09/10/11 + M6 |
-| M11.14 Real-hardware performance and long-run test | BLOCKED — MAN-09/10 |
+| M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
+| M11.11 Physical iPhone quality gate | BLOCKED — signing team undecided (MAN-03); iPhone 17 Pro is connected and ready |
+| M11.12 Physical iPad quality gate | BLOCKED — no iPad paired (MAN-10) |
+| M11.13 Game Center multi-device verification | BLOCKED — MAN-10/11 + M6 |
+| M11.14 Real-hardware performance and long-run test | BLOCKED — MAN-03/10 |
 
 **Device testing is part of the strategy, not an optional manual extra** (§156,
 §180). `scripts/devices.sh` addresses devices by role and never persists a name
