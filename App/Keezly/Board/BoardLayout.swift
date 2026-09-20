@@ -43,6 +43,10 @@ struct BoardLayout: Sendable {
     let waitingPoints: [[CGPoint]]
     /// Edge length of a square in unit space.
     let squareSize: CGFloat
+    /// Centre-to-centre spacing of adjacent track squares, in unit space.
+    /// The board's natural rhythm — ornament is measured in it so that a
+    /// two-player board and a six-player one look equally well proportioned.
+    var pitch: CGFloat { squareSize / Self.squareFill }
     /// How far past the track ring the board's edge sits, in unit space.
     ///
     /// Wide enough that the waiting areas stand *on* the board rather than
@@ -85,7 +89,11 @@ struct BoardLayout: Sendable {
         let pitch = perimeter / Double(count)
         let size = pitch * Self.squareFill
         self.squareSize = size
-        self.surfaceMargin = pitch * (Self.waitingOffset + 1.9)
+        // Wide enough to carry the ornamental border as well as the waiting
+        // areas. A rim too narrow for its border is what makes a decorated
+        // board look crowded, so the frame was widened rather than the
+        // ornament squeezed into the gap (§76).
+        self.surfaceMargin = pitch * (Self.waitingOffset + 2.75)
 
         // Home lanes run from each seat's entry square straight towards the
         // centre, which keeps every seat's lane the same length and angle

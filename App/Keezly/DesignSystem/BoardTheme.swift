@@ -29,6 +29,14 @@ struct BoardTheme: Sendable, Hashable {
     /// The lit lower lip of a hole, which is what makes it read as carved
     /// rather than as a dark dot.
     let holeLip: Color
+    /// Inlaid ornament: a deep blue-grey drawn from Dutch ceramic. A
+    /// secondary brand accent, never a player colour (§76).
+    let inlay: Color
+    /// The broken white that lifts an inlay off the wood.
+    let inlayPale: Color
+    /// Oranje. Used in single small details and nowhere else — a whole board
+    /// in it would be a souvenir, not a board.
+    let accent: Color
     /// What the board rests on.
     let table: Color
 
@@ -42,6 +50,9 @@ struct BoardTheme: Sendable, Hashable {
         holeFill: Color("HoleFill", bundle: .main),
         holeShadow: Color("HoleShadow", bundle: .main),
         holeLip: Color("HoleLip", bundle: .main),
+        inlay: Color("DelftBlue", bundle: .main),
+        inlayPale: Color("InlayPale", bundle: .main),
+        accent: Color("Oranje", bundle: .main),
         table: Color("TableFelt", bundle: .main)
     )
 
@@ -58,6 +69,9 @@ struct BoardTheme: Sendable, Hashable {
         holeFill: Color(hex: 0x232326),
         holeShadow: Color(hex: 0x000000).opacity(0.55),
         holeLip: Color(hex: 0xFFFFFF).opacity(0.14),
+        inlay: Color(hex: 0x6E8CA8),
+        inlayPale: Color(hex: 0xBFC6CC),
+        accent: Color(hex: 0xD9762E),
         table: Color(hex: 0x131315)
     )
 

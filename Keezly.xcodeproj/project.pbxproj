@@ -21,6 +21,7 @@
 		5D9F39D6B8B9B343FB63EA7B /* PlayPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B93678F21644FD63C4658C /* PlayPlanner.swift */; };
 		5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5E0E46A1D3857966A001B9EC /* KeezlyCore */; };
 		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
+		71D9948558D1AD1F37A7F8EE /* BoardOrnament.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */; };
 		74690CFDE17AFB4D550A4628 /* PawnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */; };
 		7D31621E9C5CC275E2B9A357 /* BoardPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B0B7B51FE6EE314EF9AB1A /* BoardPresenter.swift */; };
 		7E529AAE764EF5BC70A24D00 /* ScreenshotMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5615D1F3AA72616536C39E /* ScreenshotMode.swift */; };
@@ -28,6 +29,7 @@
 		813DD1386E7D98D2C9006EAC /* LaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5741C72A907AEF603B8937 /* LaunchTests.swift */; };
 		8309DF26E59769918673891D /* BoardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD74967519D049BB59C5FA /* BoardLayout.swift */; };
 		8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36B25AB04A78E23D9B845676 /* KeezlyCore */; };
+		9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */; };
 		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
 		A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF95D494649C4F6D223A28C /* MatchSession.swift */; };
 		B2801BC0A5360759083EB63B /* BoardSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */; };
@@ -75,6 +77,7 @@
 		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
 		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7312608406A17AE728331F13 /* BoardCentreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardCentreView.swift; sourceTree = "<group>"; };
+		79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardOrnamentTests.swift; sourceTree = "<group>"; };
 		7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keezly.xcconfig; sourceTree = "<group>"; };
 		88398C0B7DDDF6AFF83579CA /* Keezly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Keezly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		897EA5B37322B0549DF70ED6 /* BoardTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTheme.swift; sourceTree = "<group>"; };
@@ -87,6 +90,7 @@
 		B899A9121779A5665E7D27E6 /* HandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandView.swift; sourceTree = "<group>"; };
 		C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchFixtureTests.swift; sourceTree = "<group>"; };
 		C482C27A4DE9D8BA7FA25193 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardOrnament.swift; sourceTree = "<group>"; };
 		DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnView.swift; sourceTree = "<group>"; };
 		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBF95D494649C4F6D223A28C /* MatchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSession.swift; sourceTree = "<group>"; };
@@ -152,6 +156,7 @@
 			children = (
 				7312608406A17AE728331F13 /* BoardCentreView.swift */,
 				41AD74967519D049BB59C5FA /* BoardLayout.swift */,
+				D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */,
 				4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */,
 				1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */,
 				DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */,
@@ -246,6 +251,7 @@
 			children = (
 				AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */,
 				50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */,
+				79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */,
 				55F880978D3865E445AA5593 /* BoardPresenterTests.swift */,
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 			);
@@ -379,6 +385,7 @@
 			files = (
 				64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */,
 				579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */,
+				9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */,
 				28CC2B89F10507596DD31D50 /* BoardPresenterTests.swift in Sources */,
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 			);
@@ -390,6 +397,7 @@
 			files = (
 				C38467AD832BA4A6AE1C4DAD /* BoardCentreView.swift in Sources */,
 				8309DF26E59769918673891D /* BoardLayout.swift in Sources */,
+				71D9948558D1AD1F37A7F8EE /* BoardOrnament.swift in Sources */,
 				7D31621E9C5CC275E2B9A357 /* BoardPresenter.swift in Sources */,
 				B2801BC0A5360759083EB63B /* BoardSurface.swift in Sources */,
 				EB5021060F2317DB04D835A3 /* BoardTheme.swift in Sources */,
