@@ -208,8 +208,20 @@ platform :ios do
     results["Git tree clean"] = `git -C #{REPO_ROOT} status --porcelain`.strip.empty?
 
     # No secrets. A tracked key file is an immediate fail.
+    #
+    # Committed templates are explicitly not secrets: .env.example exists
+    # precisely so nobody has to guess the variable names, and flagging it
+    # would train people to ignore this check.
     tracked = `git -C #{REPO_ROOT} ls-files`.split("\n")
-    leaked = tracked.grep(/\.(p8|p12|mobileprovision|cer|pem)$|^\.env|AuthKey_/)
+    leaked = tracked.select do |path|
+      next false if path.end_with?(".example")
+
+      basename = File.basename(path)
+      path =~ /\.(p8|p12|mobileprovision|provisionprofile|cer|pem|keystore|jks)$/ ||
+        basename.start_with?("AuthKey_") ||
+        basename == ".env" ||
+        basename.start_with?(".env.")
+    end
     results["No secrets tracked"] = leaked.empty?
     UI.error("Tracked secret-like files: #{leaked.join(', ')}") unless leaked.empty?
 
