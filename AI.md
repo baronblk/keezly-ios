@@ -1,8 +1,13 @@
 # Keezly — Computer Opponents
 
-**Implementation status: NOT STARTED.** Nothing in this document exists as code
-yet. It records the design so it does not have to be re-derived, and so that the
-information boundary is settled *before* the first agent is written (§146).
+**Implementation status: the boundary exists, the agents do not.**
+
+| Part | Status |
+|---|---|
+| `PlayerObservation` — the information boundary | **IMPLEMENTED + TESTED** |
+| `AIAgent` protocol and `AIBudget` | **IMPLEMENTED** |
+| Easy / Medium / Hard agents | NOT STARTED |
+| Simulation harness | NOT STARTED |
 
 Tracked as M3 in `ROADMAP.md`.
 
@@ -21,6 +26,9 @@ seat's cards even by mistake.
 
 ### `PlayerObservation` — permitted contents
 
+Implemented in `Sources/KeezlyCore/AI/PlayerObservation.swift`. Its initialiser
+is the single chokepoint where hidden information is dropped.
+
 - the agent's own hand
 - every pawn's position (public — it is on the board)
 - the discard pile, i.e. every card already played this cycle
@@ -38,7 +46,31 @@ seat's cards even by mistake.
 
 A card-counting deduction — "all four Aces have been played, so nobody can bring
 a pawn out" — is legitimate and expected, because a human can do the same. It
-comes from the discard pile, which is public.
+comes from the discard pile, which is public, and is exposed as
+`observation.unseenCards`: the full deck minus your own cards minus everything
+played. It says which cards are still hidden, never *where* they are.
+
+### How the guarantee is tested
+
+Not by inspecting the agent's behaviour — by differential testing of the type.
+Two game states that differ only in something an agent must not know must
+produce **identical** observations:
+
+| Differs only in | Observations must be |
+|---|---|
+| opponents' hands | equal |
+| draw-pile order | equal |
+| random generator state | equal |
+| any pawn position, or the discard pile | **different** |
+
+The last row matters as much as the others: a boundary so tight that the agent
+cannot see the board would be equally useless.
+
+These tests were verified to actually bite. Injecting `state.hands` into
+`PlayerObservation` makes `opponentHandsDoNotLeak` fail, which is the evidence
+that the suite is not passing vacuously. A full six-player match is also played
+out while asserting, after every action, that no other seat's card is ever
+visible to the observer.
 
 ---
 

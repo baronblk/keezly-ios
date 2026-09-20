@@ -43,12 +43,18 @@ Versioning.
   committed, with a shared scheme covering the app, unit tests and UI tests.
 - **fastlane** through Bundler with lanes for tests, QA, the release gate, and
   the physical-device gates.
+- **AI information boundary**: computer opponents receive only a
+  `PlayerObservation` — their own cards, the open board, the cards already
+  played and how many cards each opponent holds. There is no route from an
+  agent to another player's hand or to the shuffled deck, so a computer
+  opponent cannot cheat even by accident.
 - **Device testing tooling**: `scripts/devices.sh` finds the physical iPhones
   and iPads paired with the development Mac and maps them onto stable roles,
   without ever storing a device name or identifier in the repository.
-- **Test suite**: 68 tests covering the board for every seat count, one test per
-  card rank, game flow, serialisation, and randomised self-play that plays 221
-  complete matches while asserting state invariants after every single action.
+- **Test suite**: 79 tests covering the board for every seat count, one test per
+  card rank, game flow, serialisation, the AI information boundary, and
+  randomised self-play that plays 221 complete matches while asserting state
+  invariants after every single action.
 - **Project memory**: `PROJECT_HANDOUT.md`, `CURRENT_STATE.md`, `ROADMAP.md`,
   `DECISIONS.md`, `ARCHITECTURE.md`, `RULES.md`, `RULE_VARIANTS.md`,
   `KNOWN_ISSUES.md` and this changelog.

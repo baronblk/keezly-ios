@@ -346,3 +346,42 @@ would end up pasted into documentation).
 **Consequences.** A fresh clone cannot build to a device until the developer
 creates `Config/Local.xcconfig`. That is documented in `PROJECT_HANDOUT.md` and
 is the intended trade-off.
+
+---
+
+## DEC-014 — Agents receive an observation, never the game state
+
+- **Date:** 2026-09-20
+- **Topic:** AI honesty
+- **Status:** ACCEPTED
+
+**Context.** §21 requires that no difficulty level is achieved by cheating: a
+computer opponent must not see another player's hand or the order of the deck.
+Stating that as a rule for implementers to follow is not enough — the first
+agent that takes a shortcut inside a rollout breaks it silently, and nothing
+fails.
+
+**Decision.** `AIAgent.chooseAction` takes a `PlayerObservation` and nothing
+else. `PlayerObservation` has exactly one initialiser, `init(of:for:)`, which
+copies the observer's own hand, all pawn positions, the discard pile, per-seat
+card *counts*, teams, phase and the legal moves — and drops the deck, the RNG
+and every other hand.
+
+**Reasoning.** An agent cannot read what it was never handed. Reviewing one
+initialiser is tractable; auditing every agent for discipline is not.
+
+**How it is enforced beyond the type.** Differential tests: two states that
+differ only in opponents' hands, deck order or generator state must produce
+equal observations, and states differing in public information must not. The
+tests were verified to fail when a leak is deliberately injected, so they are
+known to be load-bearing rather than vacuous.
+
+**Alternatives rejected.** Passing `GameState` with a convention not to touch
+hidden fields (unenforceable, and a rollout is exactly where the shortcut is
+tempting); marking hidden fields `internal` (the agents live in the same module,
+so it would not help at all).
+
+**Consequences.** If an agent needs a fact it cannot see, the fact is added to
+`PlayerObservation` deliberately and the differential tests re-run — widening
+the boundary is a visible, reviewed act. Hard AI's information-set sampling must
+draw only from `unseenCards`.

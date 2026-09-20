@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-4eca268  feat(fastlane): wire app store connect api key from outside the repo
+c4c28d9  test(ai): prove hidden information cannot reach an observation
 ```
 
 Everything below was verified against that commit on **2026-09-20** with
@@ -21,6 +21,7 @@ Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 **M0 — Repository & Foundation**: IN PROGRESS (M0.2 and M0.3 done; ci_scripts and lint config outstanding)
 **M1 — GameCore / Rules**: DONE
 **M2 — Complete Move Engine**: IN PROGRESS (only M2.10, the replay move log, is left)
+**M3 — AI**: IN PROGRESS (M3.1 done; no agent implemented yet)
 
 M1 was completed ahead of the remaining M0 tooling work, because the rules
 engine is testable with `swift test` alone and does not need the Xcode project.
@@ -80,6 +81,13 @@ engine is testable with `swift test` alone and does not need the Xcode project.
 - **Byte-stable encoding**: `GameState` has a hand-written `Codable` that sorts
   its seat sets, because Swift's `Set` iteration order is salted per process and
   would otherwise make every checksum comparison unreliable.
+- **AI information boundary** (M3.1): `PlayerObservation` is the only thing an
+  agent ever receives. It carries the observer's own hand, all pawn positions,
+  the discard pile, per-seat card *counts*, teams, phase and the legal moves —
+  and has no route to another hand, the draw pile or the RNG. `AIAgent`'s
+  signature enforces this. Card counting stays available through `unseenCards`.
+  **Verified by mutation test**: injecting `state.hands` into the observation
+  makes the boundary test fail, so the guarantee is actually checked.
 
 ---
 
@@ -92,7 +100,8 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 ## Not Implemented Yet
 
 - Xcode project, app target, shared schemes — the app does not build at all.
-- AI of any strength; `PlayerObservation` boundary does not exist.
+- AI agents of any strength (the observation boundary exists; Easy/Medium/Hard
+  do not).
 - All UI, all localisation, all audio/haptics, app icon.
 - Game Center, persistence/autosave, statistics, replay, tutorial, rulebook.
 - Fastlane, ci_scripts, Xcode Cloud, screenshot harness.
@@ -110,7 +119,8 @@ Run with `cd Packages/KeezlyCore && swift test`.
 | Game flow | 16 | passed |
 | Invariants | 6 | passed |
 | Serialization | 11 | passed |
-| **Total** | **68** | **68 passed, 0 failed** — 6.8 s |
+| AI observation boundary | 11 | passed |
+| **Total** | **79** | **79 passed, 0 failed** — 6.6 s |
 
 App-level tests, run through the Xcode project on a simulator:
 
@@ -263,18 +273,17 @@ See `DECISIONS.md` for the reasoning. In short:
 
 ## Next Steps (concrete)
 
-1. **M3.1 — `PlayerObservation`.** Define the AI's information boundary before
-   writing any agent code, so "the AI cannot cheat" is enforced by the type
-   system rather than by discipline. It must expose the acting seat's own hand,
-   all pawn positions, the discard pile, per-seat card counts, teams and phase —
-   and offer no route whatsoever to another seat's hand or to the deck order.
-   This is unblocked and is the next thing to build.
-2. **M0.4 — `ci_scripts/`.** `ci_post_clone.sh` (log toolchain versions, set up
+1. **M3.2 — the Easy agent.** Weighted random choice over
+   `observation.legalMoves`, avoiding the obviously catastrophic (knocking out
+   your own partner when an alternative exists, giving up a home-lane pawn)
+   while staying deliberately suboptimal. It is the first consumer of
+   `PlayerObservation` and will show whether that type carries enough to play
+   well — if something is missing, add it there and re-run the differential
+   tests, never widen the boundary casually.
+2. **M3.5 — the headless simulation harness**, so agent strength can be
+   measured over thousands of matches before Medium and Hard are written.
+3. **M0.4 — `ci_scripts/`.** `ci_post_clone.sh` (log toolchain versions, set up
    Bundler), `ci_pre_xcodebuild.sh` (derive `CFBundleVersion` from
    `CI_BUILD_NUMBER`), `ci_post_xcodebuild.sh` (collect result bundles). Check
    what Ruby the current Xcode Cloud image ships before writing the first one.
-3. **M0.5 — SwiftLint / SwiftFormat configuration**, wired into the `qa` lane.
-4. **Once MAN-03 is answered — the physical iPhone gate.** Put the team into
-   `Config/Local.xcconfig`, then `bundle exec fastlane device_iphone`. The
-   device is already connected and Developer Mode is on, so this should run as
-   soon as signing is settled.
+4. **M0.5 — SwiftLint / SwiftFormat configuration**, wired into the `qa` lane.

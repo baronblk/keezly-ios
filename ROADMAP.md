@@ -11,7 +11,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M0 | Repository & Foundation | IN PROGRESS |
 | M1 | GameCore / Rules | **DONE** |
 | M2 | Complete Move Engine | IN PROGRESS |
-| M3 | AI (Easy / Medium / Hard) | NOT STARTED |
+| M3 | AI (Easy / Medium / Hard) | IN PROGRESS |
 | M4 | Gameplay UI — iPad / iPhone | NOT STARTED |
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
 | M6 | Game Center Multiplayer | NOT STARTED |
@@ -115,11 +115,11 @@ integrity and size limits (done). Remaining: a replay move log (M2.10).
 
 ---
 
-## M3 — AI — NOT STARTED
+## M3 — AI — IN PROGRESS
 
 | Task | Status |
 |---|---|
-| M3.1 `PlayerObservation` — the AI's information boundary | NOT STARTED |
+| M3.1 `PlayerObservation` — the AI's information boundary | DONE |
 | M3.2 Easy AI — legal moves, weighted random, avoids obvious disasters | NOT STARTED |
 | M3.3 Medium AI — heuristic state evaluation | NOT STARTED |
 | M3.4 Hard AI — information-set sampling + time-boxed rollouts | NOT STARTED |
@@ -130,8 +130,11 @@ integrity and size limits (done). Remaining: a replay move log (M2.10).
 seat's hand or the deck order; Hard beats Medium beats Easy over a large sample;
 a move is chosen well under one second on device; the main thread never blocks.
 
-**Note.** M3.1 must land before any agent code, so that "no cheating" is an
-architectural property rather than a promise (§21). See `AI.md`.
+**M3.1 is done and verified.** Agents receive a `PlayerObservation` and never a
+`GameState`. The guarantee is tested differentially — two states differing only
+in opponents' hands, deck order or generator state must produce identical
+observations — and the tests were confirmed to bite by deliberately injecting a
+leak and watching them fail. See `AI.md`.
 
 ---
 
