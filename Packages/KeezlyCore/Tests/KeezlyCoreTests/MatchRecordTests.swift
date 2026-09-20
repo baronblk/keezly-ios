@@ -1,5 +1,5 @@
-@testable import KeezlyCore
 import Foundation
+@testable import KeezlyCore
 import Testing
 
 /// §57 — replay falls out of determinism: a seed plus the actions taken is the
