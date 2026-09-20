@@ -63,3 +63,7 @@ fastlane/*.env
 fastlane/Matchfile
 secrets/
 Credentials/
+
+# Local device role mapping — device names and UDIDs are local development
+# information and never belong in the repository (§158).
+.keezly-devices.env
