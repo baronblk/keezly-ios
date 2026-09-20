@@ -549,3 +549,57 @@ untouched, and no rule is coupled to a visual component.
 texture at board scale reads as a cheap tiling artefact. The renderer stays a
 single `Canvas` for everything static, because a turn-based board game must not
 run a render loop (§62).
+
+---
+
+## DEC-019 — A quiet Dutch identity, as ornament rather than illustration
+
+- **Date:** 2026-09-20
+- **Topic:** Visual direction
+- **Status:** ACCEPTED
+- **Extends:** DEC-018
+
+**Context.** Keezen is a Dutch game. The board said nothing about that. The
+obvious way to fix it is also the wrong one: windmills, clogs, tulip fields and
+flags would turn a premium board into an airport souvenir, and the product
+owner ruled that out explicitly.
+
+**Decision.** Dutch origin is expressed as **ornament, never illustration**,
+and always in the material rather than on top of it:
+
+- a running border engraved into the rim — an abstracted tulip alternating with
+  a concave lozenge, between two fine incised lines;
+- a medallion framing the cards in the middle, with one petal in each gap
+  between the home lanes;
+- a small chevron engraved where each home lane ends, pointing the way the
+  pawns travel;
+- **Delft blue** as a secondary accent at low opacity, never as a player colour;
+- **exactly one** orange detail on the whole board — a keystone at the top of
+  the medallion.
+
+Everything is drawn the way the milled holes are drawn: a lit lip under a dark
+incision. That is what makes it part of the board rather than a decal.
+
+**The originality line, again.** No Delft tile pattern, border or board graphic
+is traced or reproduced. The motifs are built from Keezly's own proportions —
+a leaf of one construction used at three sizes, and a lozenge of one
+construction. The tradition is the inspiration; the geometry is ours.
+
+**Three constraints that shaped it.**
+
+1. **Ornament must never be mistakable for a playing square.** Tested, not
+   assumed: every motif keeps a measured clearance from every square, at every
+   seat count. The first attempt failed this test against the waiting trays, so
+   the board's rim was widened rather than the ornament squeezed in.
+2. **It must survive being small.** The first tulip, a bud with curling strokes
+   and a stem, read as a stray squiggle at the size it is actually drawn. Three
+   symmetric leaves survive. Below roughly nine points per square the motifs are
+   dropped entirely and only the border lines remain — a phone gets the frame,
+   not the detail.
+3. **It must fit every table.** The medallion is measured against the board's
+   own inner field, not in square widths. At two seats there is no quiet centre
+   at all, and it is simply not drawn (ISS-008).
+
+**Consequence.** The board's rim is wider than before, so the playing area is
+about six percent smaller in the same space. That is the price of a frame that
+can hold a border, and it was paid deliberately.

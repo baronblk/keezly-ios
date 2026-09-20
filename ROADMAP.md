@@ -166,7 +166,8 @@ leak and watching them fail. See `AI.md`.
 | M4.8 Centre of the board — draw pile, discard, turn and deal status | DONE |
 | M4.9 Classic Wood material, round milled holes, pawn silhouettes, real playing cards (DEC-018) | DONE |
 | M4.10 Seat status panels using the spare landscape width (§35) | DONE |
-| M4.11 Deterministic screenshot mode and design-review captures (§87) | DONE |
+| M4.11 Deterministic screenshot mode and design-review captures (§87) | DONE — plus fixtures that fast-forward to a playable Jack, a Seven mid-split, a free-for-all table and a mid-match phone |
+| M4.12 Dutch ornament on the Classic Wood board (DEC-019) | DONE — engraved border, centre medallion, home-lane chevrons, one orange detail |
 
 **Acceptance criteria.** The iPad layout is designed for the large display, not
 scaled up; a pawn can never appear to move on its own or a move be applied
@@ -273,7 +274,7 @@ and mocked tests can proceed without them (§142).
 | M11.8 Simulator/orientation/localisation UI test matrix | NOT STARTED |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
 | M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
-| M11.11 Physical iPhone quality gate | PARTIAL — 34/34 on an iPhone 17 Pro (iOS 27.0) covering launch, gameplay, rotation and the phone layouts; haptics, audio and Game Center items wait on those features |
+| M11.11 Physical iPhone quality gate | PARTIAL — 58/58 on an iPhone 17 Pro (iOS 27.0); haptics, audio and Game Center items wait on those features |
 | M11.12 Physical iPad quality gate | BLOCKED — no iPad paired (MAN-10) |
 | M11.13 Game Center multi-device verification | BLOCKED — MAN-10/11 + M6 |
 | M11.14 Real-hardware performance and long-run test | BLOCKED — needs gameplay (M4) |

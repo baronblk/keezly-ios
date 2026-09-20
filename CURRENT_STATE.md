@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-e4bae0f  test(ui): cover the animation pipeline including interruption
+8c9fa43  feat(board): give the classic wood board a quiet dutch ornament
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -42,7 +42,7 @@ Three different questions, never merged into one answer (§167):
 | **SIMULATOR VERIFIED** | It was built and tested on a simulator |
 | **PHYSICAL DEVICE VERIFIED** | It was built and tested on real hardware |
 
-### Design status (DEC-018)
+### Design status (DEC-018, DEC-019)
 
 Visual direction is **tactile digital board game**, material **Classic Wood**:
 a maple panel with round milled holes, pawn silhouettes seated in them, and real
@@ -73,6 +73,13 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**The board carries a quiet Dutch identity (DEC-019).** A running border of
+tulips and lozenges engraved into the rim, a medallion framing the cards, a
+chevron at the end of each home lane, and exactly one small orange detail. All
+of it is Keezly's own geometry, all of it ton-in-ton, and none of it is drawn
+where it could be confused with a playing square — which is tested, not
+assumed.
 
 Still open: no bespoke choreography for dealing, the Seven's legs or the Jack
 swap; no haptics or audio; Dark Graphite is not offered in Settings; Split View
@@ -154,7 +161,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 ## Tests
 
 `cd Packages/KeezlyCore && swift test` — **137 tests in 12 suites, 0 failures**,
-89.7 s, re-run at the commit above.
+93.7 s, re-run at the commit above.
 
 | Suite | Tests |
 |---|---|
@@ -183,9 +190,13 @@ Two gated suites, excluded from the default run on purpose:
 
 | App-level | Result |
 |---|---|
-| iPhone 17 simulator, iOS 27.0 | **34/34** (unit, launch, play flow, animation, layout captures) |
-| iPad Pro 13" (M5) simulator, iOS 27.0 | **34/34** |
-| Physical iPhone 17 Pro, iOS 27.0 | **34/34** — re-run after the UI rebuild, not the stale pre-M4 result |
+| iPad Pro 13" (M5) simulator, iOS 27.0 | **58/58** (unit, launch, play flow, animation, ornament, fixtures, captures) |
+| Physical iPhone 17 Pro, iOS 27.0 | **58/58** |
+| Physical iPad (A16), iOS 27.0 | **58/58** |
+
+`fastlane` reports 117 for the same run: it counts parameterised cases, the
+result bundle counts test functions. Both numbers are true; they answer
+different questions.
 
 ---
 
@@ -196,9 +207,9 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (34/34) — `fastlane device_iphone` | 2026-09-20 | `e4bae0f` |
-| Physical iPad | **BLOCKED** — `fastlane device_ipad` reports DEVICE NOT AVAILABLE, not a pass (MAN-10) | — | — |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (58/58) | 2026-09-20 | `8c9fa43` |
+| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (58/58) — `fastlane device_iphone` | 2026-09-20 | `8c9fa43` |
+| Physical iPad (A16), iOS 27.0 | **PASSED** (58/58) — `fastlane device_ipad`, first real-hardware run | 2026-09-20 | `8c9fa43` |
 | Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
@@ -243,7 +254,7 @@ a position the code short-circuits out of proves nothing.
 | MAN-07 | Configure TestFlight testers | OPEN |
 | MAN-08 | App Store Connect API key | **DONE & VERIFIED** — outside the repo; `fastlane asc_check` authenticates |
 | MAN-09 | Pair a physical iPhone | **DONE** — iPhone 17 Pro, Developer Mode on |
-| MAN-10 | Pair a physical iPad | OPEN — blocks the iPad gate |
+| MAN-10 | Pair a physical iPad | **DONE & VERIFIED** — iPad (A16), iOS 27.0, gate green 2026-09-20 |
 | MAN-11 | Second Apple Account in Game Center | OPEN |
 | MAN-12 | Second physical device for Game Center tests | OPEN |
 
@@ -269,20 +280,19 @@ SwiftFormat allowlists.
 
 ## Next Steps (concrete)
 
-**M4 continues.** The iPhone pass, the animation pipeline, the full regression
-and the physical iPhone gate are done. What is left, in order:
+**M4 continues.** The iPhone pass, the animation pipeline, the screenshot
+fixtures, the Dutch ornament pass and **both** hardware gates are done. What is
+left, in order:
 
-1. **Widen the screenshot fixtures (§87).** The deterministic captures cover a
-   plain four- and six-player table. They should also cover a team game, a Jack
-   waiting for its target, a Seven mid-split, and the phone layouts, so a
-   design regression in those states cannot pass unnoticed.
-2. **Pointer, trackpad and keyboard on iPad (M4.7).**
-3. **Main menu and table configuration**, which is what lets a player choose
+1. **Pointer, trackpad and keyboard on iPad (M4.7).**
+2. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
-4. **M5 — pass & play and autosave.**
+3. **M5 — pass & play and autosave.**
+4. **Landscape captures come out rotated** (ISS-009). Harmless for a design
+   review, but they cannot be submitted as App Store screenshots as they are.
 
-Blocked and not startable: the iPad hardware gate (MAN-10), anything behind the
-App Store Connect record (MAN-02), and Game Center multi-device (MAN-11/12).
+Blocked and not startable: anything behind the App Store Connect record
+(MAN-02), and Game Center multi-device (MAN-11/12).
 
 Superseded plan, kept for context:
 

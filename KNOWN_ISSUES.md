@@ -10,11 +10,54 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ## Open
 
-*None.*
+| # | Summary | Severity |
+|---|---|---|
+| ISS-009 | Landscape captures come out rotated | Minor (tooling) |
 
 ---
 
 ## Closed
+
+### ISS-009 — Landscape captures come out rotated
+
+- **Status:** OPEN
+- **Severity:** Minor (tooling; blocks App Store submission of captures)
+- **Component:** Screenshot harness
+- **Description:** `DesignReviewScreenshots` sets `XCUIDevice.orientation` and
+  then takes `XCUIScreen.main.screenshot()`, which returns the physical screen
+  buffer. The interface is correctly in landscape, but the image comes out in
+  the device's portrait pixel orientation with the content turned on its side.
+- **Reproduction:** Run any landscape capture and open the attachment.
+- **Expected:** An image the right way up, submittable under §88.
+- **Actual:** Correct content, rotated 90°.
+- **Impact:** None on the design review — the board is fully legible and has
+  been judged from these captures. It does matter for App Store screenshots,
+  which is what the harness is ultimately for.
+- **Workaround:** Rotate on export; not yet implemented.
+- **Related files:** `App/KeezlyUITests/DesignReviewScreenshots.swift`
+
+### ISS-008 — A two-player board has no quiet centre
+
+- **Status:** VERIFIED (accepted, with the ornament suppressed)
+- **Severity:** Minor (visual)
+- **Component:** App / Board
+- **Description:** The centre medallion was first sized in hole widths, which
+  suits four and six seats. At two seats the track is half as long, so the home
+  lanes run almost to the middle of the board: a medallion of that size would
+  have been drawn straight across the deepest home square.
+- **Reproduction:** `BoardOrnament.medallionRadius(innerField:square:)` with a
+  two-seat layout's inner field.
+- **Expected:** Ornament never overlaps the game.
+- **Actual:** It would have, at two seats only.
+- **Fix:** The medallion is measured against the board's own inner field and is
+  **not drawn at all** when there is no room. Ornament over the game is worse
+  than no ornament.
+- **Remaining risk:** the same cramped centre also holds the draw pile and the
+  turn indicator, which are sized from the view rather than from the board. A
+  two-player table has not yet been reviewed for that crowding.
+- **Related tests:** `BoardOrnamentTests.medallionFitsOrIsOmitted`,
+  `BoardOrnamentTests.noRoomMeansNoMedallion`
+- **Verified by:** the app suite at commit `8c9fa43`.
 
 ### ISS-007 — Dynamic Type had no effect anywhere in the interface
 

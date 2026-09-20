@@ -25,11 +25,11 @@ the end.
 - [x] Rules engine unit tests green — 137 passed, 0 failed at commit `e4bae0f`
 - [x] AI simulation green — three strengths measured over recorded samples
       (`AI.md`); the extended sample runs behind `KEEZLY_EXTENDED_SIM=1`
-- [x] App tests green — 34/34 (21 app unit, 13 UI) on iPhone 17 and
-      iPad Pro 13" (M5) simulators **and** on a physical iPhone 17 Pro, at
-      commit `e4bae0f`. Scope is launch, rotation, the card-interaction flow,
-      the animation pipeline and the layout captures; the rule-specific
-      gameplay items below are not yet scripted.
+- [x] App tests green — 58/58 on the iPad Pro 13" (M5) simulator **and** on a
+      physical iPhone 17 Pro **and** a physical iPad (A16), at commit
+      `8c9fa43`. Scope is launch, rotation, the card-interaction flow, the
+      animation pipeline, the ornament geometry and the capture fixtures; the
+      rule-specific gameplay items below are not yet scripted.
 - [ ] Large-scale randomised simulation green — partial: 221 matches in the invariant suite
 - [ ] No known critical bugs — *currently true; see `KNOWN_ISSUES.md`*
 
@@ -62,11 +62,14 @@ which is not the same evidence.
 - [x] Card interaction · [ ] Jack swap · [ ] Seven split · [ ] Capture · [ ] Home entry
 - [x] Rotation · [ ] Background and resume · [ ] Haptics · [ ] Audio · [ ] Game Center
 
-**Physical iPad** — no iPad paired (MAN-10), so this gate is BLOCKED.
+**Physical iPad** — iPad (A16), iOS 27.0. PHYSICAL DEVICE VERIFIED at commit
+`8c9fa43` (58/58, 2026-09-20). Ticked items are covered by that automated run;
+the rest need either a feature that does not exist yet or a human judgement
+nobody has made.
 
-- [ ] Install · [ ] Launch · [ ] Landscape · [ ] Portrait · [ ] Large board layout
-- [ ] 4-player match · [ ] 6-player match · [ ] Team match · [ ] AI opponent
-- [ ] Cards legible at normal viewing distance · [ ] Touch interaction · [ ] Rotation
+- [x] Install · [x] Launch · [x] Landscape · [x] Portrait · [x] Large board layout
+- [x] 4-player match · [x] 6-player match · [x] Team match · [x] AI opponent
+- [ ] Cards legible at normal viewing distance · [x] Touch interaction · [x] Rotation
 - [ ] Multitasking where supported · [ ] Background and resume · [ ] Game Center
 - [ ] Performance — launch time, frame smoothness, memory, energy, thermals
 
@@ -80,9 +83,9 @@ which is not the same evidence.
 
 | Gate | Result | Evidence |
 |---|---|---|
-| Simulator | PASS (partial scope) | 34/34 on iPhone 17 and iPad Pro 13" (M5), iOS 27.0, at `e4bae0f` |
-| Physical iPhone | PASS (partial scope) | 34/34 on iPhone 17 Pro, iOS 27.0, at `e4bae0f` |
-| Physical iPad | BLOCKED | no iPad paired (MAN-10) |
+| Simulator | PASS (partial scope) | 58/58 on iPad Pro 13" (M5), iOS 27.0, at `8c9fa43` |
+| Physical iPhone | PASS (partial scope) | 58/58 on iPhone 17 Pro, iOS 27.0, at `8c9fa43` |
+| Physical iPad | PASS (partial scope) | 58/58 on iPad (A16), iOS 27.0, at `8c9fa43` |
 | Game Center real device | BLOCKED | not implemented (M6) |
 
 "Partial scope" means the gate ran everything that exists today. It cannot be

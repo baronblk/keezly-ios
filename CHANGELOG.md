@@ -69,7 +69,15 @@ Versioning.
   once. Interrupting an animation — leaving the app, closing the screen — always
   leaves the board on the true position. Reduce Motion lands moves instead.
 - **Deterministic screenshot mode** with a fixed seed and seat count, so a
-  design review and the App Store captures show the same board every run.
+  design review and the App Store captures show the same board every run. It
+  can also fast-forward a match to a situation worth photographing — a playable
+  Jack, a Seven halfway through its split — which the opening deal can never
+  show, because those cards need pieces already on the track.
+- **A quiet Dutch identity on the board**: a tulip-and-lozenge border engraved
+  into the rim, a medallion framing the cards, a chevron at the end of each home
+  lane, and a single orange keystone. Ornament, not illustration — from playing
+  distance it reads as a well-made board, and only up close does the detail
+  appear.
 - **Device testing tooling**: `scripts/devices.sh` finds the physical iPhones
   and iPads paired with the development Mac and maps them onto stable roles,
   without ever storing a device name or identifier in the repository.
