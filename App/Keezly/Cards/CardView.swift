@@ -1,66 +1,51 @@
 import KeezlyCore
 import SwiftUI
 
+/// Where a card is being shown.
+enum CardRole: String {
+    case hand
+    case discard
+}
+
 /// A playing card.
 ///
-/// The rank carries the card, large and rounded, legible across a table (§45).
-/// Cards whose effect is not their face value carry a small hint — a Four moves
-/// backward, a Seven splits — worded as a symbol rather than a sentence, so it
-/// reads as part of the card rather than as a tutorial overlay.
+/// The goal is that a player's first thought is "that is a playing card", not
+/// "that is a button with a letter on it" (§45). So: a cream face with a fine
+/// border, classic corner indices top-left and rotated bottom-right, and a
+/// traditional pip field in the middle. The court cards carry Keezly's own
+/// reduced emblems rather than anyone's illustrations (§76).
+///
+/// What Keezen adds — that a Four goes backward, that a Seven splits — is a
+/// small mark in the free top-right corner. Secondary by construction: it sits
+/// where a real card has nothing, and never competes with the index.
 struct CardView: View {
     let card: Card
     var width: CGFloat = 76
     var isPlayable = true
     var isSelected = false
-    /// What this card *is* on screen. A card in the hand and the card on top of
-    /// the discard pile look alike but are not interchangeable — a UI test that
-    /// cannot tell them apart will happily count the discard as part of the
-    /// hand, which is exactly what happened.
     var role: CardRole = .hand
+    var faceUp = true
 
-    private var height: CGFloat { width * 1.4 }
+    private var height: CGFloat { width * 1.45 }
+    private var suit: CardSuitKind { Self.suit(of: card) }
+    private var ink: Color { suit.isRed ? Keezly.Palette.cardRed : Keezly.Palette.cardInk }
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: width * 0.13, style: .continuous)
-                .fill(Keezly.Palette.cardFace)
-                .overlay(
-                    RoundedRectangle(cornerRadius: width * 0.13, style: .continuous)
-                        .strokeBorder(
-                            isSelected ? Keezly.Palette.legalTarget : Keezly.Palette.rim,
-                            lineWidth: isSelected ? max(2, width * 0.05) : 1
-                        )
-                )
-                .shadow(color: .black.opacity(isSelected ? 0.3 : 0.18),
-                        radius: width * (isSelected ? 0.14 : 0.07),
-                        y: width * 0.04)
-
-            VStack(spacing: width * 0.04) {
-                Text(card.rank.shorthand)
-                    .font(Keezly.Typography.cardRank(size: width * 0.46))
-                    .foregroundStyle(Keezly.Palette.cardInk)
-
-                if let hint = Self.hint(for: card.rank) {
-                    Text(hint)
-                        .font(.system(size: width * 0.17, weight: .medium, design: .rounded))
-                        .foregroundStyle(Keezly.Palette.cardInk.opacity(0.55))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
+            face
+            if !isPlayable {
+                // Dimmed, never erased: a player who cannot move needs to see
+                // which cards are stuck (§36).
+                shape.fill(Keezly.Palette.table.opacity(0.42))
             }
-            .padding(.horizontal, width * 0.08)
         }
         .frame(width: width, height: height)
-        // An unplayable card stays a visible card, dimmed rather than erased:
-        // a player who cannot move needs to see *which* cards are stuck, not
-        // an empty space where their hand was (§36).
-        .overlay {
-            if !isPlayable {
-                RoundedRectangle(cornerRadius: width * 0.13, style: .continuous)
-                    .fill(Keezly.Palette.table.opacity(0.45))
-            }
-        }
-        .offset(y: isSelected ? -width * 0.16 : 0)
+        .shadow(
+            color: .black.opacity(isSelected ? 0.34 : 0.2),
+            radius: width * (isSelected ? 0.15 : 0.07),
+            y: width * (isSelected ? 0.07 : 0.03)
+        )
+        .offset(y: isSelected ? -width * 0.18 : 0)
         .accessibilityElement(children: .ignore)
         .accessibilityIdentifier("\(role.rawValue).card.\(card.id)")
         .accessibilityLabel(Self.accessibilityLabel(for: card.rank))
@@ -68,21 +53,97 @@ struct CardView: View {
         .accessibilityValue(isPlayable ? "" : String(localized: "card.unplayable"))
     }
 
-    /// The short functional hint, for cards that do not simply move their face
-    /// value forward.
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: width * 0.085, style: .continuous)
+    }
+
+    @ViewBuilder
+    private var face: some View {
+        if faceUp {
+            ZStack {
+                shape.fill(Keezly.Palette.cardFace)
+                shape.strokeBorder(Keezly.Palette.cardInk.opacity(0.16), lineWidth: max(0.5, width * 0.008))
+
+                centre
+                    .padding(.horizontal, width * 0.2)
+                    .padding(.vertical, height * 0.13)
+
+                cornerIndices
+                if let hint = Self.hint(for: card.rank) { keezenHint(hint) }
+            }
+            .overlay {
+                if isSelected {
+                    shape.strokeBorder(ink.opacity(0.5), lineWidth: max(1, width * 0.022))
+                }
+            }
+        } else {
+            CardBackPattern()
+                .clipShape(shape)
+                .overlay(shape.strokeBorder(.white.opacity(0.2), lineWidth: max(0.5, width * 0.01)))
+        }
+    }
+
+    // MARK: - Parts
+
+    @ViewBuilder
+    private var centre: some View {
+        switch card.rank {
+        case .jack, .queen, .king:
+            CourtPanel(rank: card.rank, suit: suit, ink: ink)
+        default:
+            PipField(value: card.rank == .ace ? 1 : card.rank.rawValue, suit: suit, ink: ink)
+        }
+    }
+
+    private var cornerIndices: some View {
+        GeometryReader { proxy in
+            let index = CornerIndex(rank: card.rank, suit: suit, ink: ink, width: width)
+            ZStack {
+                index
+                    .position(x: width * 0.145, y: height * 0.125)
+                index
+                    .rotationEffect(.degrees(180))
+                    .position(x: proxy.size.width - width * 0.145, y: proxy.size.height - height * 0.125)
+            }
+        }
+    }
+
+    private func keezenHint(_ hint: String) -> some View {
+        Text(hint)
+            .font(.system(size: width * 0.115, weight: .semibold, design: .rounded))
+            .foregroundStyle(Keezly.Palette.cardInk.opacity(0.42))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .padding(.top, height * 0.055)
+            .padding(.trailing, width * 0.075)
+    }
+
+    // MARK: - Mapping and text
+
+    /// The engine's decorative suit, turned into something drawable. The rules
+    /// never see either (§10).
+    static func suit(of card: Card) -> CardSuitKind {
+        switch card.visualSuit {
+        case .spades: .spade
+        case .hearts: .heart
+        case .diamonds: .diamond
+        case .clubs: .club
+        }
+    }
+
+    /// What Keezen makes this card do, when that is not its face value.
     static func hint(for rank: CardRank) -> String? {
         switch rank {
-        case .ace: "⌂ / 1"
+        case .ace: "⌂1"
         case .king: "⌂"
         case .queen: "12"
         case .jack: "⇄"
-        case .four: "← 4"
-        case .seven: "7 ⋯"
+        case .four: "←4"
+        case .seven: "1–7"
         default: nil
         }
     }
 
-    /// Spoken description. Ranks alone are ambiguous aloud, so each says what
+    /// Spoken description. A rank alone is ambiguous aloud, so each says what
     /// it does (§53).
     static func accessibilityLabel(for rank: CardRank) -> String {
         switch rank {
@@ -97,40 +158,101 @@ struct CardView: View {
     }
 }
 
-/// Where a card is being shown.
-enum CardRole: String {
-    case hand
-    case discard
-}
-
-/// The local player's hand.
-///
-/// Cards overlap into a fan when there are many, so a full hand of five stays
-/// reachable on a phone without shrinking the cards to illegibility.
-struct HandView: View {
-    let cards: [Card]
-    let playable: Set<Card>
-    var selected: Card?
-    var cardWidth: CGFloat = 76
-    var onSelect: (Card) -> Void
+/// Rank over suit, the way a card has carried its value for two centuries.
+private struct CornerIndex: View {
+    let rank: CardRank
+    let suit: CardSuitKind
+    let ink: Color
+    let width: CGFloat
 
     var body: some View {
-        HStack(spacing: -cardWidth * 0.08) {
-            ForEach(cards) { card in
-                CardView(
-                    card: card,
-                    width: cardWidth,
-                    isPlayable: playable.contains(card),
-                    isSelected: selected == card,
-                    role: .hand
-                )
-                .zIndex(selected == card ? 1 : 0)
-                .onTapGesture {
-                    guard playable.contains(card) else { return }
-                    onSelect(card)
+        VStack(spacing: width * 0.01) {
+            Text(rank.shorthand)
+                .font(.system(size: width * 0.19, weight: .bold, design: .rounded))
+                .foregroundStyle(ink)
+            SuitGlyph(suit: suit)
+                .fill(ink)
+                .frame(width: width * 0.115, height: width * 0.115)
+        }
+        .fixedSize()
+    }
+}
+
+/// The pips of a number card, laid out traditionally.
+private struct PipField: View {
+    let value: Int
+    let suit: CardSuitKind
+    let ink: Color
+
+    var body: some View {
+        GeometryReader { proxy in
+            let pips = PipLayout.pips(for: value)
+            // The ace carries one large pip; the rest scale down as the card
+            // fills up, which is what keeps a ten from becoming a smudge.
+            let size = value == 1
+                ? min(proxy.size.width, proxy.size.height) * 0.62
+                : proxy.size.width * (value >= 9 ? 0.3 : 0.36)
+
+            ForEach(Array(pips.enumerated()), id: \.offset) { _, pip in
+                SuitGlyph(suit: suit)
+                    .fill(ink)
+                    .frame(width: size, height: size)
+                    .rotationEffect(.degrees(pip.inverted ? 180 : 0))
+                    .position(
+                        x: proxy.size.width * pip.x,
+                        y: proxy.size.height * pip.y
+                    )
+            }
+        }
+    }
+}
+
+/// A court card: Keezly's own emblem, mirrored top and bottom, with the suit
+/// shown small at each end.
+private struct CourtPanel: View {
+    let rank: CardRank
+    let suit: CardSuitKind
+    let ink: Color
+
+    private var emblem: CourtEmblem.Rank {
+        switch rank {
+        case .queen: .queen
+        case .king: .king
+        default: .jack
+        }
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let width = proxy.size.width
+            let height = proxy.size.height
+
+            ZStack {
+                RoundedRectangle(cornerRadius: width * 0.1, style: .continuous)
+                    .fill(ink.opacity(0.05))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: width * 0.1, style: .continuous)
+                            .strokeBorder(ink.opacity(0.16), lineWidth: max(0.5, width * 0.014))
+                    )
+
+                VStack(spacing: 0) {
+                    half(width: width, height: height / 2, inverted: false)
+                    half(width: width, height: height / 2, inverted: true)
                 }
             }
         }
-        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: selected)
+    }
+
+    private func half(width: CGFloat, height: CGFloat, inverted: Bool) -> some View {
+        VStack(spacing: height * 0.06) {
+            CourtEmblem(rank: emblem)
+                .fill(ink.opacity(0.82))
+                .frame(width: width * 0.48, height: height * 0.4)
+            SuitGlyph(suit: suit)
+                .fill(ink)
+                .frame(width: width * 0.24, height: width * 0.24)
+        }
+        .padding(.vertical, height * 0.1)
+        .rotationEffect(.degrees(inverted ? 180 : 0))
     }
 }

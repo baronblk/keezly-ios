@@ -62,6 +62,9 @@ enum Keezly {
         static let cardFace = Color("CardFace", bundle: .main)
         /// What is printed on a card.
         static let cardInk = Color("CardInk", bundle: .main)
+        /// Hearts and diamonds. Traditional colouring only — it carries no rule
+        /// meaning, and the engine never sees it (§10).
+        static let cardRed = Color("CardRed", bundle: .main)
     }
 
     // MARK: - Type

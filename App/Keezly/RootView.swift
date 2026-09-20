@@ -8,10 +8,13 @@ import SwiftUI
 /// judged on device. The main menu, where the table is configured, arrives
 /// later in M4; there are deliberately no controls here that do nothing.
 struct RootView: View {
+    // The table comes from ScreenshotMode so a UI test or a screenshot run can
+    // ask for a specific seat count and seed. Outside such a run it returns the
+    // ordinary four-player defaults (§87).
     @State private var session = MatchSession(
-        configuration: .standard(seatCount: 4),
-        seed: 2026,
-        roles: [.human, .computer(.medium), .computer(.medium), .computer(.medium)]
+        configuration: ScreenshotMode.configuration,
+        seed: ScreenshotMode.seed,
+        roles: ScreenshotMode.roles
     )
 
     var body: some View {

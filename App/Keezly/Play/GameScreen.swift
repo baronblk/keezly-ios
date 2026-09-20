@@ -11,6 +11,9 @@ struct GameScreen: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Classic Wood is the material for 1.0.0 (DEC-018).
+    private let theme = BoardTheme.classicWood
+
     @State private var session: MatchSession
     @State private var selectedCard: Card?
     @State private var selectedPawn: PawnID?
@@ -21,6 +24,8 @@ struct GameScreen: View {
     }
 
     private var isCompact: Bool { horizontalSizeClass == .compact }
+    /// Cards are larger on iPad: the big display is the point, not a bonus (§4).
+    private var handCardWidth: CGFloat { isCompact ? 72 : 112 }
     private var layout: BoardLayout { BoardLayout(board: session.state.board) }
 
     /// The interaction state, rebuilt from the session every render so it can
@@ -38,23 +43,96 @@ struct GameScreen: View {
     }
 
     var body: some View {
-        ZStack {
-            Keezly.Palette.table.ignoresSafeArea()
+        GeometryReader { proxy in
+            ZStack {
+                theme.table.ignoresSafeArea()
 
-            VStack(spacing: isCompact ? Keezly.Spacing.medium : Keezly.Spacing.large) {
-                board
-                    .frame(maxHeight: .infinity)
-
-                if let remaining = planner.remainingSevenSteps, remaining > 0 {
-                    SevenProgress(remaining: remaining, isCompact: isCompact)
+                if isCompact {
+                    compactLayout(size: proxy.size)
+                } else {
+                    wideLayout(size: proxy.size)
                 }
-
-                hand
             }
-            .padding(isCompact ? Keezly.Spacing.small : Keezly.Spacing.large)
         }
+        .environment(\.boardTheme, theme)
         .onAppear { session.begin() }
         .onChange(of: session.pendingEvents.count) { _, _ in playOutEvents() }
+    }
+
+    // MARK: - Layouts
+
+    /// Phone-shaped: the board leads, the hand sits under it within thumb reach,
+    /// and the opponents are a single compact row (§5).
+    private func compactLayout(size: CGSize) -> some View {
+        VStack(spacing: Keezly.Spacing.small) {
+            opponentStrip
+            board.frame(maxHeight: .infinity)
+            sevenProgress
+            hand(availableWidth: size.width - Keezly.Spacing.regular * 2)
+        }
+        .padding(Keezly.Spacing.small)
+    }
+
+    /// iPad-shaped, and especially landscape: the board takes the height it can
+    /// get, the hand sits beneath it, and the width left over carries the seat
+    /// status — rather than being left empty because the board happens to be
+    /// square (§4).
+    private func wideLayout(size: CGSize) -> some View {
+        // The board is square, so in landscape its size is set by the height
+        // left after the hand. Whatever width that leaves goes to the seat
+        // panels rather than sitting empty either side of a centred board.
+        let handHeight = handCardWidth * 1.45 + handCardWidth * 0.3
+        let boardSide = max(240, size.height - handHeight - Keezly.Spacing.section)
+        let sideWidth = max(210, (size.width - boardSide) / 2 - Keezly.Spacing.large)
+        let opponents = session.state.configuration.seats.filter { $0 != session.localSeat }
+        let split = (opponents.count + 1) / 2
+
+        return HStack(alignment: .center, spacing: Keezly.Spacing.large) {
+            SeatColumn(
+                seats: Array(opponents.prefix(split)),
+                state: session.state, roles: session.roles, localSeat: session.localSeat
+            )
+            .frame(width: sideWidth)
+
+            VStack(spacing: Keezly.Spacing.medium) {
+                board.frame(maxHeight: .infinity)
+                sevenProgress
+                hand(availableWidth: boardSide)
+            }
+
+            SeatColumn(
+                seats: Array(opponents.suffix(from: split)),
+                state: session.state, roles: session.roles, localSeat: session.localSeat
+            )
+            .frame(width: sideWidth)
+        }
+        .padding(Keezly.Spacing.regular)
+    }
+
+    private var opponentStrip: some View {
+        HStack(spacing: Keezly.Spacing.tight) {
+            ForEach(session.state.configuration.seats.filter { $0 != session.localSeat }, id: \.self) { seat in
+                SeatStatusView(
+                    seat: seat,
+                    role: session.roles[seat.index],
+                    cardCount: session.state.hand(of: seat).count,
+                    pawnsHome: session.state.pawns(of: seat).count(where: \.isHome),
+                    isDealer: session.state.dealer == seat,
+                    isOnTurn: session.state.currentSeat == seat,
+                    isPartner: session.localSeat.map {
+                        session.state.configuration.areAllied($0, seat) && $0 != seat
+                    } ?? false,
+                    compact: true
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var sevenProgress: some View {
+        if let remaining = planner.remainingSevenSteps, remaining > 0 {
+            SevenProgress(remaining: remaining, isCompact: isCompact)
+        }
     }
 
     // MARK: - Pieces
@@ -86,7 +164,7 @@ struct GameScreen: View {
     }
 
     @ViewBuilder
-    private var hand: some View {
+    private func hand(availableWidth: CGFloat) -> some View {
         VStack(spacing: Keezly.Spacing.small) {
             if session.mustFold {
                 Button {
@@ -106,7 +184,8 @@ struct GameScreen: View {
                     cards: session.state.hand(of: seat).cards,
                     playable: planner.playableCards,
                     selected: selectedCard,
-                    cardWidth: isCompact ? 58 : 84,
+                    cardWidth: handCardWidth,
+                    availableWidth: availableWidth,
                     onSelect: select(card:)
                 )
                 .disabled(!session.isAwaitingHuman)

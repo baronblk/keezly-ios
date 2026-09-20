@@ -43,25 +43,31 @@ private struct DrawPile: View {
     let remaining: Int
     let width: CGFloat
 
+    private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: width * 0.085, style: .continuous) }
+
     var body: some View {
         ZStack {
-            // A couple of offset backs read as a pile without drawing one card
-            // per remaining card.
+            // A few offset backs read as a stack without drawing one card per
+            // remaining card. The count rides on top as a small token rather
+            // than as a number printed across the cards.
             ForEach(0..<min(3, max(1, remaining)), id: \.self) { layer in
-                RoundedRectangle(cornerRadius: width * 0.14, style: .continuous)
-                    .fill(Keezly.Palette.board)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: width * 0.14, style: .continuous)
-                            .strokeBorder(Keezly.Palette.rim, lineWidth: 1)
-                    )
-                    .offset(x: CGFloat(layer) * width * 0.03, y: CGFloat(layer) * -width * 0.03)
+                CardBackPattern()
+                    .clipShape(shape)
+                    .overlay(shape.strokeBorder(.white.opacity(0.22), lineWidth: max(0.5, width * 0.012)))
+                    .frame(width: width, height: width * 1.45)
+                    .shadow(color: .black.opacity(0.22), radius: width * 0.05, y: width * 0.02)
+                    .offset(x: CGFloat(layer) * width * 0.022, y: CGFloat(layer) * -width * 0.022)
             }
+
             Text("\(remaining)")
-                .font(.system(size: width * 0.34, weight: .semibold, design: .rounded))
-                .foregroundStyle(Keezly.Palette.secondaryText)
-                .offset(x: width * 0.06, y: -width * 0.06)
+                .font(.system(size: width * 0.2, weight: .bold, design: .rounded))
+                .foregroundStyle(Keezly.Palette.cardInk)
+                .padding(.horizontal, width * 0.11)
+                .padding(.vertical, width * 0.05)
+                .background(Capsule().fill(Keezly.Palette.cardFace))
+                .offset(y: width * 0.58)
         }
-        .frame(width: width, height: width * 1.4)
+        .frame(width: width, height: width * 1.45)
         .accessibilityElement()
         .accessibilityLabel("pile.draw \(remaining)")
     }

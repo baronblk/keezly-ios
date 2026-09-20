@@ -501,3 +501,51 @@ imitation wood grain (§43 asks for restrained materiality, not skeuomorphism).
 **Consequences.** `BoardLayout.ringExponent` is the single knob for this. The
 layout tests already bound how far seat-to-seat geometry may diverge, and they
 gate any future change to it.
+
+---
+
+## DEC-018 — Tactile Digital Board Game, in Classic Wood
+
+- **Date:** 2026-09-20
+- **Topic:** Visual direction
+- **Status:** ACCEPTED
+- **Supersedes the material choices in:** the first board rendering
+
+**Context.** The first playable board used grey rounded rectangles on a flat
+surface. It worked and it was legible, but it read as a prototype: flat
+business UI wearing a board game's rules. The product owner corrected the
+direction explicitly.
+
+**Decision.** The visual language is **tactile digital board game**, with
+**Classic Wood** as the default and the quality bar for 1.0.0:
+
+- a light maple panel with milled, *round* holes — a dark floor, a shadow under
+  the upper rim and a lit lower lip, which together read as carved;
+- pieces as classic pawn silhouettes with weight and a contact shadow, not flat
+  markers;
+- cards as real playing cards — cream faces, classic corner indices, traditional
+  pip layouts, drawn suits;
+- the centre of the board kept quiet, because a board should look like a board
+  and not like a dashboard.
+
+`BoardTheme` carries the material as a value, so Dark Graphite can follow
+without touching the renderer. A theme is not an appearance: Classic Wood is the
+same board in light and dark mode, dimmed rather than recoloured.
+
+**The originality line.** A photograph of a commercial Keezen board was supplied
+as a reference. What is taken from it is materiality and the traditional *form*
+of the game — a square track, holes, home lanes, cards in the middle — which
+belong to the game and to nobody in particular. Every graphic in Keezly is
+drawn from our own geometry: the superellipse ring, the pawn silhouette, the
+suit paths, the court emblems, the card back. Nothing is traced, measured or
+sampled from the reference (§76).
+
+**Reasoning.** §80 asks one question of every decision: would this be credible
+in a high-quality iPad board game? Grey rectangles were not. The change is
+purely presentational — `GameCore`, the rules, the AI and determinism are
+untouched, and no rule is coupled to a visual component.
+
+**Consequences.** Materials are drawn, never photographed: a photographic wood
+texture at board scale reads as a cheap tiling artefact. The renderer stays a
+single `Canvas` for everything static, because a turn-based board game must not
+run a render loop (§62).

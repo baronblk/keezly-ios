@@ -157,13 +157,16 @@ leak and watching them fail. See `AI.md`.
 |---|---|
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
-| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | NOT STARTED |
-| M4.4 iPhone layout — portrait and both landscape orientations | NOT STARTED |
-| M4.5 Card interaction flow, Jack targeting, seven sequence builder | NOT STARTED |
-| M4.6 Event-driven animation pipeline with input locking | IN PROGRESS — `MatchSession` holds the state, locks input and runs agents off the main actor; the animation playback itself is outstanding |
+| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done with seat panels using the spare width; Split View and Stage Manager untested |
+| M4.4 iPhone layout — portrait and both landscape orientations | IN PROGRESS — a compact layout exists but has had no design pass |
+| M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
+| M4.6 Event-driven animation pipeline with input locking | IN PROGRESS — input locking done and covered by a double-tap UI test; events still play as one timed pause rather than one at a time |
 | M4.7 Pointer, trackpad and full keyboard access on iPad | NOT STARTED |
 
-| M4.8 Centre of the board — draw pile, discard, turn and deal status | NOT STARTED |
+| M4.8 Centre of the board — draw pile, discard, turn and deal status | DONE |
+| M4.9 Classic Wood material, round milled holes, pawn silhouettes, real playing cards (DEC-018) | DONE |
+| M4.10 Seat status panels using the spare landscape width (§35) | DONE |
+| M4.11 Deterministic screenshot mode and design-review captures (§87) | DONE |
 
 **Acceptance criteria.** The iPad layout is designed for the large display, not
 scaled up; a pawn can never appear to move on its own or a move be applied
