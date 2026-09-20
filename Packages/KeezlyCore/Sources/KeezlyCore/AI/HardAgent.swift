@@ -49,6 +49,14 @@ public struct HardAgent: AIAgent, Sendable {
         self.rolloutWeight = rolloutWeight
     }
 
+    /// A move together with what it does and what the static evaluation makes
+    /// of it — the unit the sampling pass works on.
+    private struct Candidate {
+        let move: Move
+        let preview: MovePreview
+        let staticScore: Double
+    }
+
     public func chooseAction(for observation: PlayerObservation) async -> PlayerAction {
         guard !observation.legalMoves.isEmpty else { return forcedFold(for: observation) }
 
@@ -56,20 +64,26 @@ public struct HardAgent: AIAgent, Sendable {
         let clock = ContinuousClock()
         let deadline = clock.now + budget.maximumDuration
 
-        // Static pass: score everything, keep the plausible candidates.
-        let scored = observation.previewAll()
-            .map { candidate in
-                (
-                    move: candidate.move,
-                    preview: candidate.preview,
-                    staticScore: PositionEvaluator.score(
-                        move: candidate.move, preview: candidate.preview,
-                        in: observation, weights: weights
-                    )
+        // Static pass: score everything, keep the plausible candidates. The
+        // risk term is O(pawns²) per move, so on a six-seat board with a Seven
+        // in hand this loop is substantial and needs its own cancellation
+        // check — the sampling pass below is far from the only slow part.
+        var evaluated: [Candidate] = []
+        for (index, candidate) in observation.previewAll().enumerated() {
+            if index.isMultiple(of: 16), Task.isCancelled { break }
+            evaluated.append(Candidate(
+                move: candidate.move,
+                preview: candidate.preview,
+                staticScore: PositionEvaluator.score(
+                    move: candidate.move, preview: candidate.preview,
+                    in: observation, weights: weights
                 )
-            }
-            .sorted { $0.staticScore > $1.staticScore }
+            ))
+        }
+        let scored = evaluated.sorted { $0.staticScore > $1.staticScore }
 
+        // Cancelled before anything was scored: any legal move will do, since
+        // the result is about to be discarded anyway.
         guard let front = scored.first else { return .play(observation.legalMoves[0]) }
         let candidates = Array(scored.prefix(candidateLimit))
         guard candidates.count > 1 else { return .play(front.move) }

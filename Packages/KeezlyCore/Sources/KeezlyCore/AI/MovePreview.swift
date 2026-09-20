@@ -40,13 +40,25 @@ public extension PlayerObservation {
     ///
     /// This is what agents use: the per-move cost is then one array copy rather
     /// than a full reconstruction.
+    ///
+    /// Stops early when the surrounding task is cancelled. A position with a
+    /// Seven and several pawns in play can offer hundreds of split variants,
+    /// and previewing all of them is the longest stretch of work before an
+    /// agent's first cancellation check — so the check belongs here (§62).
+    /// Outside a task `Task.isCancelled` is simply false, so nothing changes
+    /// for synchronous callers.
     func previewAll() -> [(move: Move, preview: MovePreview)] {
         let shadow = publicShadowState()
-        return legalMoves.compactMap { move in
+        var results: [(move: Move, preview: MovePreview)] = []
+        results.reserveCapacity(legalMoves.count)
+
+        for (index, move) in legalMoves.enumerated() {
+            if index.isMultiple(of: 16), Task.isCancelled { break }
             var scratch = shadow
-            guard let preview = Self.preview(move, applyingTo: &scratch) else { return nil }
-            return (move, preview)
+            guard let preview = Self.preview(move, applyingTo: &scratch) else { continue }
+            results.append((move, preview))
         }
+        return results
     }
 
     // MARK: - Internals
