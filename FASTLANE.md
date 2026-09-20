@@ -1,21 +1,23 @@
 # Keezly — fastlane
 
-**Status: NOT STARTED.** There is no `Gemfile` and no `fastlane/` content yet.
-None of the commands below work today. They are the agreed target so that the
-lane names do not drift.
+**Status: SET UP.** fastlane 2.240.1 runs through Bundler. The test, QA and
+device lanes work; the screenshot lanes arrive with M11.4/M11.5.
 
-Tracked as M0.3 and M11.5/M11.6 in `ROADMAP.md`. See also `CI_CD.md`.
+## Toolchain
 
----
+Ruby is pinned to **4.0.5** in `.tool-versions` and `.ruby-version`, which
+`mise`, `asdf` and `rbenv` all read. A version manager is *not* required:
+Homebrew's `ruby` provides exactly that version. fastlane's own version is
+fixed by the committed `Gemfile.lock` (DEC-012).
 
-## Blocking decision
+First time on a machine:
 
-System Ruby on this machine is **2.6.10**, which is too old for a modern
-Bundler-based fastlane. Homebrew `ruby@4.0` and `mise` are both available. The
-toolchain choice must be made before M0.3 starts, and recorded in
-`DECISIONS.md`.
+```bash
+bundle config set --local path vendor/bundle
+bundle install
+```
 
-fastlane is always invoked through Bundler once it exists:
+fastlane is always invoked through Bundler:
 
 ```bash
 bundle exec fastlane <lane>
@@ -44,14 +46,18 @@ fastlane/
 
 ## Planned lanes (§84, §122)
 
-| Lane | Purpose |
-|---|---|
-| `tests` | Full unit and integration tests — rules engine, AI, persistence |
-| `ui_tests` | XCUITests on iPhone and iPad |
-| `screenshots` | The complete App Store screenshot matrix |
-| `screenshots_verify` | Run screenshots, verify completeness and correctness, emit an HTML preview |
-| `qa` | The whole local quality gate: build, unit, integration, relevant UI tests, static checks, engine simulation, screenshot smoke test |
-| `release_check` | Release-candidate gate: version, build number, clean git tree, tests, app icon, localisations, store metadata, screenshot completeness, release configuration, no debug code, no secrets — **plus** the four gate results below |
+| Lane | Purpose | Status |
+|---|---|---|
+| `tests` | Rules engine (`swift test`) plus app-level tests on an iPhone simulator | working |
+| `ui_tests` | XCUITests on an iPhone and an iPad simulator | working |
+| `qa` | The whole local quality gate: engine tests, build, unit tests, UI tests | working |
+| `release_check` | Release-candidate gate, reporting each sub-gate separately | working |
+| `screenshots` | The complete App Store screenshot matrix | M11.5 |
+| `screenshots_verify` | Verify completeness and emit an HTML preview | M11.5 |
+`release_check` currently verifies the version, a clean git tree, the absence
+of tracked secret-like files, a real app icon, and the engine test suite. As
+localisations, store metadata and screenshots land, their checks are added
+there too.
 
 `release_check` reports each gate separately and never collapses them (§178):
 

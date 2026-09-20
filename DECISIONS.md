@@ -266,3 +266,83 @@ would compute a different board even from correctly decoded data.
 **Consequences.** Every error case needs a player-readable message; the UI must
 handle "this match was saved by a newer version of Keezly" without losing the
 user's other matches.
+
+---
+
+## DEC-011 — Bundle identifier `de.gcng.keezly`
+
+- **Date:** 2026-09-20
+- **Topic:** Product identity
+- **Status:** ACCEPTED
+
+**Decision.** The canonical bundle identifier is **`de.gcng.keezly`**, with
+`de.gcng.keezly.tests` for unit tests and `de.gcng.keezly.uitests` for UI tests.
+
+It is used consistently for the Xcode project, signing, Apple Developer, App
+Store Connect, Game Center, Xcode Cloud and everything derived from them. No
+alternative identifier is used in parallel.
+
+**Reasoning.** Reverse-DNS on a domain the owner controls, which keeps the
+identifier stable regardless of account names. Chosen by the product owner.
+
+**Consequences.** Any App Store Connect record, Game Center configuration and
+provisioning profile must be created against exactly this identifier. Changing
+it later would mean a new App Store record, so it is treated as fixed.
+
+---
+
+## DEC-012 — fastlane through Bundler, Ruby pinned declaratively
+
+- **Date:** 2026-09-20
+- **Topic:** Build toolchain
+- **Status:** ACCEPTED
+
+**Context.** macOS system Ruby is 2.6.10, far too old for a current fastlane.
+Homebrew already provides Ruby 4.0.5, and `mise` is installed but has no Ruby
+built — installing one would mean compiling from source.
+
+**Decision.** Pin the Ruby version declaratively in `.tool-versions` and
+`.ruby-version` (4.0.5), which `mise`, `asdf` and `rbenv` all understand, but do
+**not** make a version manager a prerequisite. Homebrew's `ruby` satisfies the
+pin today. fastlane is always run through Bundler, with its exact version fixed
+by a committed `Gemfile.lock`.
+
+**Reasoning.** The reproducibility that matters is "everyone runs the same
+fastlane", which `Gemfile.lock` guarantees. Forcing a source compile of Ruby on
+every machine and CI image buys little and costs minutes per clean build.
+
+**Alternatives rejected.** Requiring `mise install ruby` (slow, and the Xcode
+Cloud image ships its own Ruby anyway); a globally installed fastlane
+(unpinned, drifts between machines).
+
+**Consequences.** `ci_post_clone.sh` must check what Ruby the Xcode Cloud image
+actually provides rather than assuming this version (M0.4).
+
+---
+
+## DEC-013 — The signing team never enters the repository
+
+- **Date:** 2026-09-20
+- **Topic:** Signing configuration
+- **Status:** ACCEPTED
+
+**Context.** A device build needs `DEVELOPMENT_TEAM`. Committing it hard-codes
+one developer's account into a shared project, and the project rules forbid
+guessing a signing team at all.
+
+**Decision.** `Config/Keezly.xcconfig` is committed and contains nothing but an
+*optional* include of `Config/Local.xcconfig`, which is git-ignored.
+`Config/Local.xcconfig.example` documents what to put there. Simulator builds
+and `swift test` work with no local file present.
+
+**Reasoning.** It keeps device signing working per-developer without a
+machine-specific value ever being tracked, and it degrades gracefully: a missing
+optional include is not an error.
+
+**Alternatives rejected.** `DEVELOPMENT_TEAM` in `project.yml` (tracked,
+account-specific); passing it on every command line (easy to forget, and it
+would end up pasted into documentation).
+
+**Consequences.** A fresh clone cannot build to a device until the developer
+creates `Config/Local.xcconfig`. That is documented in `PROJECT_HANDOUT.md` and
+is the intended trade-off.

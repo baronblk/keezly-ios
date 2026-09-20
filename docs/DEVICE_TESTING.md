@@ -16,20 +16,32 @@ A simulator result is never used to close a device-only bug (§174).
 
 ## Current availability
 
-Checked with `scripts/devices.sh` against the live device list — never assumed
-from documentation or memory (§157).
+Always checked with `scripts/devices.sh` against the live device list, never
+assumed from documentation or memory (§157). Availability changes during a
+working session — it did on 2026-09-20, when an iPhone appeared after an
+earlier check had found nothing — so this section is a snapshot, not a
+guarantee. `CURRENT_STATE.md` carries the dated result.
 
-**No physical iPhone or iPad is currently paired with this Mac.**
+| Role | Present |
+|---|---|
+| `PRIMARY_IPHONE` | iPhone 17 Pro, iOS 27.0, wired, Developer Mode enabled |
+| `PRIMARY_IPAD` | none |
 
-Evidence at the time of writing:
-- `xcrun devicectl list devices` returns 7 entries, all with
-  `hardwareProperties.reality = "simulated"`.
-- `xcrun xctrace list devices` lists only the host Mac under "Devices".
-- `~/Library/MobileDevice/Provisioning Profiles/` is empty.
+### Reading `devicectl` correctly
 
-This is a device-availability state, not a Keezly defect (§166). It is tracked
-as a manual action in `CURRENT_STATE.md`, and everything not blocked by it
-continues (§142).
+`xcrun devicectl list devices` lists **simulators as well as real hardware**,
+and a booted simulator reports its state as `connected`. Filtering on connection
+state alone will happily mistake a simulator for a device. The only reliable
+discriminator is `hardwareProperties.reality`, which is `"physical"` for real
+hardware and `"simulated"` otherwise. `scripts/devices.sh` filters on exactly
+that.
+
+### What blocks a device run today
+
+Not the hardware — signing. `DEVELOPMENT_TEAM` is unset, and two teams exist in
+the keychain. Choosing one belongs to the account owner (MAN-03), and building
+would additionally register the device with that team and create a provisioning
+profile, which changes an Apple Developer account and needs explicit consent.
 
 ### Simulators available
 
