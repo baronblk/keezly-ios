@@ -95,6 +95,9 @@ public struct HardAgent: AIAgent, Sendable {
                     afterMove, for: observation.seat, plies: rolloutPlies, using: &generator
                 )
                 samples += 1
+                // A rollout cut short by cancellation is not evidence; stop
+                // rather than averaging in a truncated result.
+                if Task.isCancelled { break }
             }
 
             // With no samples, the static score stands on its own.

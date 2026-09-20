@@ -41,7 +41,7 @@ enum RolloutPolicy {
             // A small spread keeps rollouts from being perfectly correlated.
             score += Double(generator.next() % 2_001) / 1_000 - 1.0
 
-            if best == nil || score > best!.score { best = (move, score) }
+            if score > (best?.score ?? -.infinity) { best = (move, score) }
         }
         return best.map { .play($0.move) } ?? .play(moves[0])
     }
@@ -73,7 +73,10 @@ enum RolloutPolicy {
     /// Plays a sampled world forward and returns its value to `seat`.
     ///
     /// Stops at `plies`, at the end of the match, or when the task is
-    /// cancelled — whichever comes first.
+    /// cancelled — whichever comes first. The cancellation check belongs
+    /// *inside* this loop, not only around it: a deep rollout is the longest
+    /// uninterruptible stretch of work an agent does, and without the check a
+    /// cancelled search keeps running to the end of the current playout.
     static func playOut(
         _ state: GameState,
         for seat: Seat,
@@ -84,6 +87,7 @@ enum RolloutPolicy {
         var played = 0
 
         while !current.isFinished && played < plies {
+            if Task.isCancelled { break }
             let action = choose(in: current, for: current.currentSeat, using: &generator)
             guard let next = try? GameReducer.apply(action, to: current).state else { break }
             current = next
