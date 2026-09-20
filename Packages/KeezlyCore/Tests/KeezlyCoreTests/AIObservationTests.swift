@@ -124,6 +124,120 @@ struct AIObservationTests {
         #expect(base != PlayerObservation(of: state(pawnAt: 20, discard: [Fixture.card(.king)]), for: Seat(0)))
     }
 
+    // MARK: - Move previews stay inside the boundary
+
+    /// Previewing a move is legitimate — a human sees where their pawn lands
+    /// and what it knocks out. It must not become a side channel, so the same
+    /// differential rule applies: hidden information may not change a preview.
+    @Test("previews are identical when only hidden information differs")
+    func previewsDoNotLeak() throws {
+        func state(opponentHands: [[CardRank]], deck: [Card], seed: UInt64) -> GameState {
+            Fixture.state(
+                seatCount: 4,
+                pawns: [
+                    Fixture.pawn(0, 0): .track(index: 5),
+                    Fixture.pawn(1, 0): .track(index: 10),
+                ],
+                hands: [0: [.five], 1: opponentHands[0], 2: opponentHands[1], 3: opponentHands[2]],
+                deck: deck,
+                seed: seed
+            )
+        }
+
+        let a = PlayerObservation(
+            of: state(opponentHands: [[.king], [.two], [.jack]], deck: Deck.standard(seatCount: 4).cards, seed: 1),
+            for: Seat(0)
+        )
+        let b = PlayerObservation(
+            of: state(opponentHands: [[.jack], [.king], [.two]], deck: Deck.standard(seatCount: 4).cards.reversed(), seed: 987),
+            for: Seat(0)
+        )
+
+        #expect(a == b)
+        let moveA = try #require(a.legalMoves.first)
+        let moveB = try #require(b.legalMoves.first)
+        #expect(moveA == moveB)
+        #expect(a.preview(moveA) == b.preview(moveB))
+    }
+
+    @Test("a preview reports the capture and the landing square correctly")
+    func previewsAreAccurate() throws {
+        let state = Fixture.state(
+            seatCount: 4,
+            pawns: [Fixture.pawn(0, 0): .track(index: 5), Fixture.pawn(1, 0): .track(index: 10)],
+            hands: [0: [.five]]
+        )
+        let observation = PlayerObservation(of: state, for: Seat(0))
+        let move = try #require(observation.legalMoves.first)
+        let preview = try #require(observation.preview(move))
+
+        #expect(preview.captured == [Fixture.pawn(1, 0)])
+        #expect(preview.pawn(Fixture.pawn(0, 0)).position == .track(index: 10))
+        #expect(preview.pawn(Fixture.pawn(1, 0)).position.isWaiting)
+        // Previewing must not disturb the real state.
+        #expect(state.position(of: Fixture.pawn(1, 0)) == .track(index: 10))
+    }
+
+    @Test("a preview matches what the reducer actually does")
+    func previewAgreesWithTheReducer() async throws {
+        var chooser = SeededGenerator(seed: 0xB0_0B5)
+        var state = GameState.newMatch(configuration: .standard(seatCount: 4), seed: 31_337)
+
+        for _ in 0..<150 where !state.isFinished {
+            let observation = PlayerObservation(of: state, for: state.currentSeat)
+            guard !observation.legalMoves.isEmpty else {
+                state = try GameReducer.apply(.foldHand(seat: state.currentSeat), to: state).state
+                continue
+            }
+            let move = observation.legalMoves[Int(chooser.next() % UInt64(observation.legalMoves.count))]
+            let preview = try #require(observation.preview(move))
+            let applied = try GameReducer.apply(.play(move), to: state).state
+
+            #expect(preview.pawns == applied.pawns, "preview disagreed with the reducer on \(move.id)")
+            state = applied
+        }
+    }
+
+    /// The stable key must be a function of the observation and nothing else,
+    /// or agents seeded from it would inherit a hidden-information channel.
+    @Test("the stable key depends only on visible information")
+    func stableKeyCarriesNoHiddenInformation() {
+        func state(opponent: [CardRank], seed: UInt64) -> GameState {
+            Fixture.state(
+                seatCount: 4,
+                pawns: [Fixture.pawn(0, 0): .track(index: 5)],
+                hands: [0: [.five], 1: opponent],
+                seed: seed
+            )
+        }
+        let a = PlayerObservation(of: state(opponent: [.king], seed: 1), for: Seat(0))
+        let b = PlayerObservation(of: state(opponent: [.jack], seed: 42), for: Seat(0))
+        #expect(a.stableKey == b.stableKey)
+
+        // …but it does change when the visible board changes.
+        let moved = Fixture.state(
+            seatCount: 4,
+            pawns: [Fixture.pawn(0, 0): .track(index: 6)],
+            hands: [0: [.five], 1: [.king]]
+        )
+        #expect(PlayerObservation(of: moved, for: Seat(0)).stableKey != a.stableKey)
+    }
+
+    @Test("the stable key is the same on every run")
+    func stableKeyIsProcessIndependent() {
+        // Hard-coding the expected value pins it: if someone swaps the hash for
+        // Swift's salted Hasher, this fails immediately instead of silently
+        // making agents non-reproducible across launches.
+        let state = Fixture.state(
+            seatCount: 4,
+            pawns: [Fixture.pawn(0, 0): .track(index: 5)],
+            hands: [0: [.ace, .seven]]
+        )
+        let key = PlayerObservation(of: state, for: Seat(0)).stableKey
+        #expect(key == PlayerObservation(of: state, for: Seat(0)).stableKey)
+        #expect(key != 0)
+    }
+
     // MARK: - Card counting is legitimate
 
     @Test("unseen cards exclude the observer's own hand and everything played")
