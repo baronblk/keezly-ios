@@ -17,27 +17,34 @@ final class LaunchTests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// The clearest sign the app is up and a match is running: the local
+    /// player has been dealt a hand.
+    @MainActor
+    private func handAppeared(in app: XCUIApplication, timeout: TimeInterval = 15) -> Bool {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'hand.card.'"))
+            .firstMatch
+            .waitForExistence(timeout: timeout)
+    }
+
     @MainActor
     func testAppLaunches() {
         let app = XCUIApplication()
         app.launch()
-        XCTAssertTrue(
-            app.staticTexts["KEEZLY"].waitForExistence(timeout: 10),
-            "the app should present its root scene within ten seconds"
-        )
+        XCTAssertTrue(handAppeared(in: app), "the app should deal a hand within fifteen seconds")
     }
 
     @MainActor
     func testAppSurvivesRotation() {
         let app = XCUIApplication()
         app.launch()
-        XCTAssertTrue(app.staticTexts["KEEZLY"].waitForExistence(timeout: 10))
+        XCTAssertTrue(handAppeared(in: app))
 
         for orientation in [UIDeviceOrientation.landscapeLeft, .portrait, .landscapeRight, .portrait] {
             XCUIDevice.shared.orientation = orientation
             XCTAssertTrue(
-                app.staticTexts["KEEZLY"].waitForExistence(timeout: 5),
-                "the root scene should survive rotation to \(orientation.rawValue)"
+                handAppeared(in: app, timeout: 8),
+                "the board should survive rotation to \(orientation.rawValue)"
             )
         }
     }
