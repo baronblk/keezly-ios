@@ -425,3 +425,39 @@ real player would have the information, add it at the one chokepoint, extend
 the differential tests, re-run the mutation, and record it here. `stableKey`
 was added under the same reasoning, and is derived purely from observation
 fields so agents can seed themselves reproducibly from a position.
+
+---
+
+## DEC-016 — SwiftFormat runs an allowlist, SwiftLint is the gate
+
+- **Date:** 2026-09-20
+- **Topic:** Static checks
+- **Status:** ACCEPTED
+
+**Context.** Adopting SwiftFormat with its default rule set wanted to rewrite
+41 of 48 files. Inspecting the diff showed the changes were not improvements:
+`hoistPatternLet` turns `case .advance(let pawn, let steps, let route)` into
+`case let .advance(pawn, steps, route)`, hiding which bindings a case
+introduces; `consecutiveSpaces` flattens the aligned trailing comments that
+explain the rules; `wrapPropertyBodies` expands one-line computed properties.
+
+**Decision.** SwiftFormat runs an explicit **allowlist** — import order and
+whitespace hygiene — via `--rules`. SwiftLint is the enforced gate, configured
+to catch things that cause bugs rather than to impose a house style:
+force-unwrapping, implicitly unwrapped optionals, complexity and length limits.
+Both run in the `lint` lane and inside `qa`; `release_check` runs SwiftLint with
+`--strict`, so warnings fail a release candidate.
+
+**Reasoning.** A formatter earns its place by ending style arguments, not by
+starting one with the existing code. Restricting it to the uncontested rules
+keeps that benefit at zero readability cost. Adopting three rules that are
+already satisfied everywhere is better than adopting thirty that require a
+500-file diff nobody will review.
+
+**What it caught immediately.** Three force-unwraps in shipping code
+(`MediumAgent`, `RolloutPolicy`, `SimulationReport`) and two in tests, all
+fixed rather than suppressed.
+
+**Consequences.** `swiftlint lint --strict` must stay clean. If a rule becomes
+more trouble than it is worth, it is disabled here with a reason rather than
+silenced inline.

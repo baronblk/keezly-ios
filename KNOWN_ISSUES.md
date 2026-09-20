@@ -16,6 +16,33 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ## Closed
 
+### ISS-005 — A cancelled Hard search kept running to the end of its rollout
+
+- **Status:** VERIFIED
+- **Severity:** Major (responsiveness)
+- **Component:** `KeezlyCore` / AI
+- **Description:** `HardAgent` checked `Task.isCancelled` between candidates and
+  between samples, but `RolloutPolicy.playOut` — the longest uninterrupted
+  stretch of work an agent does — checked nothing. A cancelled search therefore
+  finished whatever playout was in flight before noticing.
+- **Reproduction:** `HardAgentTests.cancellationIsHonoured` with a deliberately
+  oversized search (64 candidates, 100 000 samples, 200 plies): cancelling
+  immediately still took **5.2 seconds** to return.
+- **Expected:** a cancelled search returns promptly with a legal move (§62).
+- **Actual:** it returned only after the current rollout completed.
+- **Fix:** check `Task.isCancelled` inside the playout loop, and stop sampling
+  after a rollout that was cut short rather than averaging in a truncated
+  result.
+- **Effect:** the Hard agent suite went from 7.4 s to 1.4 s.
+- **Related files:** `Sources/KeezlyCore/AI/RolloutPolicy.swift`,
+  `Sources/KeezlyCore/AI/HardAgent.swift`
+- **Related tests:** `HardAgentTests.cancellationIsHonoured`,
+  `HardAgentTests.budgetIsRespected`
+- **Note:** the test passed on an earlier run and failed on a later one — the
+  timing depended on how much of the task ran before `cancel()` landed. A
+  responsiveness guarantee asserted with a generous bound is worth having
+  precisely because it catches this kind of thing eventually.
+
 ### ISS-004 — Apple Developer team ids were committed to documentation
 
 - **Status:** FIXED (working tree) — see "remaining exposure" below
