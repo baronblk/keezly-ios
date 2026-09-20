@@ -1,3 +1,5 @@
+import CoreImage
+import UIKit
 import XCTest
 
 /// Captures the screens a design review needs, in the orientations that matter.
@@ -31,17 +33,146 @@ final class DesignReviewScreenshots: XCTestCase {
             "-KEEZLY_SEATS", String(seats),
             "-KEEZLY_SEED", String(seed),
         ] + extra
+        // Set before launching, which is what actually rotates this app.
+        // Assigning it to an already-running app was tried and does nothing
+        // here, and `app.frame` reports the rotation either way, so it cannot
+        // be used to tell whether one happened.
         XCUIDevice.shared.orientation = orientation
         app.launch()
         return app
     }
 
+    /// Captures the app the right way up, and checks that it is.
+    ///
+    /// **ISS-009.** Every XCUITest screenshot API on iOS hands back the
+    /// *physical* framebuffer. On a rotated iPad that is still portrait, with
+    /// the interface lying on its side and no orientation recorded in the
+    /// image. `XCUIScreen.main.screenshot()` and `app.screenshot()` behave
+    /// identically, and an element screenshot is cropped from the same buffer,
+    /// so there is nothing to switch to — the buffer has to be turned.
+    ///
+    /// Turned only when it actually disagrees with the orientation that was
+    /// asked for, so that a future Xcode returning a rotated buffer stops the
+    /// correction instead of ruining a good capture. The assertions below are
+    /// what keep that honest, and they are what make ISS-009 unable to come
+    /// back unnoticed.
     @MainActor
-    private func attach(_ name: String) {
-        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+    private func attach(_ name: String, from app: XCUIApplication, orientation: UIDeviceOrientation) {
+        let raw = Self.flattened(app.screenshot())
+        let needsTurning = orientation.isLandscape && raw.size.width < raw.size.height
+        let image = needsTurning ? Self.turned(raw, clockwise: orientation == .landscapeLeft) : raw
+        let size = image.size
+
+        if needsTurning {
+            // Reports what the rotation had to work with, so a failure names
+            // its cause instead of leaving the next person to guess.
+            let note = XCTAttachment(
+                string: """
+                requested: \(orientation.rawValue)
+                buffer: \(raw.size) scale \(raw.scale) cgImage: \(raw.cgImage != nil)
+                result: \(size)
+                """
+            )
+            note.name = "\(name)-orientation"
+            note.lifetime = .keepAlways
+            add(note)
+
+            XCTAssertNotEqual(
+                size, raw.size,
+                "\(name): the capture could not be turned and is still on its side (ISS-009)"
+            )
+        }
+        if orientation.isLandscape {
+            XCTAssertGreaterThan(
+                size.width, size.height,
+                "\(name): a landscape capture must be wider than it is tall — got \(size) (ISS-009)"
+            )
+        } else if orientation.isPortrait {
+            XCTAssertGreaterThan(
+                size.height, size.width,
+                "\(name): a portrait capture must be taller than it is wide — got \(size)"
+            )
+        }
+
+        let attachment = XCTAttachment(image: image)
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    /// A screenshot as an image that definitely has pixels behind it.
+    ///
+    /// `XCUIScreenshot.image` can arrive without a `cgImage`, which made every
+    /// attempt to turn it quietly return the original. Decoding the API's own
+    /// PNG gives a bitmap-backed image; redrawing is the fallback.
+    private static func flattened(_ screenshot: XCUIScreenshot) -> UIImage {
+        if let decoded = UIImage(data: screenshot.pngRepresentation), decoded.cgImage != nil {
+            return decoded
+        }
+        let image = screenshot.image
+        guard image.cgImage == nil else { return image }
+
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = image.scale
+        format.opaque = true
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+        }
+    }
+
+    /// Turns an image a quarter turn, moving the pixels.
+    ///
+    /// `clockwise` describes the device orientation being corrected for, not
+    /// the direction of the transform below — see the note inside.
+    ///
+    /// Three other routes were tried first and every one failed *silently*,
+    /// returning the original image: `UIImage.draw(in:)` inside a rotated
+    /// context (its own flip cancels the rotation), a `CGContext` built from
+    /// the screenshot's bitmap description (would not create), and Core Image
+    /// (`createCGImage` returned nil in the test process). `UIImage.pngData()`
+    /// does not bake an orientation in either. That is why the assertion in
+    /// `attach` checks the size actually changed.
+    ///
+    /// Tagging an orientation would not be enough in any case: a tag survives
+    /// `UIImage` and nothing else, so the PNG reaching a reviewer or App Store
+    /// Connect would still be on its side.
+    ///
+    /// Only `.landscapeLeft` is verified, because it is the only landscape the
+    /// harness uses.
+    private static func turned(_ image: UIImage, clockwise: Bool) -> UIImage {
+        guard let source = image.cgImage else { return image }
+
+        // Re-encoding through PNG is what actually moves the pixels.
+        // `UIImage.pngData()` writes the image as its orientation says it
+        // should be seen, so decoding that data gives a plain upright bitmap.
+        // Three other routes were tried first and all failed silently: a
+        // rotated graphics context (cancelled by the flip `draw(in:)` applies),
+        // a hand-built `CGContext` (would not create), and Core Image
+        // (`createCGImage` returned nil in the test process).
+        let target = CGSize(width: image.size.height, height: image.size.width)
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = image.scale
+        format.opaque = true
+
+        return UIGraphicsImageRenderer(size: target, format: format).image { rendered in
+            let context = rendered.cgContext
+            context.translateBy(x: target.width / 2, y: target.height / 2)
+            context.rotate(by: clockwise ? -.pi / 2 : .pi / 2)
+            // The vertical flip is not a mistake. `CGContext.draw` applies its
+            // own inversion inside a `UIGraphicsImageRenderer`, and this
+            // cancels it. The pair was settled by rendering all four
+            // quarter-turn combinations and looking at them, rather than by
+            // reasoning about three stacked coordinate systems — the other
+            // three come out upside down or mirrored.
+            context.scaleBy(x: 1, y: -1)
+            context.draw(
+                source,
+                in: CGRect(
+                    x: -image.size.width / 2, y: -image.size.height / 2,
+                    width: image.size.width, height: image.size.height
+                )
+            )
+        }
     }
 
     @MainActor
@@ -70,7 +201,7 @@ final class DesignReviewScreenshots: XCTestCase {
     ) {
         let app = launch(seats: seats, seed: seed, orientation: orientation, extra: extra)
         waitForDeal(app, name)
-        attach(name)
+        attach(name, from: app, orientation: orientation)
     }
 
     // MARK: - iPad
@@ -111,6 +242,19 @@ final class DesignReviewScreenshots: XCTestCase {
         capture(name: "five-players-landscape", seats: 5, seed: 404, orientation: .landscapeLeft)
     }
 
+    /// Two seats is the table with no quiet centre: the home lanes run almost
+    /// to the middle and the medallion is deliberately absent (ISS-008). It
+    /// needs looking at as a board in its own right, not as a smaller four.
+    @MainActor
+    func testTwoPlayerLandscape() {
+        capture(name: "two-players-landscape", seats: 2, seed: 11, orientation: .landscapeLeft)
+    }
+
+    @MainActor
+    func testTwoPlayerPortrait() {
+        capture(name: "two-players-portrait", seats: 2, seed: 11, orientation: .portrait)
+    }
+
     // MARK: - Mid-match interfaces
 
     /// The Jack, with its swap targets showing.
@@ -140,7 +284,7 @@ final class DesignReviewScreenshots: XCTestCase {
         }
 
         XCTAssertFalse(elements(app, prefix: "target.").isEmpty, "\(name): no swap target was offered")
-        attach(name)
+        attach(name, from: app, orientation: .landscapeLeft)
     }
 
     /// A Seven halfway through its split, with the progress row showing how
@@ -176,7 +320,7 @@ final class DesignReviewScreenshots: XCTestCase {
 
         let progress = app.descendants(matching: .any)["seven.progress"]
         XCTAssertTrue(progress.waitForExistence(timeout: 10), "\(name): the split did not stay open")
-        attach(name)
+        attach(name, from: app, orientation: .landscapeLeft)
     }
 
     // MARK: - Phone
