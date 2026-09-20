@@ -102,6 +102,61 @@ public struct PlayerObservation: Hashable, Sendable {
             .filter { !accounted.contains($0) }
     }
 
+    /// A stable 64-bit fingerprint of everything this observation contains.
+    ///
+    /// Agents use it to seed a generator, so an agent's choice is reproducible
+    /// for a given position and seed. It is derived *only* from observation
+    /// fields, so by construction it cannot carry hidden information — two
+    /// equal observations always produce the same key, which is precisely what
+    /// the differential tests assert.
+    ///
+    /// `Hasher` is unusable here: it is salted per process, so the same
+    /// position would seed differently on every launch.
+    public var stableKey: UInt64 {
+        var bytes: [UInt8] = []
+        func feed(_ value: Int) {
+            var v = UInt64(bitPattern: Int64(value))
+            for _ in 0..<8 { bytes.append(UInt8(truncatingIfNeeded: v)); v >>= 8 }
+        }
+        feed(seat.index)
+        feed(configuration.seatCount)
+        feed(configuration.teamMode == .teamsOfTwo ? 1 : 0)
+        feed(currentSeat.index)
+        feed(dealer.index)
+        feed(deal.roundIndex)
+        feed(deal.cycleIndex)
+        for card in hand.cards.sorted(by: { $0.id < $1.id }) { feed(card.id) }
+        for pawn in pawns {
+            feed(pawn.id.seat.index)
+            feed(pawn.id.slot)
+            switch pawn.position {
+            case .waiting(_, let slot): feed(0); feed(slot)
+            case .track(let index): feed(1); feed(index)
+            case .home(_, let slot): feed(2); feed(slot)
+            }
+        }
+        for card in discardPile { feed(card.id) }
+        for count in handCounts { feed(count) }
+        for folded in foldedSeats.sorted() { feed(folded.index) }
+        for resigned in resignedSeats.sorted() { feed(resigned.index) }
+        return Checksum.fnv1a(bytes)
+    }
+
+    /// How far a pawn has travelled along its own lap.
+    ///
+    /// `nil` for a pawn still waiting. 0 is its start square, `board.lapLength`
+    /// its home entry, and higher values are inside the home lane. This is the
+    /// natural measure of progress for any heuristic, and is pure public
+    /// geometry.
+    public func progress(of pawn: PawnState) -> Int? {
+        board.progress(of: pawn.position, for: pawn.id.seat)
+    }
+
+    /// How many of a seat's pawns have reached home.
+    public func homeCount(of otherSeat: Seat) -> Int {
+        pawns(of: otherSeat).count(where: \.isHome)
+    }
+
     /// How many cards are hidden from the observer in total. Equals the unseen
     /// count, and is the sample size the Hard agent must distribute.
     public var hiddenCardCount: Int {

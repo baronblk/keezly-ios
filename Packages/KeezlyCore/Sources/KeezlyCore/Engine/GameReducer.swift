@@ -66,7 +66,10 @@ public enum GameReducer {
     }
 
     /// Executes an already-validated action against the board.
-    private static func performAction(_ action: CardAction, in state: inout GameState) -> [GameEvent] {
+    ///
+    /// Internal rather than private so `PlayerObservation` can reuse it to
+    /// preview a move's public effect without duplicating the mechanics.
+    static func performAction(_ action: CardAction, in state: inout GameState) -> [GameEvent] {
         switch action {
         case .enterFromWaiting(let pawn):
             guard let resolution = MoveResolver.resolveEnter(pawn: pawn, in: state) else { return [] }
