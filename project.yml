@@ -11,6 +11,7 @@ name: Keezly
 
 options:
   bundleIdPrefix: de.gcng
+  developmentLanguage: en
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -70,6 +71,9 @@ targets:
       path: App/Keezly/Info.plist
       properties:
         CFBundleDisplayName: Keezly
+        # Dutch, German and English from the start (§54). The String Catalog
+        # carries the translations; this is what makes the app offer them.
+        CFBundleLocalizations: [en, de, nl]
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         UILaunchScreen:

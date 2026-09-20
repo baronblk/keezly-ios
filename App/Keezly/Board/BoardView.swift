@@ -16,6 +16,8 @@ struct BoardView: View {
     /// Pawns the player may pick up right now.
     var selectablePawns: Set<PawnID> = []
     var selectedPawn: PawnID?
+    var onSelectPawn: ((PawnID) -> Void)?
+    var onSelectTarget: ((BoardPosition) -> Void)?
 
     var body: some View {
         GeometryReader { proxy in
@@ -23,6 +25,22 @@ struct BoardView: View {
 
             ZStack {
                 BoardBackdrop(layout: layout, transform: transform, legalTargets: legalTargets)
+
+                // Target squares first, so a pawn standing on one stays
+                // tappable as a pawn.
+                ForEach(Array(legalTargets), id: \.self) { target in
+                    Color.clear
+                        .frame(
+                            width: max(Keezly.Target.minimum, transform.scaled(layout.squareSize)),
+                            height: max(Keezly.Target.minimum, transform.scaled(layout.squareSize))
+                        )
+                        .contentShape(Rectangle())
+                        .position(transform.point(layout.point(for: target)))
+                        .onTapGesture { onSelectTarget?(target) }
+                        .accessibilityIdentifier("target.\(Self.identifier(for: target))")
+                        .accessibilityLabel("board.target")
+                        .accessibilityAddTraits(.isButton)
+                }
 
                 ForEach(pawns, id: \.id) { pawn in
                     PawnView(
@@ -32,10 +50,25 @@ struct BoardView: View {
                         isSelected: selectedPawn == pawn.id
                     )
                     .position(transform.point(layout.point(for: pawn.position)))
+                    .onTapGesture { onSelectPawn?(pawn.id) }
+                    .allowsHitTesting(selectablePawns.contains(pawn.id) || selectedPawn == pawn.id)
+                    .accessibilityIdentifier("pawn.\(pawn.id.seat.index).\(pawn.id.slot)")
                 }
             }
         }
         .aspectRatio(layout.contentBounds.width / layout.contentBounds.height, contentMode: .fit)
+    }
+}
+
+extension BoardView {
+    /// A stable identifier for a square, so UI tests can address one without
+    /// depending on its label or its position on screen.
+    static func identifier(for position: BoardPosition) -> String {
+        switch position {
+        case .track(let index): "track.\(index)"
+        case .home(let seat, let slot): "home.\(seat.index).\(slot)"
+        case .waiting(let seat, let slot): "waiting.\(seat.index).\(slot)"
+        }
     }
 }
 

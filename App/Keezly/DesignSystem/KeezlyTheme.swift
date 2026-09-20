@@ -55,6 +55,13 @@ enum Keezly {
         static let legalTarget = Color("LegalTarget", bundle: .main)
         /// Highlight for a pawn the player may pick up.
         static let selectable = Color("Selectable", bundle: .main)
+
+        /// A card's face. Light in both appearances, because a playing card is
+        /// a light object: a dark card on a dark table is unreadable, and no
+        /// amount of contrast tuning fixes the wrong mental model (§45).
+        static let cardFace = Color("CardFace", bundle: .main)
+        /// What is printed on a card.
+        static let cardInk = Color("CardInk", bundle: .main)
     }
 
     // MARK: - Type
