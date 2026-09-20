@@ -9,10 +9,16 @@
 /* Begin PBXBuildFile section */
 		11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ED8C1FD416E628043CC4D29 /* Assets.xcassets */; };
 		24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */; };
+		49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */; };
+		579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */; };
 		5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5E0E46A1D3857966A001B9EC /* KeezlyCore */; };
 		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
+		74690CFDE17AFB4D550A4628 /* PawnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */; };
+		8078C5050C02ADBFE8E93567 /* PlayerIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */; };
 		813DD1386E7D98D2C9006EAC /* LaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5741C72A907AEF603B8937 /* LaunchTests.swift */; };
+		8309DF26E59769918673891D /* BoardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD74967519D049BB59C5FA /* BoardLayout.swift */; };
 		8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36B25AB04A78E23D9B845676 /* KeezlyCore */; };
+		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
 		E2304885CB459B1B1D626328 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC0E53379721916E392C04F /* RootView.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +40,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		2DC0E53379721916E392C04F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		41AD74967519D049BB59C5FA /* BoardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLayout.swift; sourceTree = "<group>"; };
+		50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLayoutTests.swift; sourceTree = "<group>"; };
 		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
 		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keezly.xcconfig; sourceTree = "<group>"; };
@@ -43,8 +52,11 @@
 		A5C6FD419A3ADB18AB0D704C /* KeezlyCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = KeezlyCore; path = Packages/KeezlyCore; sourceTree = SOURCE_ROOT; };
 		AC5CC86597A4A00C17A31B2D /* KeezlyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntegrationTests.swift; sourceTree = "<group>"; };
+		AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerIdentity.swift; sourceTree = "<group>"; };
+		DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnView.swift; sourceTree = "<group>"; };
 		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +89,16 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		32DC8061A42E668F5ABC3EE2 /* Board */ = {
+			isa = PBXGroup;
+			children = (
+				41AD74967519D049BB59C5FA /* BoardLayout.swift */,
+				1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */,
+				DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */,
+			);
+			path = Board;
+			sourceTree = "<group>";
+		};
 		826A3F1418E2A0712B696398 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -103,6 +125,15 @@
 			path = Config;
 			sourceTree = "<group>";
 		};
+		C2CE7554DBA3AF25B7905141 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */,
+				AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
 		D502E80E6F1AC84285F49A69 /* KeezlyUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +155,8 @@
 		F0415EB1E80EF7024AD4013E /* Keezly */ = {
 			isa = PBXGroup;
 			children = (
+				32DC8061A42E668F5ABC3EE2 /* Board */,
+				C2CE7554DBA3AF25B7905141 /* DesignSystem */,
 				6ED8C1FD416E628043CC4D29 /* Assets.xcassets */,
 				F01639F69FA03230480F3F8B /* Info.plist */,
 				8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */,
@@ -136,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */,
+				50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */,
 			);
 			path = KeezlyTests;
 			sourceTree = "<group>";
@@ -263,6 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */,
+				579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,7 +305,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8309DF26E59769918673891D /* BoardLayout.swift in Sources */,
+				49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */,
 				24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */,
+				A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */,
+				74690CFDE17AFB4D550A4628 /* PawnView.swift in Sources */,
+				8078C5050C02ADBFE8E93567 /* PlayerIdentity.swift in Sources */,
 				E2304885CB459B1B1D626328 /* RootView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
