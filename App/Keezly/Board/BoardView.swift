@@ -16,6 +16,8 @@ struct BoardView: View {
     /// Pawns the player may pick up right now.
     var selectablePawns: Set<PawnID> = []
     var selectedPawn: PawnID?
+    /// A pawn to pick out for a beat — just taken, or just home.
+    var emphasised: PawnID?
     var onSelectPawn: ((PawnID) -> Void)?
     var onSelectTarget: ((BoardPosition) -> Void)?
 
@@ -54,7 +56,8 @@ struct BoardView: View {
                         identity: PlayerIdentity.identity(for: pawn.id.seat),
                         diameter: transform.scaled(layout.squareSize) * 0.96,
                         isSelectable: selectablePawns.contains(pawn.id),
-                        isSelected: selectedPawn == pawn.id
+                        isSelected: selectedPawn == pawn.id,
+                        isEmphasised: emphasised == pawn.id
                     )
                     // Anchored so the piece's base sits in its hole while its
                     // head rises above the board, as a real piece does.

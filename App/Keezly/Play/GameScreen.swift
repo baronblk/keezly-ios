@@ -15,12 +15,17 @@ struct GameScreen: View {
     private let theme = BoardTheme.classicWood
 
     @State private var session: MatchSession
+    @State private var presenter: BoardPresenter
+    @State private var presentation: Task<Void, Never>?
     @State private var selectedCard: Card?
     @State private var selectedPawn: PawnID?
     @State private var committedLegs: [SplitStep] = []
 
+    @Environment(\.scenePhase) private var scenePhase
+
     init(session: MatchSession) {
         _session = State(initialValue: session)
+        _presenter = State(initialValue: BoardPresenter(pawns: session.state.pawns))
     }
 
     private var isCompact: Bool { horizontalSizeClass == .compact }
@@ -70,6 +75,12 @@ struct GameScreen: View {
         .environment(\.boardTheme, theme)
         .onAppear { session.begin() }
         .onChange(of: session.pendingEvents.count) { _, _ in playOutEvents() }
+        .onDisappear { abandonPresentation() }
+        .onChange(of: scenePhase) { _, phase in
+            // Leaving the foreground mid-animation must not strand the board
+            // in a half-played position.
+            if phase != .active { abandonPresentation() }
+        }
     }
 
     // MARK: - Layouts
@@ -193,10 +204,13 @@ struct GameScreen: View {
         ZStack {
             BoardView(
                 layout: layout,
-                pawns: session.state.pawns,
+                // The board draws what the presenter is showing, which during
+                // an animation is behind the state on purpose.
+                pawns: presenter.displayedPawns,
                 legalTargets: planner.highlightedTargets,
                 selectablePawns: planner.selectablePawns,
                 selectedPawn: selectedPawn,
+                emphasised: presenter.emphasised,
                 onSelectPawn: select(pawn:),
                 onSelectTarget: tap(target:)
             )
@@ -290,41 +304,36 @@ struct GameScreen: View {
 
     // MARK: - Animation
 
-    /// Lets the board catch up, then reopens input.
+    /// Plays the events of the last action, then reopens input.
     ///
-    /// The state is already final; this only paces the visuals and holds the
-    /// input lock while they play (§39, §63). A fuller event-by-event pipeline
-    /// arrives with the rest of M4.6; the duration here is derived from the
-    /// events so a long journey already reads as longer than a short one.
+    /// The state was already final before this ran; the presenter only shows
+    /// how the board got there (§39). Input stays closed for the duration,
+    /// which is what stops a second tap landing on a board that has not caught
+    /// up (§63).
     private func playOutEvents() {
         let events = session.pendingEvents
         guard !events.isEmpty else { return }
 
-        let duration = Self.duration(of: events, reduceMotion: reduceMotion)
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(duration))
+        let pawns = session.state.pawns
+        presentation?.cancel()
+        presentation = Task { @MainActor in
+            presenter.updateTiming(reduceMotion ? .instant : .standard)
+            await presenter.present(events, finalPawns: pawns)
+            guard !Task.isCancelled else { return }
             session.animationsFinished()
         }
     }
 
-    static func duration(of events: [GameEvent], reduceMotion: Bool) -> Double {
-        var total = 0.0
-        for event in events {
-            switch event {
-            case .pawnMoved(_, _, _, let path, _):
-                total += Double(path.count) * Keezly.Motion.stepDuration
-            case .pawnsSwapped:
-                total += Keezly.Motion.swapDuration
-            case .pawnCaptured:
-                total += Keezly.Motion.captureDuration
-            case .pawnEntered, .cardPlayed:
-                total += Keezly.Motion.cardPlayDuration
-            default:
-                break
-            }
-        }
-        let capped = min(total, 2.2)
-        return reduceMotion ? min(capped, 0.35) : capped
+    /// Stops an animation in flight and shows the true position.
+    ///
+    /// Called when the view goes away or the app leaves the foreground: an
+    /// animation that was interrupted must never leave the board showing
+    /// something that is not the state.
+    private func abandonPresentation() {
+        presentation?.cancel()
+        presentation = nil
+        presenter.snap(to: session.state.pawns)
+        if session.isBusy { session.animationsFinished() }
     }
 }
 

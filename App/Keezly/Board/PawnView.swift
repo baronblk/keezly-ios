@@ -56,6 +56,8 @@ struct PawnView: View {
     let diameter: CGFloat
     var isSelectable = false
     var isSelected = false
+    /// Picked out for a beat by the presenter — just captured, or just home.
+    var isEmphasised = false
 
     private var height: CGFloat { diameter * 1.28 }
 
@@ -77,8 +79,9 @@ struct PawnView: View {
         .contentShape(
             Rectangle().inset(by: -max(0, (Keezly.Target.minimum - diameter) / 2))
         )
-        .scaleEffect(isSelected ? 1.14 : 1, anchor: .bottom)
+        .scaleEffect(isSelected ? 1.14 : (isEmphasised ? 1.22 : 1), anchor: .bottom)
         .animation(.spring(response: 0.26, dampingFraction: 0.72), value: isSelected)
+        .animation(.spring(response: 0.3, dampingFraction: 0.55), value: isEmphasised)
     }
 
     private var piece: some View {
@@ -113,6 +116,11 @@ struct PawnView: View {
                 .fill(.white.opacity(0.88))
                 .frame(width: diameter * 0.28, height: diameter * 0.28)
                 .offset(y: height * 0.26)
+
+            if isEmphasised {
+                PawnSilhouette()
+                    .stroke(.white.opacity(0.85), lineWidth: max(1.5, diameter * 0.1))
+            }
 
             if isSelectable || isSelected {
                 PawnSilhouette()
