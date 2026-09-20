@@ -8,8 +8,9 @@ stays unticked and is marked `NOT RUN` — never "probably fine" (§139).
 
 ## Release 1.0.0 — status: **NOT READY**
 
-The app does not build yet. This checklist is established now so it is filled in
-as work lands, not reconstructed at the end.
+The app builds and runs on simulator and on a physical iPhone, but there is no
+gameplay yet. This checklist is filled in as work lands, not reconstructed at
+the end.
 
 ### Build and versioning
 
@@ -21,9 +22,10 @@ as work lands, not reconstructed at the end.
 
 ### Tests
 
-- [ ] Rules engine unit tests green — *currently: 57 passed at commit `64931ef`*
+- [x] Rules engine unit tests green — 68 passed, 0 failed at commit `4eca268`
 - [ ] AI simulation green — NOT RUN (no AI)
-- [ ] UI tests green — NOT RUN (no app target)
+- [x] UI tests green — 7/7 on two simulators, 11/11 on a physical iPhone
+      (scope is launch and rotation only until M4 lands gameplay)
 - [ ] Large-scale randomised simulation green — partial: 221 matches in the invariant suite
 - [ ] No known critical bugs — *currently true; see `KNOWN_ISSUES.md`*
 
