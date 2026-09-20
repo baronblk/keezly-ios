@@ -71,6 +71,14 @@ The physical iPad gate
 
 Both physical device gates
 
+### ios lint
+
+```sh
+[bundle exec] fastlane ios lint
+```
+
+Static checks: SwiftLint and SwiftFormat
+
 ### ios qa
 
 ```sh
