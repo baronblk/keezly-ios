@@ -48,6 +48,47 @@ almost invisible; what sells it is that the eye cannot quite resolve it.
 
 ---
 
+## A quiet Dutch identity (DEC-019)
+
+Keezen is Dutch. The board says so without saying it loudly: **ornament, never
+illustration.** No windmills, no clogs, no tulip fields, no flags — those would
+make a souvenir out of a board meant to look like a good one.
+
+| Where | What |
+|---|---|
+| The rim | A running border between two fine incised lines: an abstracted tulip alternating with a concave lozenge |
+| The middle | A medallion framing the cards, one petal in each gap between the home lanes |
+| Each home lane | A small chevron at its inner end, pointing the way the pawns travel |
+| One place only | A single orange keystone at the top of the medallion |
+
+**Engraved, not printed.** Every ornament is drawn the way a milled hole is
+drawn: a lit lip beneath a dark incision. That one shared trick is what makes
+it belong to the board rather than sit on it. The blue is Delft, at low
+opacity, and it is never a player colour — those stay independent.
+
+**Its own geometry.** One leaf construction, used at three sizes, plus one
+lozenge. No tile pattern, border or board graphic is traced from anywhere; the
+tradition is the inspiration, the shapes are Keezly's.
+
+Three things it has to survive, each of which changed the design:
+
+- **Never mistakable for a playing square.** A test measures every motif
+  against every square at every seat count. The first attempt collided with the
+  waiting trays — so the rim was *widened* rather than the ornament squeezed
+  into the gap. The playing area is about six percent smaller as a result, and
+  that is the price of a frame that can carry a border.
+- **It has to be small and still read.** The first tulip — a bud with curling
+  side strokes and a stem — came out as a stray squiggle at the size it is
+  actually drawn. Three symmetric leaves survive. Below about nine points per
+  square the motifs are dropped and only the border lines remain: a phone gets
+  the frame, not the detail.
+- **It has to fit every table.** The medallion is measured against the board's
+  inner field rather than in square widths. At two seats the home lanes reach
+  almost to the middle and there is no quiet centre at all, so nothing is drawn
+  (ISS-008). Ornament over the game is worse than no ornament.
+
+---
+
 ## Board geometry
 
 `BoardLayout` maps `BoardPosition` to coordinates. `KeezlyCore` holds no
@@ -260,8 +301,13 @@ hardware.
 | iPhone portrait, 4 and 6 players — smallest, standard and largest | SIMULATOR VERIFIED |
 | iPhone landscape | SIMULATOR VERIFIED |
 | Accessibility text size (extra large) | SIMULATOR VERIFIED |
-| iPhone 17 Pro, iOS 27.0 | PHYSICAL DEVICE VERIFIED |
-| iPad hardware | **BLOCKED** — no physical iPad paired (MAN-10) |
+| Free-for-all table (no partner badge) | SIMULATOR VERIFIED |
+| Five-player table | SIMULATOR VERIFIED |
+| A Jack with its swap targets | SIMULATOR VERIFIED |
+| A Seven mid-split | SIMULATOR VERIFIED |
+| Phone mid-match | SIMULATOR VERIFIED |
+| iPhone 17 Pro, iOS 27.0 | PHYSICAL DEVICE VERIFIED — 58/58 |
+| iPad (A16), iOS 27.0 | PHYSICAL DEVICE VERIFIED — 58/58 |
 
 ### Open
 
@@ -270,3 +316,6 @@ hardware.
 - Haptics and audio are not implemented.
 - Dark Graphite is not offered in Settings.
 - Split View and Stage Manager are untested.
+- Landscape captures come out rotated (ISS-009) — fine for review, not
+  submittable as App Store screenshots.
+- A two-player table has not been reviewed for crowding in the middle.
