@@ -16,6 +16,29 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ## Closed
 
+### ISS-004 — Apple Developer team ids were committed to documentation
+
+- **Status:** FIXED (working tree) — see "remaining exposure" below
+- **Severity:** Low
+- **Component:** Documentation / process
+- **Description:** While recording the signing decision, two Apple Developer
+  team ids were written into `CURRENT_STATE.md`, contradicting DEC-013, which
+  says account-specific signing configuration never enters the repository.
+- **How it was caught:** the repository-wide secret sweep that runs after
+  credential work, not by review. The sweep is worth keeping for that reason.
+- **Fix:** both ids removed from all tracked files; the team id now exists only
+  in the git-ignored `Config/Local.xcconfig`.
+- **Remaining exposure:** the ids are still present in pushed history, in
+  commit `497accf`. An Apple **Team ID is an identifier, not a credential** — it
+  appears in every shipped app's provisioning profile and cannot be used to
+  authenticate — so the practical risk is negligible. Removing it entirely would
+  need a history rewrite and a force push, which is the repository owner's call.
+- **Not affected:** the App Store Connect **key id, issuer id and `.p8` private
+  key never entered the repository** at any point. They live outside it, and the
+  swept files confirm that.
+- **Related files:** `CURRENT_STATE.md`, `Config/Local.xcconfig` (untracked),
+  `DECISIONS.md` → DEC-013
+
 ### ISS-001 — Move generator failed to compile due to name shadowing
 
 - **Status:** VERIFIED
