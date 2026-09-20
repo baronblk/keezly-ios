@@ -461,3 +461,43 @@ fixed rather than suppressed.
 **Consequences.** `swiftlint lint --strict` must stay clean. If a rule becomes
 more trouble than it is worth, it is disabled here with a reason rather than
 silenced inline.
+
+---
+
+## DEC-017 — The board is a squared ring, drawn from our own curve
+
+- **Date:** 2026-09-20
+- **Topic:** Board form
+- **Status:** ACCEPTED
+
+**Context.** The first board rendering placed the track on a gentle superellipse
+(exponent 4), which read as a circle. A reference photograph of a physical
+Keezen board — a commercial product — was supplied for inspiration, and it makes
+the traditional form plain: a **square** ring with straight runs of holes and
+corners, home lanes running perpendicular inward, and the cards played in the
+centre.
+
+**The line between the two.** The traditional *form* of a Keezen board belongs
+to the game and to nobody in particular: a square track, four-square home lanes,
+waiting areas beside each seat. A specific publisher's **artwork** — their board
+graphics, colours, hole rendering, card faces, logo — does not, and §76 forbids
+reproducing it.
+
+**Decision.** Keep the parametric superellipse, but raise its exponent to 8. The
+sides become straight runs of squares with softly rounded corners: the shape
+players expect, generated from our own curve, at any seat count from two to six.
+Nothing is traced, measured or copied from the reference. The centre of the
+board is reserved for the draw and discard piles, which is where the cards go on
+a physical board and where the eye looks for them.
+
+**Reasoning.** A round track is a wheel; a square one is a board. Matching the
+familiar form costs nothing in originality — the visual language (colours,
+materials, pawn geometry, card design, the marks on the pieces) is entirely ours
+— and it saves every player the moment of "what am I looking at".
+
+**Rejected.** Reproducing the reference's layout square for square; adding
+imitation wood grain (§43 asks for restrained materiality, not skeuomorphism).
+
+**Consequences.** `BoardLayout.ringExponent` is the single knob for this. The
+layout tests already bound how far seat-to-seat geometry may diverge, and they
+gate any future change to it.
