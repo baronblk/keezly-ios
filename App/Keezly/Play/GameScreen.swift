@@ -20,6 +20,9 @@ struct GameScreen: View {
     @State private var selectedCard: Card?
     @State private var selectedPawn: PawnID?
     @State private var committedLegs: [SplitStep] = []
+    /// Where the keyboard is. Shared by the hand and the board, so focus can
+    /// cross between them (§46).
+    @FocusState private var focus: PlayFocus?
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -54,6 +57,22 @@ struct GameScreen: View {
         )
     }
 
+    /// Everything the keyboard can reach right now, rebuilt from the session
+    /// on every render exactly as the planner is — so focus can never point at
+    /// something the engine would refuse.
+    private var ring: FocusRing {
+        guard session.isAwaitingHuman else { return FocusRing(mustFold: false) }
+        guard !session.mustFold else { return FocusRing(mustFold: true) }
+        let planner = planner
+        return FocusRing(
+            mustFold: false,
+            hand: session.localSeat.map { session.state.hand(of: $0).cards } ?? [],
+            playable: planner.playableCards,
+            selectablePawns: planner.selectablePawns,
+            targets: planner.highlightedTargets
+        )
+    }
+
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -63,6 +82,22 @@ struct GameScreen: View {
                 // alone. A phone in landscape reports a regular width on some
                 // models, and stacking a board above a hand there left the
                 // board the size of a postage stamp.
+                if ScreenshotMode.showsFocusProbe {
+                    // A probe, not a feature: it exists only under the test
+                    // launch argument and reports where focus actually is, so
+                    // a capture can answer "did the key arrive" rather than
+                    // leaving it to inference.
+                    Text(Self.describe(focus))
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.white)
+                        .padding(4)
+                        .background(.black)
+                        .accessibilityIdentifier("debug.focus")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .allowsHitTesting(false)
+                        .zIndex(999)
+                }
+
                 if proxy.size.height < Self.shortHeightThreshold {
                     shortLayout(size: proxy.size)
                 } else if isCompact {
@@ -73,7 +108,21 @@ struct GameScreen: View {
             }
         }
         .environment(\.boardTheme, theme)
+        // The screen itself takes focus so that a key press arrives even
+        // before the player has focused anything — otherwise the first arrow
+        // key on a fresh board would go nowhere. Its own focus ring is
+        // suppressed: the container is a route for keys, not a destination.
+        .focusable()
+        .focusEffectDisabled()
+        .keyboardFocus($focus, equals: .screen)
+        .defaultFocus($focus, .screen)
         .onAppear { session.begin() }
+        // Not on appear: at that point the computers may still be opening, so
+        // there is nothing a human could focus yet.
+        .onChange(of: session.isAwaitingHuman) { _, awaiting in
+            guard awaiting, ScreenshotMode.forcesInitialFocus, focus == .screen || focus == nil else { return }
+            focus = ring.first ?? .screen
+        }
         .onChange(of: session.pendingEvents.count) { _, _ in playOutEvents() }
         .onDisappear { abandonPresentation() }
         .onChange(of: scenePhase) { _, phase in
@@ -81,6 +130,19 @@ struct GameScreen: View {
             // in a half-played position.
             if phase != .active { abandonPresentation() }
         }
+        // Arrows walk the current band, up and down cross between hand, pieces
+        // and squares. Bound here rather than on each element so a key press
+        // works wherever focus happens to be (§46).
+        .onKeyPress(.leftArrow) { handle(.left) }
+        .onKeyPress(.rightArrow) { handle(.right) }
+        .onKeyPress(.upArrow) { handle(.up) }
+        .onKeyPress(.downArrow) { handle(.down) }
+        .onKeyPress(.return) { handle(.activate) }
+        .onKeyPress(.space) { handle(.activate) }
+        .onKeyPress(.escape) { handle(.cancel) }
+        // The keyboard must never be left pointing at a card that has been
+        // played or a square that is no longer legal.
+        .onChange(of: session.state.revision) { _, _ in settleFocus() }
     }
 
     // MARK: - Layouts
@@ -88,6 +150,17 @@ struct GameScreen: View {
     /// Below this height there is no room to put a hand under a board and keep
     /// the board worth looking at. A phone in landscape is the case.
     static let shortHeightThreshold: CGFloat = 520
+
+    static func describe(_ focus: PlayFocus?) -> String {
+        switch focus {
+        case .none: "focus:none"
+        case .screen: "focus:screen"
+        case .fold: "focus:fold"
+        case .card(let card): "focus:card:\(card.rank.shorthand)"
+        case .pawn(let pawn): "focus:pawn:\(pawn.seat.index).\(pawn.slot)"
+        case .target(let position): "focus:target:\(position)"
+        }
+    }
 
     /// Phone-shaped: the board leads, the hand sits under it within thumb reach,
     /// and the opponents are a single compact row (§5).
@@ -213,7 +286,8 @@ struct GameScreen: View {
                 selectedPawn: selectedPawn,
                 emphasised: presenter.emphasised,
                 onSelectPawn: select(pawn:),
-                onSelectTarget: tap(target:)
+                onSelectTarget: tap(target:),
+                focus: $focus
             )
 
             GeometryReader { proxy in
@@ -243,6 +317,9 @@ struct GameScreen: View {
                         .padding(.vertical, Keezly.Spacing.medium)
                 }
                 .buttonStyle(.borderedProminent)
+                .keyboardFocusRing(focus == .fold, cornerRadius: Keezly.Radius.card)
+                .pointerEffect(.automatic)
+                .keyboardFocus($focus, equals: .fold)
                 .accessibilityHint("action.fold.hint")
             }
 
@@ -253,6 +330,7 @@ struct GameScreen: View {
                     selected: selectedCard,
                     cardWidth: availableWidth < 300 ? shortHandCardWidth : handCardWidth,
                     availableWidth: availableWidth,
+                    focus: $focus,
                     onSelect: select(card:)
                 )
                 .disabled(!session.isAwaitingHuman)
@@ -301,6 +379,59 @@ struct GameScreen: View {
         selectedCard = nil
         selectedPawn = nil
         committedLegs = []
+    }
+
+    // MARK: - Keyboard
+
+    /// Applies a key press. The decision itself lives in `PlayKeyboard`, which
+    /// is pure and therefore testable without a hardware keyboard.
+    private func handle(_ key: PlayKey) -> KeyPress.Result {
+        switch PlayKeyboard.intent(for: key, focus: focus, ring: ring) {
+        case .moveFocus(let next):
+            focus = next
+            return .handled
+        case .activate(let item):
+            activate(item)
+            return .handled
+        case .cancel:
+            clearSelection()
+            // Back to the hand, which is where a cancelled move leaves the
+            // player: nothing chosen, everything still available.
+            focus = ring.first ?? .screen
+            return .handled
+        case .ignored:
+            return .ignored
+        }
+    }
+
+    private func activate(_ item: PlayFocus) {
+        switch item {
+        // The screen itself is a route for keys, not something to act on.
+        case .screen: return
+        case .fold: submit(.foldHand(seat: session.state.currentSeat))
+        case .card(let card): select(card: card)
+        case .pawn(let pawn): select(pawn: pawn)
+        case .target(let position): tap(target: position)
+        }
+        // Acting changes what is reachable, so the keyboard moves on to
+        // whatever the player would reach for next: from a card to the pieces
+        // it can move, from a piece to its squares, and from a square — the
+        // move now made — back to the hand.
+        Task { @MainActor in
+            focus = ring.jump(from: item, by: 1) ?? ring.first
+        }
+    }
+
+    /// Puts focus back on something real after the board has moved on.
+    ///
+    /// Deliberately does nothing while focus is still on the screen itself: a
+    /// player using touch has not asked for a focus ring, and pulling one onto
+    /// the board every time a computer opponent moved would be noise on a
+    /// device that may have no keyboard at all.
+    private func settleFocus() {
+        guard let current = focus, current != .screen else { return }
+        if ring.contains(current) { return }
+        focus = ring.first ?? .screen
     }
 
     // MARK: - Animation
@@ -363,6 +494,5 @@ private struct SevenProgress: View {
         .background(Capsule().fill(Keezly.Palette.legalTarget.opacity(0.14)))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("seven.progress")
-        .accessibilityElement(children: .combine)
     }
 }

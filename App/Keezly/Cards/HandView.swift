@@ -16,6 +16,9 @@ struct HandView: View {
     var cardWidth: CGFloat = 76
     /// How much room the hand may take. The fan tightens to fit it.
     var availableWidth: CGFloat = .infinity
+    /// Where the keyboard is, shared with the board so focus can move between
+    /// the two without either owning it.
+    var focus: FocusState<PlayFocus?>.Binding?
     var onSelect: (Card) -> Void
 
     /// Degrees of tilt between neighbouring cards.
@@ -38,11 +41,14 @@ struct HandView: View {
                 let offsetFromCentre = Double(index) - centre
                 let isChosen = selected == card
 
+                let isLive = playable.contains(card)
+
                 CardView(
                     card: card,
                     width: cardWidth,
-                    isPlayable: playable.contains(card),
+                    isPlayable: isLive,
                     isSelected: isChosen,
+                    isFocused: focus?.wrappedValue == .card(card),
                     role: .hand
                 )
                 // A fanned card sits a little lower the further it is from the
@@ -55,11 +61,16 @@ struct HandView: View {
                     x: CGFloat(offsetFromCentre) * step,
                     y: isChosen ? 0 : abs(offsetFromCentre) * cardWidth * 0.035
                 )
-                .zIndex(isChosen ? 100 : Double(index))
+                // A focused card comes forward too, or the ring would be
+                // drawn underneath its neighbour.
+                .zIndex(isChosen ? 100 : (focus?.wrappedValue == .card(card) ? 90 : Double(index)))
                 .onTapGesture {
-                    guard playable.contains(card) else { return }
+                    guard isLive else { return }
                     onSelect(card)
                 }
+                .pointerEffect(.lift, enabled: isLive)
+                .focusable(isLive)
+                .keyboardFocus(focus, equals: .card(card))
             }
         }
         .frame(

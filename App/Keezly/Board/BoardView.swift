@@ -24,6 +24,8 @@ struct BoardView: View {
     var emphasised: PawnID?
     var onSelectPawn: ((PawnID) -> Void)?
     var onSelectTarget: ((BoardPosition) -> Void)?
+    /// Where the keyboard is, shared with the hand.
+    var focus: FocusState<PlayFocus?>.Binding?
 
     @Environment(\.boardTheme) private var theme
 
@@ -50,6 +52,13 @@ struct BoardView: View {
                         .contentShape(Rectangle())
                         .position(transform.point(layout.point(for: target)))
                         .onTapGesture { onSelectTarget?(target) }
+                        .keyboardFocusRing(
+                            focus?.wrappedValue == .target(target),
+                            cornerRadius: transform.scaled(layout.squareSize) / 2
+                        )
+                        .pointerEffect(.highlight)
+                        .focusable()
+                        .keyboardFocus(focus, equals: .target(target))
                         .accessibilityIdentifier(
                             "target.\(legTargets.contains(target) ? "leg." : "")\(Self.identifier(for: target))"
                         )
@@ -74,6 +83,13 @@ struct BoardView: View {
                     )
                     .onTapGesture { onSelectPawn?(pawn.id) }
                     .allowsHitTesting(selectablePawns.contains(pawn.id) || selectedPawn == pawn.id)
+                    .keyboardFocusRing(
+                        focus?.wrappedValue == .pawn(pawn.id),
+                        cornerRadius: transform.scaled(layout.squareSize) / 2
+                    )
+                    .pointerEffect(.lift, enabled: selectablePawns.contains(pawn.id))
+                    .focusable(selectablePawns.contains(pawn.id))
+                    .keyboardFocus(focus, equals: .pawn(pawn.id))
                     .accessibilityIdentifier("pawn.\(pawn.id.seat.index).\(pawn.id.slot)")
                 }
             }

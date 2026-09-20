@@ -42,6 +42,22 @@ enum ScreenshotMode {
         return nil
     }
 
+    /// Whether to show the focus probe.
+    ///
+    /// Separate from `isActive` on purpose: every deterministic capture runs
+    /// with `-KEEZLY_UI_TESTING`, and a debug label burned into an App Store
+    /// screenshot would be a genuine mistake.
+    static var showsFocusProbe: Bool { arguments.contains("-KEEZLY_DEBUG_FOCUS") }
+
+    /// Puts the keyboard somewhere at launch.
+    ///
+    /// iOS gives a view focus only when a hardware keyboard or Full Keyboard
+    /// Access is present — with neither, focus is `nil` and nothing about the
+    /// keyboard path can be observed at all. This makes the focus state
+    /// reachable so it can be verified on a simulator that has no keyboard
+    /// attached (§177: verify what can be verified, and say what cannot).
+    static var forcesInitialFocus: Bool { value(for: "-KEEZLY_FOCUS") == "first" }
+
     /// How seats are grouped. Defaults to the standard arrangement for the
     /// table size, which is partners at four and six seats.
     ///

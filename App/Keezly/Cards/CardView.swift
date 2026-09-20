@@ -23,6 +23,9 @@ struct CardView: View {
     var width: CGFloat = 76
     var isPlayable = true
     var isSelected = false
+    /// Where the keyboard is. Separate from `isSelected`, which is a choice the
+    /// player has actually made (§46).
+    var isFocused = false
     var role: CardRole = .hand
     var faceUp = true
 
@@ -46,6 +49,7 @@ struct CardView: View {
             y: width * (isSelected ? 0.07 : 0.03)
         )
         .offset(y: isSelected ? -width * 0.18 : 0)
+        .keyboardFocusRing(isFocused, cornerRadius: width * 0.14)
         .accessibilityElement(children: .ignore)
         // The rank sits in the identifier so a screenshot fixture can find,
         // say, the Jack in a hand without knowing the deck copy it came from.
