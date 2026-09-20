@@ -22,7 +22,7 @@ the end.
 
 ### Tests
 
-- [x] Rules engine unit tests green — 68 passed, 0 failed at commit `4eca268`
+- [x] Rules engine unit tests green — 79 passed, 0 failed at commit `c4c28d9`
 - [ ] AI simulation green — NOT RUN (no AI)
 - [x] UI tests green — 7/7 on two simulators, 11/11 on a physical iPhone
       (scope is launch and rotation only until M4 lands gameplay)
