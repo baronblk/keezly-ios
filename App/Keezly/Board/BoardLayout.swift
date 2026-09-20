@@ -47,6 +47,26 @@ struct BoardLayout: Sendable {
     /// The board's natural rhythm — ornament is measured in it so that a
     /// two-player board and a six-player one look equally well proportioned.
     var pitch: CGFloat { squareSize / Self.squareFill }
+
+    /// How much of the board is quiet middle, as a fraction of its whole
+    /// extent.
+    ///
+    /// The home lanes run inwards from the track, so the fewer seats there
+    /// are, the shorter the track and the closer the lanes come to the centre.
+    /// A two-player board has barely any middle at all. Anything placed there
+    /// — a medallion, the cards — has to be measured against this rather than
+    /// against the size of the view (ISS-008).
+    var innerFieldFraction: CGFloat {
+        let extent = max(contentBounds.width, contentBounds.height)
+        guard extent > 0 else { return 0 }
+        let inner = homePoints.compactMap { $0.last.map { hypot($0.x, $0.y) } }.min() ?? 0
+        return (inner * 2) / extent
+    }
+
+    /// The classic four-player board's quiet middle, which everything else is
+    /// proportioned against.
+    static let classicInnerFieldFraction: CGFloat =
+        BoardLayout(board: BoardGraph(seatCount: 4)).innerFieldFraction
     /// How far past the track ring the board's edge sits, in unit space.
     ///
     /// Wide enough that the waiting areas stand *on* the board rather than

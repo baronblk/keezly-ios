@@ -12,13 +12,65 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
-| ISS-009 | Landscape captures come out rotated | Minor (tooling) |
+| ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
+| ISS-013 | A two-player board has no room for the cards in the middle | Minor (visual) |
 | ISS-010 | No hardware keyboard or pointer available to verify M4.7 end to end | Verification gap |
 | ISS-011 | Commit `1d46410` carries a message that does not match its content | Cosmetic (history) |
 
 ---
 
-## Closed
+## Open — in detail
+
+### ISS-013 — A two-player board has no room for the cards in the middle
+
+- **Status:** OPEN
+- **Severity:** Minor (visual)
+- **Component:** App / Board
+- **Description:** The home lanes are four squares long whatever the table
+  size, so on a two-seat board — half the track of a four-seat one — they run
+  almost to the centre. The draw pile, the played card and the turn indicator
+  are drawn across them.
+- **Reproduction:** `-KEEZLY_SEATS 2` on an iPad, or the
+  `testTwoPlayerLandscape` capture.
+- **Expected:** The middle of the board reads as clearly as it does at four
+  seats.
+- **Actual:** At the original size the cards sit across both home lanes. Scaled
+  honestly to the space available they become too small to read, so the scale
+  is now floored (`GameScreen.minimumCentreScale`) and a little crowding
+  remains.
+- **What is done:** the centre is now proportioned to the board's own quiet
+  middle rather than to the size of the view, which fixes five and six seats
+  and improves two. The medallion is already correctly absent there (ISS-008).
+- **What is left:** a two-seat table probably needs the centre arranged
+  differently rather than merely smaller — the piles side by side outside the
+  lanes, or moved out of the board altogether. That is design work, not a
+  parameter.
+- **Related files:** `App/Keezly/Play/GameScreen.swift`,
+  `App/Keezly/Board/BoardLayout.swift`
+- **Related tests:** `InnerFieldTests`
+
+### ISS-012 — Landscape captures carry a 25% black margin
+
+- **Status:** OPEN
+- **Severity:** Minor (tooling; blocks App Store submission of captures)
+- **Component:** Screenshot harness
+- **Description:** `XCUIApplication.screenshot()` on a rotated app returns the
+  application element's region rather than the window, and on this simulator
+  that region is exactly three quarters of the screen's short side. Every
+  landscape capture therefore carries a black band.
+- **Reproduction:** Run `DesignReviewScreenshots` and measure the captures:
+  **exactly 516 of 2064 rows** are black on every landscape capture and **none**
+  on any portrait one. The number is identical every run.
+- **Impact:** None on a design review — the interface itself is complete and
+  correctly oriented. It does matter for App Store screenshots.
+- **Attempted:** switching to `XCUIScreen.main.screenshot()` removed the band
+  but returned portrait-shaped images, and a 1.5-second settle before capturing
+  changed nothing. The cause is the capture API, not a rotation still in
+  flight.
+- **Next step:** settle this in the screenshot milestone (M11), where the
+  captures move to `fastlane snapshot` and are written to disk, and where the
+  result can be checked as a file rather than as an attachment.
+- **Related files:** `App/KeezlyUITests/DesignReviewScreenshots.swift`
 
 ### ISS-011 — A commit message that does not match its content
 
@@ -58,6 +110,10 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 - **Resolution:** carry out the hardware gate when a keyboard and a pointer are
   available. Recorded in `RELEASE_CHECKLIST.md` as NOT VERIFIED — HARDWARE NOT
   AVAILABLE, never as a pass.
+
+---
+
+## Closed
 
 ### ISS-009 — Landscape captures come out rotated
 

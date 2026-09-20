@@ -43,6 +43,28 @@ struct GameScreen: View {
     private var shortHandCardWidth: CGFloat { 74 }
     private var layout: BoardLayout { BoardLayout(board: session.state.board) }
 
+    /// How big the cards in the middle may be, as a fraction of the board.
+    ///
+    /// Proportioned to the board's quiet middle rather than to the view. A
+    /// fixed fraction suits the classic four-player board and is far too much
+    /// for two seats, where the home lanes run almost to the centre and the
+    /// draw pile ends up sitting across them (ISS-008). Never larger than the
+    /// four-player value, so the board it was designed on is unchanged.
+    private var centreScale: CGFloat {
+        let reference = BoardLayout.classicInnerFieldFraction
+        guard reference > 0 else { return Self.classicCentreScale }
+        let scaled = Self.classicCentreScale * layout.innerFieldFraction / reference
+        // Floored as well as capped. Two seats leave so little middle that the
+        // honest proportion would shrink the draw pile past reading, and an
+        // illegible count is worse than a crowded one (ISS-013).
+        return min(Self.classicCentreScale, max(Self.minimumCentreScale, scaled))
+    }
+
+    /// The share of the board the middle takes on a four-player table.
+    static let classicCentreScale: CGFloat = 0.26
+    /// Below this the cards in the middle stop being readable.
+    static let minimumCentreScale: CGFloat = 0.19
+
     /// The interaction state, rebuilt from the session every render so it can
     /// never disagree with the board.
     private var planner: PlayPlanner {
@@ -232,6 +254,11 @@ struct GameScreen: View {
                 sevenProgress
                 hand(availableWidth: boardSide)
             }
+            // Given explicitly so the three columns add up. Left to itself the
+            // middle took whatever the seat columns did not, which on a
+            // two-player table — one opponent, so one empty column — pushed
+            // the board well off centre.
+            .frame(width: boardSide)
 
             SeatColumn(
                 seats: Array(opponents.suffix(from: split)),
@@ -295,7 +322,7 @@ struct GameScreen: View {
                 BoardCentreView(
                     state: session.state,
                     roles: session.roles,
-                    width: side * 0.26
+                    width: side * centreScale
                 )
                 .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
             }

@@ -201,6 +201,9 @@ final class DesignReviewScreenshots: XCTestCase {
     ) {
         let app = launch(seats: seats, seed: seed, orientation: orientation, extra: extra)
         waitForDeal(app, name)
+        // A rotation is not instant, and a capture taken while one is in
+        // flight catches the app still laid out for the old size.
+        Thread.sleep(forTimeInterval: 1.5)
         attach(name, from: app, orientation: orientation)
     }
 
