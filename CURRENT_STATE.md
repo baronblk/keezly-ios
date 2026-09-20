@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-5d9fbf4  docs: correct the cancellation diagnosis and separate average from worst case
+1c85146  feat(ui): redesign the board and cards as a tactile wooden board game
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -23,10 +23,37 @@ Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 | M1 — GameCore / Rules | **DONE** |
 | M2 — Complete Move Engine | **DONE** |
 | M3 — AI | **DONE** |
-| **M4 — Gameplay UI (iPad / iPhone)** | **NEXT — not started** |
+| **M4 — Gameplay UI (iPad / iPhone)** | **IN PROGRESS** |
 
 Everything up to and including M3 lives in `KeezlyCore`, which is testable with
 `swift test` alone. M4 is the first milestone that is mostly app-layer work.
+
+**The game is playable.** One human against three computer opponents, board and
+hand on screen, moves applied through the engine, verified end to end by UI
+tests rather than by assertion.
+
+### Design status (DEC-018)
+
+Visual direction is **tactile digital board game**, material **Classic Wood**:
+a maple panel with round milled holes, pawn silhouettes seated in them, and real
+playing cards with classic corner indices and traditional pip layouts. The full
+design system is in `docs/UI_UX.md`.
+
+Reviewed against the seven design questions on iPad 13" landscape and portrait,
+four and six players:
+
+| | |
+|---|---|
+| Reads as a real board game | **yes** |
+| Cards look like real cards | **yes** |
+| Card values instantly readable | **yes** — the corner index survives the fan |
+| Pieces have enough presence | **yes** |
+| Track immediately understandable | **yes** |
+| Good enough for App Store screenshots | **iPad yes; iPhone not yet reviewed** |
+| iPad uses its area convincingly | **yes in landscape** — the width beside a square board carries the seat panels |
+
+Open design work: the iPhone layout has had no design pass, and animations
+still play as one timed pause rather than event by event.
 
 ---
 
@@ -89,8 +116,10 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Not Implemented Yet
 
-- **All gameplay UI** — the app builds and launches but cannot play a game.
+- Main menu and table configuration — the app opens straight into a match.
 - Pass & play, autosave, statistics, match history, replay playback UI.
+- Event-by-event animation; dealing, capture and swap animations.
+- iPhone design pass; Split View and Stage Manager verification.
 - Game Center of any kind.
 - Tutorial, rulebook, hints, accessibility work.
 - Localisation, audio, haptics, app icon, artwork.
@@ -129,9 +158,8 @@ Two gated suites, excluded from the default run on purpose:
 
 | App-level | Result |
 |---|---|
-| iPhone 17 simulator, iOS 27.0 | 7/7 |
-| iPad Pro 13" (M5) simulator, iOS 27.0 | 7/7 |
-| Physical iPhone 17 Pro, iOS 27.0 | 11/11 |
+| iPhone 17 simulator, iOS 27.0 | **22/22** (unit, launch, play flow, screenshots) |
+| Physical iPhone 17 Pro, iOS 27.0 | 11/11 — **before** the M4 UI work; needs a re-run |
 
 ---
 
@@ -141,9 +169,9 @@ Recorded per environment; never merged (§167, §175).
 
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
-| Simulator — iPhone 17, iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (7/7) | 2026-09-20 | `705497c` |
-| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (11/11) | 2026-09-20 | `705497c` |
+| Simulator — iPhone 17, iOS 27.0 | **PASSED** (22/22) | 2026-09-20 | `1c85146` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (design review captures) | 2026-09-20 | `1c85146` |
+| Physical iPhone 17 Pro, iOS 27.0 | PASSED (11/11) — **stale**, predates the M4 UI | 2026-09-20 | `705497c` |
 | Physical iPad | **BLOCKED** — none paired (MAN-10) | — | — |
 | Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
@@ -215,8 +243,20 @@ SwiftFormat allowlists.
 
 ## Next Steps (concrete)
 
-**M4 — Gameplay UI.** The first milestone whose work is mostly outside
-`KeezlyCore`. Order matters here, because each step is verifiable on its own:
+**M4 continues.** What is left, in order:
+
+1. **iPhone design pass.** The compact layout works but has not been judged on
+   a phone. Capture it, look at it, fix what is wrong.
+2. **Event-by-event animation (M4.6).** Input locking is done and tested; the
+   events still play as one timed pause. Walk them instead: a pawn should visit
+   each square, a capture should read as a capture.
+3. **Re-run the physical iPhone gate.** The recorded pass predates all the UI
+   work, so it is stale.
+4. **Pointer, trackpad and keyboard on iPad (M4.7).**
+5. **Main menu and table configuration**, which is what lets a player choose
+   2–6 seats, teams and opponents rather than getting the built-in four.
+
+Superseded plan, kept for context:
 
 1. **M4.1 — design system.** Spacing, typography, materials, motion, and
    player identity. Player identity must be colour **plus** a symbol or shape:
