@@ -172,8 +172,52 @@ centred board. Each panel carries the seat's colour and mark, its name, how
 many cards it holds, how many pawns are home, whether it deals, and whether it
 is on turn (§35).
 
-**Compact width (iPhone).** The board leads, the hand sits beneath it within
-thumb reach, and the opponents collapse to a single compact row.
+**Compact width (iPhone).** Not the iPad layout scaled down. Two defects made
+the difference concrete:
+
+- **Six seat panels across a phone** forced the names to wrap and pushed the
+  layout wider than the screen, which clipped the board. Phones show compact
+  **chips** that drop the name entirely — colour and mark already identify a
+  seat, and identify it the same way on the board, so nothing is lost.
+- **A phone in landscape can report a regular width.** Deriving the board size
+  from the height left after the hand produced a 149-point board on a
+  393-point screen. The layout is now chosen by the space actually available:
+  below 520 points of height a short-and-wide arrangement gives the board the
+  full height and puts the hand beside it.
+
+A square board on a tall phone is limited by width, which leaves height to
+spare. It goes to the cards.
+
+**Dynamic Type.** The interface used fixed font sizes throughout, so the
+reader's setting had no effect at all — an accessibility failure, not a rough
+edge (§53). The distinction that resolves it: **chrome text follows the reader,
+card ranks and pips follow the card.** A rank that outgrew its card would be
+less readable, not more. Seat panels, chips, the turn indicator and the deal
+label scale; at an accessibility size the board's labels wrap rather than
+truncate, because half a sentence tells the reader nothing.
+
+---
+
+## Animation
+
+Event-driven (§39). `GameState` is final before the first frame; the presenter
+only shows how the board got there.
+
+- A pawn **visits every square it passes**, which is also how a player checks
+  that the engine did what they expected.
+- A **capture is shown after the move that caused it**. The engine emits it
+  first, because the square must be vacated before the mover can take it; drawn
+  in that order it reads as a piece flying off before anything hits it. The
+  reordering is presentation only and touches nothing in the engine.
+- A **swap** moves both pieces at once.
+- **Reduce Motion** lands moves instead of walking them.
+- **Any interruption settles on the truth.** Cancelling, leaving the foreground
+  and dismissing the screen all end with the board showing the real position,
+  because the settle sits in a `defer`. Verified by removing it and watching
+  three tests fail.
+
+The presenter holds its own copy of the pawn positions and has no access to
+`GameState`, so no animation can change the game.
 
 ---
 
@@ -204,16 +248,25 @@ Screenshots are captured by `DesignReviewScreenshots`, which launches the app
 in a deterministic mode with a fixed seed and seat count (§87), so the same
 board comes out every run.
 
+Status terms are kept apart on purpose (§167): **DESIGN IMPLEMENTED** means it
+exists in code, **SIMULATOR VERIFIED** means it was built and tested on a
+simulator, **PHYSICAL DEVICE VERIFIED** means it was built and tested on real
+hardware.
+
 | Screen | Status |
 |---|---|
-| iPad 13" landscape, 4 players | captured and reviewed |
-| iPad 13" landscape, 6 players | captured and reviewed |
-| iPad 13" portrait, 4 players | captured and reviewed |
-| iPhone | **not yet reviewed** |
+| iPad 13" landscape, 4 and 6 players | SIMULATOR VERIFIED |
+| iPad 13" portrait, 4 players | SIMULATOR VERIFIED |
+| iPhone portrait, 4 and 6 players — smallest, standard and largest | SIMULATOR VERIFIED |
+| iPhone landscape | SIMULATOR VERIFIED |
+| Accessibility text size (extra large) | SIMULATOR VERIFIED |
+| iPhone 17 Pro, iOS 27.0 | PHYSICAL DEVICE VERIFIED |
+| iPad hardware | **BLOCKED** — no physical iPad paired (MAN-10) |
 
 ### Open
 
-- iPhone layout has not had a design pass.
-- Animations still play as a single timed pause rather than event by event.
-- Dealing, capture and swap have no dedicated animation yet.
+- Dealing, the Seven's legs and the Jack swap have no bespoke choreography
+  beyond the generic move and swap.
+- Haptics and audio are not implemented.
 - Dark Graphite is not offered in Settings.
+- Split View and Stage Manager are untested.

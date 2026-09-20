@@ -16,6 +16,58 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ## Closed
 
+### ISS-007 — Dynamic Type had no effect anywhere in the interface
+
+- **Status:** VERIFIED
+- **Severity:** Major (accessibility)
+- **Component:** App / UI
+- **Description:** Every text style in the gameplay interface was a fixed
+  `.system(size:)` derived from the board geometry, so the reader's text-size
+  setting changed nothing at all. This is an accessibility failure rather than
+  a cosmetic one (§53).
+- **Reproduction:** Launch on any simulator with the content size category set
+  to `accessibility-extra-large`; the interface is pixel-identical to the
+  default.
+- **Expected:** Chrome text grows with the reader's setting.
+- **Actual:** Nothing moved.
+- **Fix:** `@ScaledMetric` on the chrome — seat panels, seat chips, the turn
+  indicator and the deal label. Card ranks and pips deliberately stay
+  proportional to the card: a rank that outgrew its card would be less
+  readable, not more. A second defect surfaced with the fix — the labels in the
+  middle of the board were pinned to the pile width and truncated instead of
+  wrapping — and was fixed by letting them wrap.
+- **Related files:** `App/Keezly/Play/SeatStatusView.swift`,
+  `App/Keezly/Board/BoardCentreView.swift`
+- **Verified by:** screenshot captures at `accessibility-extra-large`, and the
+  34/34 UI suite at commit `e4bae0f`.
+
+### ISS-006 — Six seat panels clipped the board on iPhone
+
+- **Status:** VERIFIED
+- **Severity:** Major (layout)
+- **Component:** App / UI
+- **Description:** The phone layout reused the iPad's named seat panels. At six
+  players the row of panels was wider than the screen, which widened the
+  enclosing stack and pushed the board off the edge. A related defect: the wide
+  layout was chosen by size class, but an iPhone in landscape can report a
+  regular width, and deriving the board size from the height left after the
+  hand produced a 149-point board on a 393-point screen.
+- **Reproduction:** Launch with `-KEEZLY_SEATS 6` on an iPhone 17e (portrait),
+  and rotate any iPhone to landscape.
+- **Expected:** The board fits, on every phone, in both orientations.
+- **Actual:** Clipped in portrait at six seats; unusably small in landscape.
+- **Fix:** Phones get compact seat chips that drop the name — colour and mark
+  already identify a seat, and identify it the same way on the board. The
+  layout is chosen by the height actually available rather than by size class:
+  below 520 points a short-and-wide arrangement gives the board the full height
+  and puts the hand beside it. The seat row is also explicitly clipped to the
+  screen width so an overflow can never widen the layout again.
+- **Related files:** `App/Keezly/Play/GameScreen.swift`,
+  `App/Keezly/Play/SeatStatusView.swift`
+- **Verified by:** captures on iPhone 17e, iPhone 17 and iPhone 18 Pro Max in
+  both orientations at four and six seats, and the 34/34 UI suite at commit
+  `e4bae0f`.
+
 ### ISS-005 — Cancellation latency in the Hard agent
 
 - **Status:** VERIFIED (and the original diagnosis was **wrong** — see below)

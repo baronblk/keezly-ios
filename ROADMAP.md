@@ -158,9 +158,9 @@ leak and watching them fail. See `AI.md`.
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
 | M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done with seat panels using the spare width; Split View and Stage Manager untested |
-| M4.4 iPhone layout — portrait and both landscape orientations | IN PROGRESS — a compact layout exists but has had no design pass |
+| M4.4 iPhone layout — portrait and both landscape orientations | DONE — phones get their own compact and short-landscape layouts; reviewed on the smallest, standard and largest iPhones, in both orientations, at 4 and 6 seats |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
-| M4.6 Event-driven animation pipeline with input locking | IN PROGRESS — input locking done and covered by a double-tap UI test; events still play as one timed pause rather than one at a time |
+| M4.6 Event-driven animation pipeline with input locking | DONE — `BoardPresenter` plays events one at a time, reorders a capture behind the move that caused it, honours Reduce Motion, and settles on the true position on any interruption |
 | M4.7 Pointer, trackpad and full keyboard access on iPad | NOT STARTED |
 
 | M4.8 Centre of the board — draw pile, discard, turn and deal status | DONE |
@@ -273,7 +273,7 @@ and mocked tests can proceed without them (§142).
 | M11.8 Simulator/orientation/localisation UI test matrix | NOT STARTED |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
 | M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
-| M11.11 Physical iPhone quality gate | PARTIAL — build, install, launch, rotation verified on an iPhone 17 Pro; gameplay items wait on M4 |
+| M11.11 Physical iPhone quality gate | PARTIAL — 34/34 on an iPhone 17 Pro (iOS 27.0) covering launch, gameplay, rotation and the phone layouts; haptics, audio and Game Center items wait on those features |
 | M11.12 Physical iPad quality gate | BLOCKED — no iPad paired (MAN-10) |
 | M11.13 Game Center multi-device verification | BLOCKED — MAN-10/11 + M6 |
 | M11.14 Real-hardware performance and long-run test | BLOCKED — needs gameplay (M4) |

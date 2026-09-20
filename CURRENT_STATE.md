@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-1c85146  feat(ui): redesign the board and cards as a tactile wooden board game
+e4bae0f  test(ui): cover the animation pipeline including interruption
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -32,6 +32,16 @@ Everything up to and including M3 lives in `KeezlyCore`, which is testable with
 hand on screen, moves applied through the engine, verified end to end by UI
 tests rather than by assertion.
 
+### Status vocabulary
+
+Three different questions, never merged into one answer (§167):
+
+| Term | Means |
+|---|---|
+| **DESIGN IMPLEMENTED** | It exists in code |
+| **SIMULATOR VERIFIED** | It was built and tested on a simulator |
+| **PHYSICAL DEVICE VERIFIED** | It was built and tested on real hardware |
+
 ### Design status (DEC-018)
 
 Visual direction is **tactile digital board game**, material **Classic Wood**:
@@ -39,8 +49,9 @@ a maple panel with round milled holes, pawn silhouettes seated in them, and real
 playing cards with classic corner indices and traditional pip layouts. The full
 design system is in `docs/UI_UX.md`.
 
-Reviewed against the seven design questions on iPad 13" landscape and portrait,
-four and six players:
+Reviewed against the seven design questions on iPad 13" landscape and portrait
+and on iPhone — smallest, standard and largest — in both orientations, at four
+and six players:
 
 | | |
 |---|---|
@@ -49,11 +60,23 @@ four and six players:
 | Card values instantly readable | **yes** — the corner index survives the fan |
 | Pieces have enough presence | **yes** |
 | Track immediately understandable | **yes** |
-| Good enough for App Store screenshots | **iPad yes; iPhone not yet reviewed** |
+| Good enough for App Store screenshots | **yes**, iPad and iPhone |
 | iPad uses its area convincingly | **yes in landscape** — the width beside a square board carries the seat panels |
+| iPhone is its own layout, not a shrunken iPad | **yes** — compact chips instead of named panels, and a separate short-landscape arrangement |
 
-Open design work: the iPhone layout has had no design pass, and animations
-still play as one timed pause rather than event by event.
+**The iPhone pass is done.** It found two real defects rather than rough edges:
+six seat panels pushed the layout wider than the screen and clipped the board,
+and the interface used fixed font sizes throughout, so Dynamic Type had no
+effect at all. Both are fixed and captured.
+
+**Animations are event-driven.** A pawn visits every square it passes, and a
+capture is drawn after the move that caused it. The presenter holds its own
+copy of the positions and cannot reach `GameState`; an interrupted animation
+always settles on the true position.
+
+Still open: no bespoke choreography for dealing, the Seven's legs or the Jack
+swap; no haptics or audio; Dark Graphite is not offered in Settings; Split View
+and Stage Manager are untested.
 
 ---
 
@@ -118,8 +141,9 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 - Main menu and table configuration — the app opens straight into a match.
 - Pass & play, autosave, statistics, match history, replay playback UI.
-- Event-by-event animation; dealing, capture and swap animations.
-- iPhone design pass; Split View and Stage Manager verification.
+- Bespoke dealing, Seven-leg and Jack-swap choreography (the generic move and
+  swap animations exist).
+- Split View and Stage Manager verification.
 - Game Center of any kind.
 - Tutorial, rulebook, hints, accessibility work.
 - Localisation, audio, haptics, app icon, artwork.
@@ -129,7 +153,8 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Tests
 
-`cd Packages/KeezlyCore && swift test` — **136 tests, 0 failures**, ~90 s.
+`cd Packages/KeezlyCore && swift test` — **137 tests in 12 suites, 0 failures**,
+89.7 s, re-run at the commit above.
 
 | Suite | Tests |
 |---|---|
@@ -139,12 +164,12 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 | Invariants | 6 |
 | Serialization | 11 |
 | Match record | 7 |
-| AI observation boundary | 15 |
+| AI observation boundary | 16 |
 | Easy agent | 7 |
 | Medium agent | 9 |
-| Hard agent | 12 |
+| Hard agent | 13 |
 | AI strength | 8 |
-| Simulation harness | 10 |
+| Simulation harness | 9 |
 
 Many are parameterised over seat counts or card ranks, so executed cases exceed
 test-function count. The invariant suite alone plays 221 complete matches.
@@ -158,8 +183,9 @@ Two gated suites, excluded from the default run on purpose:
 
 | App-level | Result |
 |---|---|
-| iPhone 17 simulator, iOS 27.0 | **22/22** (unit, launch, play flow, screenshots) |
-| Physical iPhone 17 Pro, iOS 27.0 | 11/11 — **before** the M4 UI work; needs a re-run |
+| iPhone 17 simulator, iOS 27.0 | **34/34** (unit, launch, play flow, animation, layout captures) |
+| iPad Pro 13" (M5) simulator, iOS 27.0 | **34/34** |
+| Physical iPhone 17 Pro, iOS 27.0 | **34/34** — re-run after the UI rebuild, not the stale pre-M4 result |
 
 ---
 
@@ -169,10 +195,10 @@ Recorded per environment; never merged (§167, §175).
 
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
-| Simulator — iPhone 17, iOS 27.0 | **PASSED** (22/22) | 2026-09-20 | `1c85146` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (design review captures) | 2026-09-20 | `1c85146` |
-| Physical iPhone 17 Pro, iOS 27.0 | PASSED (11/11) — **stale**, predates the M4 UI | 2026-09-20 | `705497c` |
-| Physical iPad | **BLOCKED** — none paired (MAN-10) | — | — |
+| Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
+| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (34/34) — `fastlane device_iphone` | 2026-09-20 | `e4bae0f` |
+| Physical iPad | **BLOCKED** — `fastlane device_ipad` reports DEVICE NOT AVAILABLE, not a pass (MAN-10) | — | — |
 | Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
@@ -243,18 +269,20 @@ SwiftFormat allowlists.
 
 ## Next Steps (concrete)
 
-**M4 continues.** What is left, in order:
+**M4 continues.** The iPhone pass, the animation pipeline, the full regression
+and the physical iPhone gate are done. What is left, in order:
 
-1. **iPhone design pass.** The compact layout works but has not been judged on
-   a phone. Capture it, look at it, fix what is wrong.
-2. **Event-by-event animation (M4.6).** Input locking is done and tested; the
-   events still play as one timed pause. Walk them instead: a pawn should visit
-   each square, a capture should read as a capture.
-3. **Re-run the physical iPhone gate.** The recorded pass predates all the UI
-   work, so it is stale.
-4. **Pointer, trackpad and keyboard on iPad (M4.7).**
-5. **Main menu and table configuration**, which is what lets a player choose
+1. **Widen the screenshot fixtures (§87).** The deterministic captures cover a
+   plain four- and six-player table. They should also cover a team game, a Jack
+   waiting for its target, a Seven mid-split, and the phone layouts, so a
+   design regression in those states cannot pass unnoticed.
+2. **Pointer, trackpad and keyboard on iPad (M4.7).**
+3. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
+4. **M5 — pass & play and autosave.**
+
+Blocked and not startable: the iPad hardware gate (MAN-10), anything behind the
+App Store Connect record (MAN-02), and Game Center multi-device (MAN-11/12).
 
 Superseded plan, kept for context:
 

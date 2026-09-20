@@ -55,16 +55,44 @@ Versioning.
   them can see another player's cards.
 - **Replay**: finished matches can be played back exactly, move by move,
   because the engine is deterministic.
+- **A playable game on iPad and iPhone.** One player against three computer
+  opponents: a wooden board with milled holes and seated pieces, real playing
+  cards with classic corner indices, and the flow card → pawn → square. Illegal
+  targets are never offered, and a Seven can only be started in a way that can
+  be finished.
+- **Its own layout on each device.** The iPad puts the width beside a square
+  board to work with seat status panels; the iPhone uses compact seat chips and
+  switches to a short-and-wide arrangement in landscape rather than shrinking
+  the board. Verified on the smallest, standard and largest iPhones.
+- **Animation that follows the game.** A piece walks the squares it passes, a
+  capture is shown after the move that took it, and a swap moves both pieces at
+  once. Interrupting an animation — leaving the app, closing the screen — always
+  leaves the board on the true position. Reduce Motion lands moves instead.
+- **Deterministic screenshot mode** with a fixed seed and seat count, so a
+  design review and the App Store captures show the same board every run.
 - **Device testing tooling**: `scripts/devices.sh` finds the physical iPhones
   and iPads paired with the development Mac and maps them onto stable roles,
   without ever storing a device name or identifier in the repository.
-- **Test suite**: 79 tests covering the board for every seat count, one test per
+- **Test suite**: covering the board for every seat count, one test per
   card rank, game flow, serialisation, the AI information boundary, and
   randomised self-play that plays 221 complete matches while asserting state
   invariants after every single action.
 - **Project memory**: `PROJECT_HANDOUT.md`, `CURRENT_STATE.md`, `ROADMAP.md`,
   `DECISIONS.md`, `ARCHITECTURE.md`, `RULES.md`, `RULE_VARIANTS.md`,
   `KNOWN_ISSUES.md` and this changelog.
+
+### Fixed
+
+- Six players on an iPhone pushed the layout wider than the screen and clipped
+  the board.
+- An iPhone in landscape could report a regular width, which left the board at
+  149 points on a 393-point screen.
+- The interface used fixed font sizes throughout, so Dynamic Type had no effect
+  at all. Chrome text now follows the reader's setting; card ranks and pips
+  stay proportional to the card, because a rank that outgrew its card would be
+  less readable, not more.
+- Labels in the middle of the board truncated at large text sizes instead of
+  wrapping.
 
 ### Security
 
@@ -75,6 +103,8 @@ Versioning.
 
 ## Not yet in this changelog
 
-The app itself does not build yet — there is no Xcode project, no UI, no AI, no
-Game Center integration and no CI. See `CURRENT_STATE.md` for exactly what
-exists and `ROADMAP.md` for what is planned.
+No main menu or table configuration — the app opens straight into a four-player
+match. No pass & play, autosave, statistics or match history. No Game Center,
+tutorial, rulebook, localisation, audio, haptics or app icon. Xcode Cloud is
+prepared but not configured. See `CURRENT_STATE.md` for exactly what exists and
+`ROADMAP.md` for what is planned.

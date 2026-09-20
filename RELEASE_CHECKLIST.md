@@ -22,10 +22,14 @@ the end.
 
 ### Tests
 
-- [x] Rules engine unit tests green — 79 passed, 0 failed at commit `c4c28d9`
-- [ ] AI simulation green — NOT RUN (no AI)
-- [x] UI tests green — 7/7 on two simulators, 11/11 on a physical iPhone
-      (scope is launch and rotation only until M4 lands gameplay)
+- [x] Rules engine unit tests green — 137 passed, 0 failed at commit `e4bae0f`
+- [x] AI simulation green — three strengths measured over recorded samples
+      (`AI.md`); the extended sample runs behind `KEEZLY_EXTENDED_SIM=1`
+- [x] App tests green — 34/34 (21 app unit, 13 UI) on iPhone 17 and
+      iPad Pro 13" (M5) simulators **and** on a physical iPhone 17 Pro, at
+      commit `e4bae0f`. Scope is launch, rotation, the card-interaction flow,
+      the animation pipeline and the layout captures; the rule-specific
+      gameplay items below are not yet scripted.
 - [ ] Large-scale randomised simulation green — partial: 221 matches in the invariant suite
 - [ ] No known critical bugs — *currently true; see `KNOWN_ISSUES.md`*
 
@@ -44,11 +48,18 @@ the end.
 These are mandatory. A release candidate may **not** ship with them `BLOCKED`
 (§178).
 
-**Physical iPhone** — iPhone 17 Pro, iOS 27.0. Install, launch and rotation are
-verified (11/11 tests, 2026-09-20); the gameplay items wait on M4.
+**Physical iPhone** — iPhone 17 Pro, iOS 27.0. PHYSICAL DEVICE VERIFIED at
+commit `e4bae0f` (34/34, 2026-09-20), re-run after the M4 UI rebuild rather
+than carried over from the earlier launch-only pass.
 
-- [x] Install · [x] Launch · [ ] New game · [ ] 2-player match · [ ] AI opponent
-- [ ] Card interaction · [ ] Jack swap · [ ] Seven split · [ ] Capture · [ ] Home entry
+"New game" and "2-player match" are unticked because there is no main menu yet
+— the app opens into a fixed four-player table. The Jack, Seven, capture and
+home-entry items are unticked because no UI test drives those specific
+situations on device yet; they are exercised exhaustively in the engine suite,
+which is not the same evidence.
+
+- [x] Install · [x] Launch · [ ] New game · [ ] 2-player match · [x] AI opponent
+- [x] Card interaction · [ ] Jack swap · [ ] Seven split · [ ] Capture · [ ] Home entry
 - [x] Rotation · [ ] Background and resume · [ ] Haptics · [ ] Audio · [ ] Game Center
 
 **Physical iPad** — no iPad paired (MAN-10), so this gate is BLOCKED.
@@ -69,8 +80,8 @@ verified (11/11 tests, 2026-09-20); the gameplay items wait on M4.
 
 | Gate | Result | Evidence |
 |---|---|---|
-| Simulator | PASS (partial scope) | 7/7 on iPhone 17 and iPad Pro 13" (M5), iOS 27.0 |
-| Physical iPhone | PASS (partial scope) | 11/11 on iPhone 17 Pro, iOS 27.0 |
+| Simulator | PASS (partial scope) | 34/34 on iPhone 17 and iPad Pro 13" (M5), iOS 27.0, at `e4bae0f` |
+| Physical iPhone | PASS (partial scope) | 34/34 on iPhone 17 Pro, iOS 27.0, at `e4bae0f` |
 | Physical iPad | BLOCKED | no iPad paired (MAN-10) |
 | Game Center real device | BLOCKED | not implemented (M6) |
 
