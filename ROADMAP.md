@@ -11,7 +11,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M0 | Repository & Foundation | IN PROGRESS |
 | M1 | GameCore / Rules | **DONE** |
 | M2 | Complete Move Engine | IN PROGRESS |
-| M3 | AI (Easy / Medium / Hard) | IN PROGRESS |
+| M3 | AI (Easy / Medium / Hard) | **DONE** |
 | M4 | Gameplay UI — iPad / iPhone | NOT STARTED |
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
 | M6 | Game Center Multiplayer | NOT STARTED |
@@ -34,10 +34,10 @@ test reproducibly, with the project memory in place from day one.
 | M0.1 Git repository, structure, secret-safe `.gitignore` | DONE |
 | M0.2 Xcode project via XcodeGen (`project.yml`), shared scheme, committed `.xcodeproj` | DONE |
 | M0.3 Bundler + fastlane skeleton with a `tests` lane | DONE |
-| M0.4 `ci_scripts/` (`ci_post_clone.sh`, `ci_pre_xcodebuild.sh`, `ci_post_xcodebuild.sh`) | NOT STARTED |
+| M0.4 `ci_scripts/` (`ci_post_clone.sh`, `ci_pre_xcodebuild.sh`, `ci_post_xcodebuild.sh`) | DONE |
 | M0.5 SwiftLint / SwiftFormat configuration | NOT STARTED |
 | M0.6 Project memory documents | DONE |
-| M0.7 Xcode Cloud compatibility check (no absolute paths, no local-only config) | NOT STARTED |
+| M0.7 Xcode Cloud compatibility check (no absolute paths, no local-only config) | DONE — see `docs/XCODE_CLOUD_SETUP_CHECKLIST.md` |
 
 **Dependencies.** M0.4 and M0.7 depend on M0.2 (done). Device builds depend on
 MAN-03, the signing team decision.
@@ -115,16 +115,16 @@ integrity and size limits (done). Remaining: a replay move log (M2.10).
 
 ---
 
-## M3 — AI — IN PROGRESS
+## M3 — AI — DONE
 
 | Task | Status |
 |---|---|
 | M3.1 `PlayerObservation` — the AI's information boundary | DONE |
 | M3.2 Easy AI — legal moves, weighted random, avoids obvious disasters | DONE |
 | M3.3 Medium AI — heuristic state evaluation | DONE |
-| M3.4 Hard AI — information-set sampling + time-boxed rollouts | IN PROGRESS — implemented and measured; search size being tuned |
+| M3.4 Hard AI — information-set sampling + time-boxed rollouts | DONE |
 | M3.5 Headless simulation harness | DONE |
-| M3.6 Cancellation and time budgets under Swift Concurrency | IN PROGRESS — `AIBudget` and `Task.isCancelled` are wired into Hard; a cancellation test is outstanding |
+| M3.6 Cancellation and time budgets under Swift Concurrency | DONE |
 
 **Acceptance criteria.**
 - An agent is structurally unable to read another seat's hand or the deck
@@ -133,8 +133,12 @@ integrity and size limits (done). Remaining: a replay move log (M2.10).
   Easy, Hard 97.5% vs Easy, Hard 67.5% vs Medium (80/80/40 team matches)
 - A move is chosen well under one second. — met on a development Mac
   (~0.3 ms Medium, ~16 ms Hard per action); **not yet measured on device**
-- The main thread never blocks. — by construction; not yet demonstrated by a
-  cancellation test (M3.6)
+- The main thread never blocks. — met: a cancelled search returns a legal move
+  promptly, and an exhausted budget falls back to the static evaluation, both
+  asserted in `HardAgentTests`
+
+**Verification.** `swift test` — 126 tests, 0 failures, at commit `ad6c2e2`.
+Measured results and their sample sizes are in `AI.md`.
 
 **M3.1 is done and verified.** Agents receive a `PlayerObservation` and never a
 `GameState`. The guarantee is tested differentially — two states differing only
