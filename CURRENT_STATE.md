@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-dfa323d  feat(ipad): add pointer and keyboard interaction with visible focus
+9a2d4e3  fix(board): proportion the middle to the board instead of the view
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -74,6 +74,24 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**Screenshot orientation is fixed (ISS-009).** Landscape captures come out
+landscape-shaped and upright, and every capture now asserts its own shape, so
+the defect cannot return unnoticed. The cause was the platform: every XCUITest
+screenshot API returns the physical framebuffer, which stays portrait however
+the app is rotated. A separate defect remains — the captures carry a 25% black
+margin (ISS-012), measured at exactly 516 of 2064 rows on every landscape
+capture and none on any portrait one. It is a capture artefact, not something
+wrong with the interface, and it is settled in M11 where the captures move to
+files.
+
+**The two-player board has been reviewed (ISS-013).** The home lanes are four
+squares long whatever the table size, so on a half-length track they run almost
+to the centre and the cards were drawn across them. The middle is now
+proportioned to the board's own quiet field rather than to the size of the
+view, which fixes five and six seats outright and improves two. Two seats still
+needs the centre *arranged* differently rather than merely made smaller; that
+is recorded, not hidden.
 
 **Pointer and keyboard are implemented (M4.7, DEC-020).** Cards lift under the
 pointer, squares highlight, arrows walk the hand and the board, return acts and
@@ -210,9 +228,13 @@ Two gated suites, excluded from the default run on purpose:
 
 | App-level | Result |
 |---|---|
-| iPad Pro 13" (M5) simulator, iOS 27.0 | **58/58** (unit, launch, play flow, animation, ornament, fixtures, captures) |
-| Physical iPhone 17 Pro, iOS 27.0 | **58/58** |
-| Physical iPad (A16), iOS 27.0 | **58/58** |
+| iPad Pro 13" (M5) simulator, iOS 27.0 | **80 passed, 0 failed, 3 skipped** |
+| Physical iPhone 17 Pro, iOS 27.0 | **80 passed, 0 failed, 3 skipped** |
+| Physical iPad (A16), iOS 27.0 | **80 passed, 0 failed, 3 skipped** |
+
+The three skips are the keyboard tests, which report honestly that no hardware
+keyboard reached the app rather than passing without exercising anything
+(ISS-010).
 
 `fastlane` reports 117 for the same run: it counts parameterised cases, the
 result bundle counts test functions. Both numbers are true; they answer
@@ -227,9 +249,9 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (75/78, 3 skipped — no keyboard, ISS-010) | 2026-09-20 | `dfa323d` |
-| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (58/58) — `fastlane device_iphone` | 2026-09-20 | `8c9fa43` |
-| Physical iPad (A16), iOS 27.0 | **PASSED** (58/58) — `fastlane device_ipad`, first real-hardware run | 2026-09-20 | `8c9fa43` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (80/83, 3 skipped — no keyboard, ISS-010) | 2026-09-20 | `9a2d4e3` |
+| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (80/83, 3 skipped) — `fastlane device_iphone` | 2026-09-20 | `9a2d4e3` |
+| Physical iPad (A16), iOS 27.0 | **PASSED** (80/83, 3 skipped) — `fastlane device_ipad` | 2026-09-20 | `9a2d4e3` |
 | Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
@@ -304,13 +326,9 @@ SwiftFormat allowlists.
 fixtures, the Dutch ornament pass and **both** hardware gates are done. What is
 left, in order:
 
-1. **ISS-009** — landscape captures come out rotated. It blocks App Store
-   screenshots, so it is fixed at its cause before the screenshot milestone.
-2. **A two-player board review** — the middle has never been looked at for
-   crowding, and the medallion is deliberately absent there.
-3. **Main menu and table configuration**, which is what lets a player choose
+1. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
-4. **M5 — pass & play and autosave.**
+2. **M5 — pass & play and autosave.**
 
 Blocked and not startable: anything behind the App Store Connect record
 (MAN-02), and Game Center multi-device (MAN-11/12).

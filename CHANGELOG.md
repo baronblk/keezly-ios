@@ -96,6 +96,12 @@ Versioning.
 
 ### Fixed
 
+- Landscape screenshots came out on their side and could not have been
+  submitted to the App Store.
+- The cards in the middle of the board were sized from the screen rather than
+  from the board, so on a two- or three-player table they were drawn across the
+  home lanes.
+
 - Six players on an iPhone pushed the layout wider than the screen and clipped
   the board.
 - An iPhone in landscape could report a regular width, which left the board at
