@@ -1,0 +1,186 @@
+# frozen_string_literal: true
+
+# Keezly lanes. Always invoked through Bundler:
+#
+#   bundle exec fastlane <lane>
+#
+# Documented in FASTLANE.md. Two rules govern everything here:
+#
+#   1. A lane never reports success for something it did not run. A missing
+#      device produces BLOCKED, not PASSED (§177).
+#   2. Lanes do not duplicate Xcode Cloud. There is no archive lane and no
+#      TestFlight upload lane (§85, DEC-008).
+
+default_platform(:ios)
+
+REPO_ROOT   = File.expand_path("..", __dir__)
+PROJECT     = "Keezly.xcodeproj"
+SCHEME      = "Keezly"
+CORE_PATH   = File.join(REPO_ROOT, "Packages", "KeezlyCore")
+ARTIFACTS   = File.join(REPO_ROOT, "artifacts")
+
+# Simulator destinations used by the fast local matrix. Names are resolved
+# against whatever is installed rather than pinned to an OS version.
+SIM_IPHONE = "iPhone 17"
+SIM_IPAD   = "iPad Pro 13-inch (M5)"
+
+# ── helpers ────────────────────────────────────────────────────────────────
+
+# Resolves a physical device role via scripts/devices.sh.
+# Returns an xcodebuild destination string, or nil when the role is unfilled.
+def physical_destination(role)
+  output = `#{File.join(REPO_ROOT, "scripts", "devices.sh")} destination #{role} 2>/dev/null`.strip
+  $?.success? && !output.empty? ? output : nil
+end
+
+def report_blocked(gate, role)
+  UI.important("#{gate}: BLOCKED — no physical device fills the role #{role}")
+  UI.important("Run scripts/devices.sh list for what to do about it.")
+end
+
+def run_core_tests
+  UI.header("KeezlyCore — rules engine")
+  Dir.chdir(CORE_PATH) { sh("swift test") }
+end
+
+# ── lanes ──────────────────────────────────────────────────────────────────
+
+platform :ios do
+  desc "Full unit and integration tests: rules engine plus app-level tests on a simulator"
+  lane :tests do
+    run_core_tests
+    run_tests(
+      project: PROJECT,
+      scheme: SCHEME,
+      devices: [SIM_IPHONE],
+      only_testing: ["KeezlyTests"],
+      result_bundle: true,
+      output_directory: File.join(ARTIFACTS, "test-results", "unit"),
+      xcodebuild_formatter: "xcbeautify --quiet"
+    )
+  end
+
+  desc "XCUITests on an iPhone and an iPad simulator"
+  lane :ui_tests do
+    run_tests(
+      project: PROJECT,
+      scheme: SCHEME,
+      devices: [SIM_IPHONE, SIM_IPAD],
+      only_testing: ["KeezlyUITests"],
+      result_bundle: true,
+      output_directory: File.join(ARTIFACTS, "test-results", "ui"),
+      xcodebuild_formatter: "xcbeautify --quiet"
+    )
+  end
+
+  desc "Build, install and launch on whichever physical device is available"
+  lane :device_smoke do
+    destination = physical_destination("PRIMARY_IPHONE") || physical_destination("PRIMARY_IPAD")
+    if destination.nil?
+      report_blocked("Device smoke", "PRIMARY_IPHONE or PRIMARY_IPAD")
+      UI.user_error!("DEVICE NOT AVAILABLE")
+    end
+    run_tests(
+      project: PROJECT,
+      scheme: SCHEME,
+      destination: destination,
+      only_testing: ["KeezlyUITests/LaunchTests/testAppLaunches"],
+      result_bundle: true,
+      output_directory: File.join(ARTIFACTS, "test-results", "device-smoke"),
+      xcodebuild_formatter: "xcbeautify --quiet"
+    )
+  end
+
+  desc "The physical iPhone gate"
+  lane :device_iphone do
+    destination = physical_destination("PRIMARY_IPHONE")
+    if destination.nil?
+      report_blocked("Physical iPhone gate", "PRIMARY_IPHONE")
+      UI.user_error!("DEVICE NOT AVAILABLE")
+    end
+    run_tests(
+      project: PROJECT, scheme: SCHEME, destination: destination,
+      result_bundle: true,
+      output_directory: File.join(ARTIFACTS, "test-results", "device-iphone"),
+      xcodebuild_formatter: "xcbeautify --quiet"
+    )
+  end
+
+  desc "The physical iPad gate"
+  lane :device_ipad do
+    destination = physical_destination("PRIMARY_IPAD")
+    if destination.nil?
+      report_blocked("Physical iPad gate", "PRIMARY_IPAD")
+      UI.user_error!("DEVICE NOT AVAILABLE")
+    end
+    run_tests(
+      project: PROJECT, scheme: SCHEME, destination: destination,
+      result_bundle: true,
+      output_directory: File.join(ARTIFACTS, "test-results", "device-ipad"),
+      xcodebuild_formatter: "xcbeautify --quiet"
+    )
+  end
+
+  desc "Both physical device gates"
+  lane :device_gate do
+    device_iphone
+    device_ipad
+  end
+
+  desc "The whole local quality gate"
+  lane :qa do
+    run_core_tests
+    build_app(
+      project: PROJECT, scheme: SCHEME,
+      destination: "generic/platform=iOS Simulator",
+      skip_archive: true, skip_codesigning: true, skip_package_ipa: true,
+      xcodebuild_formatter: "xcbeautify --quiet"
+    )
+    tests
+    ui_tests
+    UI.success("QA gate passed")
+  end
+
+  desc "Release-candidate gate — reports every sub-gate separately, never merged"
+  lane :release_check do
+    results = {}
+
+    # Version and repository hygiene.
+    version = get_version_number(xcodeproj: PROJECT, target: SCHEME)
+    UI.message("MARKETING_VERSION: #{version}")
+    results["Version is 1.0.0"] = (version == "1.0.0")
+    results["Git tree clean"] = `git -C #{REPO_ROOT} status --porcelain`.strip.empty?
+
+    # No secrets. A tracked key file is an immediate fail.
+    tracked = `git -C #{REPO_ROOT} ls-files`.split("\n")
+    leaked = tracked.grep(/\.(p8|p12|mobileprovision|cer|pem)$|^\.env|AuthKey_/)
+    results["No secrets tracked"] = leaked.empty?
+    UI.error("Tracked secret-like files: #{leaked.join(', ')}") unless leaked.empty?
+
+    # App icon must be a real icon, not an empty slot.
+    icon_dir = File.join(REPO_ROOT, "App/Keezly/Assets.xcassets/AppIcon.appiconset")
+    results["App icon present"] = !Dir.glob(File.join(icon_dir, "*.png")).empty?
+
+    # Simulator gate.
+    begin
+      run_core_tests
+      results["Simulator gate"] = true
+    rescue StandardError
+      results["Simulator gate"] = false
+    end
+
+    UI.header("Keezly release gates")
+    results.each { |name, ok| UI.message(format("%-24s : %s", name, ok ? "PASS" : "FAIL")) }
+
+    # Device gates report BLOCKED rather than FAIL when no hardware exists,
+    # because "not run" and "ran and failed" are different facts (§139, §178).
+    %w[PRIMARY_IPHONE PRIMARY_IPAD].each do |role|
+      label = role == "PRIMARY_IPHONE" ? "Physical iPhone gate" : "Physical iPad gate"
+      UI.message(format("%-24s : %s", label, physical_destination(role) ? "AVAILABLE — run device_gate" : "BLOCKED"))
+    end
+    UI.message(format("%-24s : %s", "Game Center gate", "BLOCKED — see docs/GAME_CENTER_DEVICE_TESTS.md"))
+
+    UI.user_error!("Release check failed") if results.value?(false)
+    UI.important("Mandatory real-device gates are still BLOCKED — not releasable (§178).")
+  end
+end

@@ -1,0 +1,6 @@
+# Ruby version for the fastlane toolchain. Read by mise, asdf and rbenv.
+#
+# Homebrew's `ruby` formula currently provides exactly this version, so no
+# version manager is strictly required on a developer machine — see FASTLANE.md.
+# What matters is that everyone and every CI image agrees on one version.
+ruby 4.0.5

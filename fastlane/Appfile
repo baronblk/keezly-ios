@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+# The canonical Keezly product identifier (DECISIONS.md → DEC-011).
+app_identifier("de.gcng.keezly")
+
+# apple_id and team_id are deliberately absent. They are account-specific and
+# must never be guessed or committed. Supply them through the environment or an
+# App Store Connect API key held outside this repository (§106, §107):
+#
+#   FASTLANE_USER, FASTLANE_TEAM_ID
+#
+# See CURRENT_STATE.md → Manual Actions (MAN-02, MAN-03, MAN-08).
