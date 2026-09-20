@@ -1,0 +1,75 @@
+# Keezly — SwiftLint configuration.
+#
+# The goal is to catch things that actually cause bugs or arguments, not to
+# impose a house style on every line. Rules that fight SwiftUI or that would
+# flag the engine's deliberately dense rule code are off, with a reason.
+
+included:
+  - App
+  - Packages/KeezlyCore/Sources
+  - Packages/KeezlyCore/Tests
+
+excluded:
+  - .build
+  - Packages/KeezlyCore/.build
+  - vendor
+  - Keezly.xcodeproj
+
+disabled_rules:
+  # SwiftUI view bodies and rule tables are legitimately long.
+  - type_body_length
+  # Trailing commas are a matter of taste and create noisy diffs either way.
+  - trailing_comma
+  # The engine names things after the rules of the game; `id`, `a`, `b` in a
+  # swap are clearer than forced expansions.
+  - identifier_name
+
+opt_in_rules:
+  - array_init
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_first_not_nil
+  - empty_count
+  - empty_string
+  - first_where
+  - last_where
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - joined_default_parameter
+  - literal_expression_end_indentation
+  - modifier_order
+  - operator_usage_whitespace
+  - overridden_super_call
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - yoda_condition
+
+line_length:
+  warning: 120
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+function_body_length:
+  warning: 80
+  error: 150
+
+file_length:
+  warning: 500
+  error: 900
+  ignore_comment_only_lines: true
+
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+# Force-unwrapping is an error in shipping code and merely a warning in tests,
+# where a failed unwrap is a test failure rather than a crash for a player.
+force_unwrapping:
+  severity: warning
+
+nesting:
+  type_level: 2

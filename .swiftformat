@@ -1,0 +1,20 @@
+# Keezly — SwiftFormat configuration.
+#
+# Deliberately an *allowlist*. SwiftFormat's full rule set disagrees with the
+# hand-set style in this repository in ways that would cost readability rather
+# than gain it — `consecutiveSpaces` flattens the aligned trailing comments that
+# explain the rules, `hoistPatternLet` hides which bindings a case introduces,
+# and `wrapPropertyBodies` expands one-line computed properties for no benefit.
+#
+# So the formatter runs only the rules nobody argues about: whitespace hygiene
+# and import order. Style beyond that is enforced by review and by SwiftLint,
+# which catches things that actually cause bugs.
+#
+# Recorded as DEC-016.
+
+--swiftversion 6.0
+--exclude .build,Packages/KeezlyCore/.build,vendor,Keezly.xcodeproj
+
+--rules sortImports,duplicateImports,trailingSpace,consecutiveBlankLines,linebreakAtEndOfFile,emptyBraces,spaceInsideParens,spaceInsideBrackets,blankLinesAtEndOfScope,redundantParens
+
+--emptybraces no-space
