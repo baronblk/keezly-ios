@@ -8,6 +8,8 @@ import SwiftUI
 /// and who is on turn — the status a player checks without wanting to read
 /// anything (§35).
 struct BoardCentreView: View {
+    @ScaledMetric(relativeTo: .caption2) private var captionScale: CGFloat = 1
+
     let state: GameState
     let roles: [SeatRole]
     var width: CGFloat
@@ -32,10 +34,19 @@ struct BoardCentreView: View {
             )
 
             Text("deal.round \(state.deal.roundIndex + 1) \(DealState.cardsPerRound.count)")
-                .font(.system(size: max(9, width * 0.055), weight: .medium, design: .rounded))
+                .font(.system(size: max(10, width * 0.055) * captionScale, weight: .medium, design: .rounded))
+                // Wraps rather than truncates at large text sizes. Half a
+                // sentence tells the reader nothing, and the middle of the
+                // board has room for two lines (§53).
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(Keezly.Palette.secondaryText)
         }
-        .frame(width: width)
+        // Width comes from the piles; the labels are free to be wider when the
+        // reader's text size asks for it. Pinning this to `width` is what
+        // truncated them.
+        .frame(maxWidth: width * 3, alignment: .center)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -93,6 +104,10 @@ private struct DiscardPile: View {
 }
 
 private struct TurnIndicator: View {
+    /// The one piece of board chrome that is genuinely text, so it follows the
+    /// reader's setting (§53).
+    @ScaledMetric(relativeTo: .subheadline) private var textScale: CGFloat = 1
+
     let identity: PlayerIdentity
     let isComputer: Bool
     let finished: Bool
@@ -105,7 +120,10 @@ private struct TurnIndicator: View {
                 .frame(width: width * 0.12, height: width * 0.12)
 
             Text(finished ? "turn.finished" : (isComputer ? "turn.thinking" : "turn.yours"))
-                .font(.system(size: max(10, width * 0.07), weight: .semibold, design: .rounded))
+                .font(.system(size: max(11, width * 0.07) * textScale, weight: .semibold, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .fixedSize(horizontal: true, vertical: false)
                 .foregroundStyle(Keezly.Palette.primaryText)
         }
         .padding(.horizontal, width * 0.08)
