@@ -41,10 +41,55 @@ struct BoardLayoutTests {
             Issue.record("no track points")
             return
         }
-        // Equal arc length, not equal angle: on a superellipse those differ,
-        // and equal angle would bunch squares up at the corners.
-        #expect(largest / smallest < 1.02,
+
+        // Squares are placed at equal *arc length*, which is exact by
+        // construction. What this measures is the straight-line gap between
+        // neighbours, and those are not quite equal: on a curve, equal arc
+        // length yields shorter chords wherever curvature is high — at the
+        // board's corners. The effect is real geometry, not an error, and on
+        // the squared ring it comes to about 2%.
+        //
+        // The bound is therefore perceptual: a gap varying by a twentieth is
+        // invisible; anything approaching a tenth would read as bunching.
+        // Placing by equal *angle* instead would put the ratio near 1.3.
+        #expect(largest / smallest < 1.05,
                 "spacing varies by \(largest / smallest)x on a \(seatCount)-seat board")
+    }
+
+    /// The placement algorithm, checked against the obvious alternative.
+    ///
+    /// An earlier version of this file tried to re-measure arc length from the
+    /// drawn outline, which only measured that outline's sampling resolution.
+    /// This asks the question that actually matters instead: does placing by
+    /// arc length beat placing by angle? On a squared ring it does, by a lot —
+    /// equal angle crowds squares into the corners.
+    @Test("arc-length placement beats placing squares by angle", arguments: 2...6)
+    func arcLengthPlacementBeatsAngularPlacement(seatCount: Int) {
+        let layout = Self.layout(seatCount)
+        let count = layout.board.mainTrackCount
+
+        func spread(_ points: [CGPoint]) -> Double {
+            let gaps = (0..<points.count).map { Self.distance(points[$0], points[($0 + 1) % points.count]) }
+            guard let smallest = gaps.min(), let largest = gaps.max(), smallest > 0 else { return .infinity }
+            return largest / smallest
+        }
+
+        // What the naive approach would produce: one point per equal slice of
+        // angle around the same superellipse.
+        let angular = (0..<count).map { index -> CGPoint in
+            let angle = Double(index) / Double(count) * 2 * .pi + .pi / 2
+            let exponent = 2 / BoardLayout.ringExponent
+            let cosine = cos(angle), sine = sin(angle)
+            return CGPoint(
+                x: (cosine < 0 ? -1 : 1) * pow(abs(cosine), exponent),
+                y: (sine < 0 ? -1 : 1) * pow(abs(sine), exponent)
+            )
+        }
+
+        let byArcLength = spread(layout.trackPoints)
+        let byAngle = spread(angular)
+        #expect(byArcLength < byAngle / 2,
+                "arc length spread \(byArcLength) vs angular \(byAngle) on a \(seatCount)-seat board")
     }
 
     @Test("home lanes run inward and waiting areas sit outside", arguments: 2...6)

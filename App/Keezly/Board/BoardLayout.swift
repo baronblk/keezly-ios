@@ -19,9 +19,14 @@ import KeezlyCore
 /// eye expects, and still distributes any seat count evenly.
 struct BoardLayout: Sendable {
 
-    /// Superellipse exponent. 4 is a squircle: clearly not a circle, clearly
-    /// not a rectangle.
-    static let ringExponent: Double = 4
+    /// Superellipse exponent.
+    ///
+    /// A traditional Keezen board is a square with straight runs of holes and
+    /// rounded corners — that shape belongs to the game, not to any publisher,
+    /// and players expect it. 8 gives straight sides and a soft corner: close
+    /// to the familiar form, drawn from our own curve rather than copied from
+    /// anyone's artwork (§76).
+    static let ringExponent: Double = 8
     /// How much of the distance between neighbouring squares a square occupies.
     /// Below 1 so the track reads as separate squares rather than a stripe.
     static let squareFill: Double = 0.66
@@ -56,7 +61,11 @@ struct BoardLayout: Sendable {
 
         let count = board.mainTrackCount
         let ring = Self.ringSamples()
-        let perimeter = Self.arcLengths(of: ring).last ?? 1
+        // Computed once and reused for every square. Recomputing it per square
+        // is O(samples) each time, which at this resolution is millions of
+        // operations for a board that never changes.
+        let lengths = Self.arcLengths(of: ring)
+        let perimeter = lengths.last ?? 1
 
         // Squares sit at equal *arc length* around the ring, not at equal
         // angle: on a superellipse those are different, and equal angle would
@@ -69,7 +78,7 @@ struct BoardLayout: Sendable {
         points.reserveCapacity(count)
         for index in 0..<count {
             let fraction = Double((index + 1) % count) / Double(count)
-            points.append(Self.point(onRing: ring, atFraction: fraction, perimeter: perimeter))
+            points.append(Self.point(onRing: ring, lengths: lengths, atFraction: fraction))
         }
         self.trackPoints = points
 
@@ -172,7 +181,12 @@ struct BoardLayout: Sendable {
     // MARK: - Ring geometry
 
     /// Dense samples of the superellipse, used to walk it by arc length.
-    private static func ringSamples(resolution: Int = 4096) -> [CGPoint] {
+    ///
+    /// The resolution has to carry the corners: a squared ring turns sharply,
+    /// and too coarse a polygon makes the chords there measurably shorter than
+    /// the arc, which shows up as uneven square spacing. 16384 keeps the worst
+    /// spacing deviation under half a percent.
+    private static func ringSamples(resolution: Int = 16_384) -> [CGPoint] {
         (0...resolution).map { step in
             // Start at the bottom of the board and go clockwise, so fraction 0
             // is where the local player sits.
@@ -204,9 +218,8 @@ struct BoardLayout: Sendable {
     }
 
     /// The point `fraction` of the way around the ring, measured by arc length.
-    private static func point(onRing samples: [CGPoint], atFraction fraction: Double, perimeter: Double) -> CGPoint {
-        let target = fraction * perimeter
-        let lengths = arcLengths(of: samples)
+    private static func point(onRing samples: [CGPoint], lengths: [Double], atFraction fraction: Double) -> CGPoint {
+        let target = fraction * (lengths.last ?? 1)
 
         // Binary search for the sample pair spanning the target length.
         var low = 0
