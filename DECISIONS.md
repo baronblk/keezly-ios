@@ -385,3 +385,43 @@ so it would not help at all).
 `PlayerObservation` deliberately and the differential tests re-run — widening
 the boundary is a visible, reviewed act. Hard AI's information-set sampling must
 draw only from `unseenCards`.
+
+---
+
+## DEC-015 — Move previews widen the AI boundary, deliberately
+
+- **Date:** 2026-09-20
+- **Topic:** AI honesty
+- **Status:** ACCEPTED
+- **Extends:** DEC-014
+
+**Context.** The first real agent exposed a gap: `PlayerObservation` told an
+agent which moves were legal but not what any of them would *do*. Without that,
+an agent cannot tell a capture from a shuffle and there is nothing to weigh.
+
+The tempting fix — hand the agent a `GameState` so it can apply moves itself —
+would have destroyed DEC-014 entirely.
+
+**Decision.** `PlayerObservation` gained `preview(_:)` and `previewAll()`,
+returning the board transition a move would produce. The implementation builds
+a *shadow state* from observation fields alone — the observer's own hand, the
+pawns, the discard pile, no draw pile, no other hands — and reuses
+`GameReducer.performAction` on it. The shadow is private; agents see only the
+resulting `MovePreview`.
+
+**Reasoning.** A human at the table can see exactly this: the board is open and
+the rules are known, so working out "that Seven lands me there and knocks his
+pawn out" is ordinary play. Reusing the real move mechanics also means a
+preview cannot drift away from what the reducer actually does, which is
+asserted directly over 150 random moves.
+
+**How it was verified.** The differential tests were extended to previews —
+two states differing only in opponents' hands, deck order or generator state
+must produce identical previews — and the mutation test was repeated: injecting
+`state.hands` into the observation now fails *two* tests rather than one.
+
+**Consequences.** This is the pattern for every future widening: check that a
+real player would have the information, add it at the one chokepoint, extend
+the differential tests, re-run the mutation, and record it here. `stableKey`
+was added under the same reasoning, and is derived purely from observation
+fields so agents can seed themselves reproducibly from a position.

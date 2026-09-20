@@ -5,9 +5,12 @@
 | Part | Status |
 |---|---|
 | `PlayerObservation` — the information boundary | **IMPLEMENTED + TESTED** |
+| Move previews inside the boundary (DEC-015) | **IMPLEMENTED + TESTED** |
 | `AIAgent` protocol and `AIBudget` | **IMPLEMENTED** |
-| Easy / Medium / Hard agents | NOT STARTED |
-| Simulation harness | NOT STARTED |
+| Easy agent | **IMPLEMENTED + TESTED** |
+| Medium agent + `PositionEvaluator` | **IMPLEMENTED + TESTED** |
+| Hard agent — determinization + rollouts | **IMPLEMENTED + TESTED** |
+| Headless simulation harness | **IMPLEMENTED + TESTED** |
 
 Tracked as M3 in `ROADMAP.md`.
 
@@ -80,17 +83,44 @@ Three genuinely different agents. None of them is made stronger by being given
 extra information or a rigged deal; strength comes only from search and
 evaluation quality (§21).
 
-### Easy
+### Easy — implemented
 
-Picks from the legal moves with a weighted random choice. Avoids the obviously
-catastrophic — knocking out its own partner when an alternative exists, or
-giving up a home-lane pawn — but is deliberately suboptimal and slightly
-inconsistent, so it feels like a beginner rather than a broken expert.
+`EasyAgent` draws from the legal moves with a **weighted** random choice, not a
+uniform one. Five features and nothing more: take a capture, bring a pawn out,
+reach home, keep your start blockade, and a strong aversion to hitting your own
+side. Weights live in the type and are listed below; a wide jitter (×0.7…1.3)
+keeps it inconsistent.
 
-### Medium
+| Feature | Weight |
+|---|---|
+| base | 1.00 |
+| captures an opponent | +2.00 |
+| brings a pawn out | +1.20 |
+| reaches home | +3.00 |
+| captures its own or its partner's pawn | −6.00 |
+| gives up its own start square while pawns still wait | −0.60 |
+| floor (so a forced move stays reachable) | 0.02 |
 
-Applies each candidate move and scores the **resulting state**, rather than
-matching moves against a tree of special cases. Factors to weigh:
+The small feature set is the design, not a shortcut: a beginner who never
+blunders is not a beginner. Measured behaviour: it takes an available capture
+in ~75% of positions offering one, and hits its own partner in under 8% of
+positions where an alternative exists — the residual is the floor doing its job
+when the forced-move rule leaves no choice.
+
+### Medium — implemented
+
+`MediumAgent` previews every legal move and scores the **resulting position**
+with `PositionEvaluator`. It plans exactly one move ahead and does not search;
+that is the honest ceiling of a heuristic agent and is the gap Hard fills.
+
+The design rule is that a move is never pattern-matched. A Jack that throws a
+pawn thirty squares forward and a Ten that advances it ten are the same kind of
+thing — progress — and both fall out of the position score with no special
+case. Only effects genuinely invisible in the resulting position get their own
+term, which in practice means captures: once a pawn is back in its waiting
+area, the position no longer records how far it had come.
+
+All weights live in `HeuristicWeights`, one reviewable table. Factors:
 
 - own and partner progress toward home; opponent progress
 - pawns still waiting versus pawns in play
@@ -102,12 +132,27 @@ matching moves against a tree of special cases. Factors to weigh:
 - quality of a Seven split
 - card-availability inferences from the discard pile
 
-Weights live in one table and are documented here whenever they change. No
-undocumented tuning (§146).
+Weights live in `HeuristicWeights` and are documented there whenever they
+change. No undocumented tuning (§146).
 
-### Hard
+**Card counting is real, not decorative.** The risk term asks, for each of the
+agent's exposed pawns: how far behind it is each opponent pawn, and how likely
+is that opponent to still hold a card covering exactly that distance? The
+probability comes from `unseenCards`. Consequences that fall out for free:
 
-Builds on the Medium evaluation and adds information-set sampling:
+- a distance of **eleven is never threatening** — no card travels eleven squares,
+  since the Jack swaps rather than lands;
+- a distance of **four is only reachable by a split Seven**, because the Four
+  moves backward;
+- an opponent sitting **four squares ahead** is dangerous, for the same reason;
+- once **all four Queens have been played**, a pawn twelve squares in front of
+  an opponent stops reading as exposed. This is asserted directly by
+  `MediumAgentTests.cardCountingLowersRisk`.
+
+### Hard — implemented
+
+`HardAgent` starts from the Medium evaluation and then asks what Medium cannot:
+how does this tend to turn out? Information-set sampling:
 
 1. enumerate the legal moves
 2. sample plausible opponent hands **only from the cards that could still be
