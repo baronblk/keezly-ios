@@ -14,7 +14,8 @@ struct RootView: View {
     @State private var session = MatchSession(
         configuration: ScreenshotMode.configuration,
         seed: ScreenshotMode.seed,
-        roles: ScreenshotMode.roles
+        roles: ScreenshotMode.roles,
+        fixture: ScreenshotMode.fixture
     )
 
     var body: some View {

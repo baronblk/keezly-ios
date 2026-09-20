@@ -87,6 +87,15 @@ struct PlayPlanner {
         Set(targets.keys)
     }
 
+    /// The squares where tapping commits a leg of a Seven rather than
+    /// finishing the move. The board names these differently so a test or a
+    /// screenshot can land mid-split deliberately instead of by luck.
+    var legTargets: Set<BoardPosition> {
+        Set(targets.compactMap { position, action in
+            if case .commitLeg = action { position } else { nil }
+        })
+    }
+
     // MARK: - Helpers
 
     /// The pawn that takes the next undecided leg of `move`.

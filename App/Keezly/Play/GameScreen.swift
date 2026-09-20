@@ -208,6 +208,7 @@ struct GameScreen: View {
                 // an animation is behind the state on purpose.
                 pawns: presenter.displayedPawns,
                 legalTargets: planner.highlightedTargets,
+                legTargets: planner.legTargets,
                 selectablePawns: planner.selectablePawns,
                 selectedPawn: selectedPawn,
                 emphasised: presenter.emphasised,
@@ -360,6 +361,8 @@ private struct SevenProgress: View {
         .padding(.horizontal, Keezly.Spacing.regular)
         .padding(.vertical, Keezly.Spacing.small)
         .background(Capsule().fill(Keezly.Palette.legalTarget.opacity(0.14)))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("seven.progress")
         .accessibilityElement(children: .combine)
     }
 }

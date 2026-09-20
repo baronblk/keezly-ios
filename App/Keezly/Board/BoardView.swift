@@ -13,6 +13,10 @@ struct BoardView: View {
     let pawns: [PawnState]
     /// Positions to highlight as reachable by the current selection.
     var legalTargets: Set<BoardPosition> = []
+    /// Of those, the ones that commit a leg of a Seven rather than finishing
+    /// the move. They look the same; only their identifier differs, so a test
+    /// can choose one on purpose.
+    var legTargets: Set<BoardPosition> = []
     /// Pawns the player may pick up right now.
     var selectablePawns: Set<PawnID> = []
     var selectedPawn: PawnID?
@@ -46,7 +50,9 @@ struct BoardView: View {
                         .contentShape(Rectangle())
                         .position(transform.point(layout.point(for: target)))
                         .onTapGesture { onSelectTarget?(target) }
-                        .accessibilityIdentifier("target.\(Self.identifier(for: target))")
+                        .accessibilityIdentifier(
+                            "target.\(legTargets.contains(target) ? "leg." : "")\(Self.identifier(for: target))"
+                        )
                         .accessibilityLabel("board.target")
                         .accessibilityAddTraits(.isButton)
                 }

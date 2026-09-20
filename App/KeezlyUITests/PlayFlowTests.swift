@@ -18,8 +18,9 @@ final class PlayFlowTests: XCTestCase {
         return app
     }
 
-    /// Hand cards carry identifiers of the form `hand.card.<id>`. The discard
-    /// pile uses `discard.card.<id>`, so counting the hand cannot pick it up.
+    /// Hand cards carry identifiers of the form `hand.card.<rank>.<id>`. The
+    /// discard pile uses `discard.card.<rank>.<id>`, so counting the hand
+    /// cannot pick it up.
     @MainActor
     private func cards(in app: XCUIApplication) -> [XCUIElement] {
         app.descendants(matching: .any)

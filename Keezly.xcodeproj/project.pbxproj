@@ -17,6 +17,7 @@
 		49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */; };
 		579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */; };
 		58241CDF0095935276E260B2 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C482C27A4DE9D8BA7FA25193 /* CardView.swift */; };
+		5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */; };
 		5D9F39D6B8B9B343FB63EA7B /* PlayPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B93678F21644FD63C4658C /* PlayPlanner.swift */; };
 		5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5E0E46A1D3857966A001B9EC /* KeezlyCore */; };
 		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
@@ -84,6 +85,7 @@
 		AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntegrationTests.swift; sourceTree = "<group>"; };
 		AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerIdentity.swift; sourceTree = "<group>"; };
 		B899A9121779A5665E7D27E6 /* HandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandView.swift; sourceTree = "<group>"; };
+		C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchFixtureTests.swift; sourceTree = "<group>"; };
 		C482C27A4DE9D8BA7FA25193 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnView.swift; sourceTree = "<group>"; };
 		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -245,6 +247,7 @@
 				AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */,
 				50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */,
 				55F880978D3865E445AA5593 /* BoardPresenterTests.swift */,
+				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 			);
 			path = KeezlyTests;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */,
 				579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */,
 				28CC2B89F10507596DD31D50 /* BoardPresenterTests.swift in Sources */,
+				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

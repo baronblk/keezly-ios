@@ -47,7 +47,9 @@ struct CardView: View {
         )
         .offset(y: isSelected ? -width * 0.18 : 0)
         .accessibilityElement(children: .ignore)
-        .accessibilityIdentifier("\(role.rawValue).card.\(card.id)")
+        // The rank sits in the identifier so a screenshot fixture can find,
+        // say, the Jack in a hand without knowing the deck copy it came from.
+        .accessibilityIdentifier("\(role.rawValue).card.\(card.rank.shorthand).\(card.id)")
         .accessibilityLabel(Self.accessibilityLabel(for: card.rank))
         .accessibilityAddTraits(isPlayable ? .isButton : [])
         .accessibilityValue(isPlayable ? "" : String(localized: "card.unplayable"))
