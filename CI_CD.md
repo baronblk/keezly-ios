@@ -65,6 +65,22 @@ Not every combination on every build (§111).
 | Release | Smallest supported iPhone, current iPhone, large iPhone, iPad mini, iPad 11", iPad 13" |
 | Nightly (optional) | Large AI simulation, serialisation compatibility, replay, extra seeds |
 
+## Cloud versus local devices
+
+Xcode Cloud uses Apple's hosted infrastructure and its configured destinations.
+The development Mac uses the physical devices actually paired with it. These are
+different things and their results are recorded separately (§167):
+
+```
+Simulator      : …
+Xcode Cloud    : …
+Physical iPhone: …
+Physical iPad  : …
+```
+
+It is never claimed that a locally paired device was tested "by Xcode Cloud".
+Device discovery and the gates are described in `docs/DEVICE_TESTING.md`.
+
 AI simulation runs at two depths: a few hundred deterministic matches in fast
 CI, thousands or tens of thousands nightly or before release (§112).
 

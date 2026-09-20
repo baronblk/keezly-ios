@@ -242,7 +242,18 @@ and mocked tests can proceed without them (§142).
 | M11.5 `fastlane screenshots` / `screenshots_verify` | NOT STARTED |
 | M11.6 `fastlane qa` and `fastlane release_check` | NOT STARTED |
 | M11.7 Large-scale AI simulation in CI | NOT STARTED |
-| M11.8 Device/orientation/localisation UI test matrix | NOT STARTED |
+| M11.8 Simulator/orientation/localisation UI test matrix | NOT STARTED |
+| M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
+| M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | NOT STARTED |
+| M11.11 Physical iPhone quality gate | BLOCKED — no device paired (MAN-09) |
+| M11.12 Physical iPad quality gate | BLOCKED — no device paired (MAN-10) |
+| M11.13 Game Center multi-device verification | BLOCKED — MAN-09/10/11 + M6 |
+| M11.14 Real-hardware performance and long-run test | BLOCKED — MAN-09/10 |
+
+**Device testing is part of the strategy, not an optional manual extra** (§156,
+§180). `scripts/devices.sh` addresses devices by role and never persists a name
+or UDID. Full plan: `docs/DEVICE_TESTING.md` and
+`docs/GAME_CENTER_DEVICE_TESTS.md`.
 
 **Note.** §119 asks for the first real Xcode Cloud run no later than after M1.
 That is currently **not possible**: there is no Xcode project yet (M0.2) and

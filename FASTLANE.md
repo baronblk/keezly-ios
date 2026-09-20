@@ -51,7 +51,34 @@ fastlane/
 | `screenshots` | The complete App Store screenshot matrix |
 | `screenshots_verify` | Run screenshots, verify completeness and correctness, emit an HTML preview |
 | `qa` | The whole local quality gate: build, unit, integration, relevant UI tests, static checks, engine simulation, screenshot smoke test |
-| `release_check` | Release-candidate gate: version, build number, clean git tree, tests, app icon, localisations, store metadata, screenshot completeness, release configuration, no debug code, no secrets |
+| `release_check` | Release-candidate gate: version, build number, clean git tree, tests, app icon, localisations, store metadata, screenshot completeness, release configuration, no debug code, no secrets — **plus** the four gate results below |
+
+`release_check` reports each gate separately and never collapses them (§178):
+
+```
+Simulator Gate              : PASS / FAIL
+Physical iPhone Gate        : PASS / FAIL / BLOCKED
+Physical iPad Gate          : PASS / FAIL / BLOCKED
+Game Center Real Device Gate: PASS / FAIL / BLOCKED
+```
+
+A final App Store release candidate may not leave a mandatory real-device gate
+at `BLOCKED`.
+
+### Device lanes (§177)
+
+| Lane | Purpose |
+|---|---|
+| `device_smoke` | Build, install and launch on whichever physical device is available |
+| `device_iphone` | The physical-iPhone gate: XCUITests on `PRIMARY_IPHONE` |
+| `device_ipad` | The physical-iPad gate: XCUITests on `PRIMARY_IPAD` |
+| `device_gate` | Both of the above plus the long-run test |
+
+Each device lane resolves its target through `scripts/devices.sh`, which
+addresses devices by **role**, never by name or UDID (§158, §176). Every lane
+checks availability first. If no suitable device is connected, the lane reports
+**`BLOCKED / DEVICE NOT AVAILABLE`** and exits non-zero. It never reports
+`PASSED` for a test it did not run (§177).
 
 No other commands. Nothing magic and undocumented.
 

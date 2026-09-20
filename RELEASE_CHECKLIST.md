@@ -27,7 +27,7 @@ as work lands, not reconstructed at the end.
 - [ ] Large-scale randomised simulation green — partial: 221 matches in the invariant suite
 - [ ] No known critical bugs — *currently true; see `KNOWN_ISSUES.md`*
 
-### Devices
+### Simulator matrix
 
 - [ ] iPhone, smallest supported form factor
 - [ ] iPhone, current standard
@@ -36,6 +36,41 @@ as work lands, not reconstructed at the end.
 - [ ] iPad 11"
 - [ ] iPad 13"
 - [ ] Portrait and landscape where applicable
+
+### Physical device gates (§170)
+
+These are mandatory. A release candidate may **not** ship with them `BLOCKED`
+(§178). Current status: **BLOCKED — no physical device is paired with this Mac**
+(MAN-09, MAN-10).
+
+**Physical iPhone**
+
+- [ ] Install · [ ] Launch · [ ] New game · [ ] 2-player match · [ ] AI opponent
+- [ ] Card interaction · [ ] Jack swap · [ ] Seven split · [ ] Capture · [ ] Home entry
+- [ ] Rotation · [ ] Background and resume · [ ] Haptics · [ ] Audio · [ ] Game Center
+
+**Physical iPad**
+
+- [ ] Install · [ ] Launch · [ ] Landscape · [ ] Portrait · [ ] Large board layout
+- [ ] 4-player match · [ ] 6-player match · [ ] Team match · [ ] AI opponent
+- [ ] Cards legible at normal viewing distance · [ ] Touch interaction · [ ] Rotation
+- [ ] Multitasking where supported · [ ] Background and resume · [ ] Game Center
+- [ ] Performance — launch time, frame smoothness, memory, energy, thermals
+
+**Long-run test (§172)**
+
+- [ ] Several complete matches back to back, varying player counts, with AI,
+      rotation, backgrounding and match restore — no state corruption, no
+      runaway memory, no hang
+
+### Gate summary (§178)
+
+| Gate | Result |
+|---|---|
+| Simulator | NOT RUN |
+| Physical iPhone | BLOCKED |
+| Physical iPad | BLOCKED |
+| Game Center real device | BLOCKED |
 
 ### Gameplay completeness
 

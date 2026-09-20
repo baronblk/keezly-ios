@@ -109,7 +109,41 @@ monotonic revisions.
 | AI simulation harness | NOT RUN — no AI exists |
 | Screenshot runs | NOT RUN — no harness exists |
 | Xcode Cloud | NOT RUN — not configured |
-| Device / simulator verification | NOT RUN — nothing to run |
+
+---
+
+## Device Verification
+
+Recorded per environment; these are never merged into one number (§167, §175).
+
+| Environment | Status | Last run | Commit |
+|---|---|---|---|
+| Simulator — iPhone | NOT RUN — no app target exists | — | — |
+| Simulator — iPad | NOT RUN — no app target exists | — | — |
+| Xcode Cloud | NOT RUN — not configured | — | — |
+| Physical iPhone | **BLOCKED** — no device paired | — | — |
+| Physical iPad | **BLOCKED** — no device paired | — | — |
+| Game Center multi-device | **BLOCKED** — no devices, no implementation | — | — |
+
+### Device availability, checked 2026-09-20
+
+`./scripts/devices.sh list` → exit 3, **no physical iPhone or iPad is paired
+with this Mac.** Verified three ways rather than assumed (§157):
+
+- `xcrun devicectl list devices` → 7 entries, every one
+  `hardwareProperties.reality = "simulated"`
+- `xcrun xctrace list devices` → only the host Mac under "Devices"
+- `~/Library/MobileDevice/Provisioning Profiles/` → empty
+
+This is a device-availability state, **not a Keezly defect** (§166). Everything
+not blocked by it continues (§142).
+
+Simulators available: iOS 27.0, 26.5 and 26.3 runtimes covering iPhone 18 Pro /
+18 Pro Max / 17 / 17e / Air / 16e and iPad Pro 13" (M5), iPad Pro 11" (M5),
+iPad mini (A17 Pro), iPad Air 13"/11" (M4 and M3), iPad (A16).
+
+Full strategy: `docs/DEVICE_TESTING.md`. Game Center matrix:
+`docs/GAME_CENTER_DEVICE_TESTS.md`.
 
 ---
 
@@ -143,9 +177,18 @@ two closed items from this session.
 | MAN-06 | Create Game Center leaderboards and achievements | OPEN |
 | MAN-07 | Configure TestFlight testers | OPEN |
 | MAN-08 | Provide an App Store Connect API key (outside the repo) | OPEN |
+| MAN-09 | Pair a physical iPhone with this Mac (cable or wireless), unlock it, trust the computer, enable Developer Mode | OPEN |
+| MAN-10 | Pair a physical iPad, same steps — required for the iPad quality gate | OPEN |
+| MAN-11 | Provide a second Apple Account signed into Game Center, for multi-device online tests | OPEN |
 
 None of these can be completed from here. They are not blockers for the work
 queued next.
+
+MAN-09 and MAN-10 block the physical-device gates in `RELEASE_CHECKLIST.md` and
+every case in `docs/GAME_CENTER_DEVICE_TESTS.md`. Since no app target exists
+yet, they are not blocking today's work either — but they must be resolved
+before a 1.0.0 release candidate, because those gates may not stay `BLOCKED`
+(§178).
 
 ---
 

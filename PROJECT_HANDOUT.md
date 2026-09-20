@@ -114,6 +114,25 @@ Not yet buildable — the Xcode project does not exist. See `ROADMAP.md` → M0.
 Not yet set up. See `CI_CD.md`, `FASTLANE.md`, `XCODE_CLOUD.md`, which
 currently state honestly that these are NOT STARTED.
 
+### Physical devices
+
+Simulators, Xcode Cloud and real devices each prove something the others
+cannot, and none substitutes for another. Real iPhones and iPads are part of the
+test strategy, not an optional manual extra.
+
+```bash
+./scripts/devices.sh list          # what is actually paired, right now
+./scripts/devices.sh roles         # PRIMARY_IPHONE, PRIMARY_IPAD, …
+```
+
+Devices are addressed by **role**, never by name or UDID — nothing device-
+specific is ever committed. Exit code `3` means *no device available*, and a
+caller must then report `BLOCKED`, never `PASSED`.
+
+Strategy: `docs/DEVICE_TESTING.md`. Game Center matrix:
+`docs/GAME_CENTER_DEVICE_TESTS.md`. Current availability and results:
+`CURRENT_STATE.md` → Device Verification.
+
 ---
 
 ## Which rules does the engine implement?
