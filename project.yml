@@ -17,6 +17,10 @@ options:
   generateEmptyDirectories: false
   groupSortPosition: top
 
+configFiles:
+  Debug: Config/Keezly.xcconfig
+  Release: Config/Keezly.xcconfig
+
 packages:
   KeezlyCore:
     path: Packages/KeezlyCore
@@ -34,8 +38,9 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     DEAD_CODE_STRIPPING: YES
     # DEVELOPMENT_TEAM is deliberately NOT set here. It is developer-specific,
-    # and guessing a signing team is forbidden by the project rules. Device
-    # builds need it supplied locally or by Xcode Cloud (MAN-03).
+    # and guessing a signing team is forbidden by the project rules. Supply it
+    # in the git-ignored Config/Local.xcconfig (see Config/Local.xcconfig.example)
+    # or let Xcode Cloud provide it (MAN-03).
     CODE_SIGN_STYLE: Automatic
 
 targets:

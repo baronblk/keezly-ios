@@ -1,0 +1,10 @@
+// Copy to Config/Local.xcconfig and fill in your own values.
+// Config/Local.xcconfig is git-ignored and must never be committed.
+//
+// Your Apple Developer team id. Find the ones available on this Mac with:
+//   security find-identity -v -p codesigning
+//
+// Required only for building onto a physical device; simulator builds and
+// `swift test` do not need it.
+
+// DEVELOPMENT_TEAM = XXXXXXXXXX

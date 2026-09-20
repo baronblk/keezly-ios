@@ -37,6 +37,7 @@
 		2DC0E53379721916E392C04F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
 		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keezly.xcconfig; sourceTree = "<group>"; };
 		88398C0B7DDDF6AFF83579CA /* Keezly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Keezly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyApp.swift; sourceTree = "<group>"; };
 		A5C6FD419A3ADB18AB0D704C /* KeezlyCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = KeezlyCore; path = Packages/KeezlyCore; sourceTree = SOURCE_ROOT; };
@@ -88,9 +89,18 @@
 			isa = PBXGroup;
 			children = (
 				2E2B37B50B5C1DAD597F802A /* App */,
+				BE018A5F9F26968F429B0794 /* Config */,
 				826A3F1418E2A0712B696398 /* Packages */,
 				EA2F00AFF036415A01093C8A /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		BE018A5F9F26968F429B0794 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 		D502E80E6F1AC84285F49A69 /* KeezlyUITests */ = {
@@ -331,6 +341,7 @@
 		};
 		3C962E83C7B9295E242483FF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -471,6 +482,7 @@
 		};
 		FDC8BE5422461C5419556C51 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
