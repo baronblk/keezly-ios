@@ -54,6 +54,7 @@ fastlane/
 | `release_check` | Release-candidate gate, reporting each sub-gate separately | working |
 | `screenshots` | The complete App Store screenshot matrix | M11.5 |
 | `screenshots_verify` | Verify completeness and emit an HTML preview | M11.5 |
+
 `release_check` currently verifies the version, a clean git tree, the absence
 of tracked secret-like files, a real app icon, and the engine test suite. As
 localisations, store metadata and screenshots land, their checks are added

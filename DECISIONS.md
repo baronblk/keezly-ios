@@ -163,7 +163,7 @@ revision guards. Tracked as M2.9 and M6.4/M6.5.
 
 - **Date:** 2026-09-20
 - **Topic:** Project file management
-- **Status:** ACCEPTED (not yet executed — M0.2)
+- **Status:** ACCEPTED (executed 2026-09-20 — M0.2 done)
 
 **Context.** Xcode Cloud needs a real `.xcodeproj` in the repository. Hand-edited
 `project.pbxproj` files are merge-hostile and cannot be reviewed meaningfully.

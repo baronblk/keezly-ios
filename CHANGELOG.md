@@ -39,6 +39,10 @@ Versioning.
   saved by a newer version of Keezly, a damaged save, or one too large for its
   transport is reported clearly instead of being partly restored.
 - **Byte-stable encoding** so two devices can prove they hold the same board.
+- **Xcode project** for iPhone and iPad, generated from `project.yml` and
+  committed, with a shared scheme covering the app, unit tests and UI tests.
+- **fastlane** through Bundler with lanes for tests, QA, the release gate, and
+  the physical-device gates.
 - **Device testing tooling**: `scripts/devices.sh` finds the physical iPhones
   and iPads paired with the development Mac and maps them onto stable roles,
   without ever storing a device name or identifier in the repository.
