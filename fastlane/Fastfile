@@ -38,6 +38,38 @@ def report_blocked(gate, role)
   UI.important("Run scripts/devices.sh list for what to do about it.")
 end
 
+# Loads App Store Connect credentials from a file kept outside the repository.
+# Returns false when no credentials are configured, so lanes can report that
+# honestly rather than failing with an opaque authentication error (§107).
+def load_asc_env
+  path = ENV["KEEZLY_ASC_ENV"]
+  return false if path.nil? || path.empty? || !File.exist?(path)
+
+  File.readlines(path).each do |line|
+    line = line.strip
+    next if line.empty? || line.start_with?("#")
+
+    key, value = line.split("=", 2)
+    ENV[key] = value if key && value
+  end
+  %w[KEEZLY_ASC_ISSUER_ID KEEZLY_ASC_KEY_ID KEEZLY_ASC_KEY_PATH].all? { |k| ENV[k].to_s != "" }
+end
+
+# Configures the App Store Connect API key for actions that need it.
+def configure_asc_api_key
+  unless load_asc_env
+    UI.important("App Store Connect credentials not configured — see .env.example")
+    return false
+  end
+  app_store_connect_api_key(
+    key_id: ENV.fetch("KEEZLY_ASC_KEY_ID"),
+    issuer_id: ENV.fetch("KEEZLY_ASC_ISSUER_ID"),
+    key_filepath: ENV.fetch("KEEZLY_ASC_KEY_PATH"),
+    in_house: false
+  )
+  true
+end
+
 def run_core_tests
   UI.header("KeezlyCore — rules engine")
   Dir.chdir(CORE_PATH) { sh("swift test") }
@@ -71,6 +103,30 @@ platform :ios do
       output_directory: File.join(ARTIFACTS, "test-results", "ui"),
       xcodebuild_formatter: "xcbeautify --quiet"
     )
+  end
+
+  desc "Verify App Store Connect credentials and whether the app record exists"
+  lane :asc_check do
+    unless configure_asc_api_key
+      UI.user_error!("App Store Connect API key not configured")
+    end
+
+    UI.success("Credentials load: OK (key #{ENV.fetch('KEEZLY_ASC_KEY_ID')})")
+
+    # Spaceship confirms the credentials actually authenticate, and tells us
+    # whether MAN-02 (the app record) is still outstanding.
+    require "spaceship"
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(
+      key_id: ENV.fetch("KEEZLY_ASC_KEY_ID"),
+      issuer_id: ENV.fetch("KEEZLY_ASC_ISSUER_ID"),
+      filepath: ENV.fetch("KEEZLY_ASC_KEY_PATH")
+    )
+    app = Spaceship::ConnectAPI::App.find("de.gcng.keezly")
+    if app
+      UI.success("App record de.gcng.keezly exists (#{app.name}, id #{app.id})")
+    else
+      UI.important("App record de.gcng.keezly does NOT exist yet — MAN-02 is still OPEN")
+    end
   end
 
   desc "Build, install and launch on whichever physical device is available"
