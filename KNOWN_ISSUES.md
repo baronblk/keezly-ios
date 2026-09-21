@@ -102,6 +102,13 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   but returned portrait-shaped images, and a 1.5-second settle before capturing
   changed nothing. The cause is the capture API, not a rotation still in
   flight.
+- **Settled cause, for the pipeline to build on:** measured on a rotated iPad,
+  `app.screenshot()` returns 2064×2752 with a quarter of it black, while
+  `XCUIScreen.main.screenshot()` returns the full 2752×2064. The screenshot
+  pipeline is to be built on the **screen** capture.
+- **Explicitly not the answer:** cropping a fixed black margin, or any
+  correction tuned to one device's proportions. The margin is an artefact of
+  the wrong capture source, not something to trim off.
 - **Next step:** settle this in the screenshot milestone (M11), where the
   captures move to `fastlane snapshot` and are written to disk, and where the
   result can be checked as a file rather than as an attachment.

@@ -11,9 +11,15 @@ final class PlayFlowTests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// Launched straight onto a deterministic board.
+    ///
+    /// A plain launch now opens the menu, where a player chooses a table
+    /// (`MenuFlowTests` covers that). These tests are about the board, so they
+    /// ask for a fixed one rather than driving the menu to reach it (§87).
     @MainActor
     private func launched() -> XCUIApplication {
         let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026"]
         app.launch()
         return app
     }

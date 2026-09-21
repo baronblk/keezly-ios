@@ -55,6 +55,12 @@ Versioning.
   them can see another player's cards.
 - **Replay**: finished matches can be played back exactly, move by move,
   because the engine is deterministic.
+- **A menu to set up the table**: two to six players, partners or everyone for
+  themselves, and opponents at three strengths. The seats are shown as they
+  will be dealt, so choosing a table shows what the table will look like rather
+  than only setting a number. Partners are offered only where they mean
+  something — never at two players, where the engine would otherwise put both
+  players on the same side.
 - **A playable game on iPad and iPhone.** One player against three computer
   opponents: a wooden board with milled holes and seated pieces, real playing
   cards with classic corner indices, and the flow card → pawn → square. Illegal

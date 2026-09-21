@@ -27,17 +27,25 @@ final class LaunchTests: XCTestCase {
             .waitForExistence(timeout: timeout)
     }
 
+    /// Launched onto a fixed table, because a plain launch now opens the menu
+    /// — which `MenuFlowTests` covers.
+    @MainActor
+    private func launched() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026"]
+        app.launch()
+        return app
+    }
+
     @MainActor
     func testAppLaunches() {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launched()
         XCTAssertTrue(handAppeared(in: app), "the app should deal a hand within fifteen seconds")
     }
 
     @MainActor
     func testAppSurvivesRotation() {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launched()
         XCTAssertTrue(handAppeared(in: app))
 
         for orientation in [UIDeviceOrientation.landscapeLeft, .portrait, .landscapeRight, .portrait] {

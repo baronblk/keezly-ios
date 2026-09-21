@@ -155,6 +155,7 @@ leak and watching them fail. See `AI.md`.
 
 | Task | Status |
 |---|---|
+| M4.0 Main menu and table configuration | DONE — 2–6 seats, partners or everyone alone, three opponent strengths, and the table shown as it will be dealt |
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
 | M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done, all table sizes reviewed, three clipping defects fixed; a two-player table has its own presentation (DEC-021); Split View and Stage Manager untested |

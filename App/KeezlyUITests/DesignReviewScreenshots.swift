@@ -251,6 +251,23 @@ final class DesignReviewScreenshots: XCTestCase {
         capture(name: "two-players-portrait", seats: 2, seed: 11, orientation: .portrait)
     }
 
+    // MARK: - The menu
+
+    /// Where a player actually starts, so it is reviewed like any other screen.
+    @MainActor
+    func testMenu() {
+        let name = "menu"
+        let app = XCUIApplication()
+        app.launchArguments = []
+        XCUIDevice.shared.orientation = .landscapeLeft
+        app.launch()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),
+            "\(name): the menu never appeared"
+        )
+        attach(name, from: app, orientation: .landscapeLeft)
+    }
+
     // MARK: - Mid-match interfaces
 
     /// The Jack, with its swap targets showing.
