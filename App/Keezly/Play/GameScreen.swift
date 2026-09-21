@@ -73,15 +73,21 @@ struct GameScreen: View {
             BoardCentreView(
                 state: session.state,
                 roles: session.roles,
-                width: isCompact ? 74 : 112,
+                width: isCompact ? 84 : 128,
                 axis: axis
             )
             .padding(.horizontal, Keezly.Spacing.regular)
-            .padding(.vertical, Keezly.Spacing.small)
-            .background(
-                RoundedRectangle(cornerRadius: Keezly.Radius.panel, style: .continuous)
-                    .fill(Keezly.Palette.board.opacity(0.35))
-            )
+            .padding(.vertical, Keezly.Spacing.regular)
+            // The same wood as the seat panels, so the tray reads as part of
+            // the table rather than as a floating panel of app chrome.
+            .background {
+                let shape = RoundedRectangle(cornerRadius: Keezly.Radius.panel, style: .continuous)
+                shape
+                    .fill(theme.surfaceMid.opacity(0.92))
+                    .overlay(shape.strokeBorder(theme.edge.opacity(0.45), lineWidth: 1))
+                    .overlay(shape.strokeBorder(Color.white.opacity(0.16), lineWidth: 1).padding(1))
+                    .shadow(color: .black.opacity(0.24), radius: 5, y: 2)
+            }
             .accessibilityIdentifier("table.tray")
         }
     }

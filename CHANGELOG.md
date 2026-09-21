@@ -78,6 +78,11 @@ Versioning.
   move, return plays, escape cancels. The focus ring is drawn in black and
   white so it never depends on colour. Touch is unchanged and remains complete
   on its own.
+- **Depth and balance across the board**: holes that read as drilled rather
+  than drawn, player colours with more presence but no less restraint, a
+  modelled edge that sets the board on a dark table, a calmer middle where the
+  cards are what you see first, and seat panels made of the same wood as the
+  board rather than grey system chrome.
 - **A quiet Dutch identity on the board**: a tulip-and-lozenge border engraved
   into the rim, a medallion framing the cards, a chevron at the end of each home
   lane, and a single orange keystone. Ornament, not illustration — from playing
@@ -95,6 +100,13 @@ Versioning.
   `KNOWN_ISSUES.md` and this changelog.
 
 ### Fixed
+
+- A two-player board had no room in the middle for the draw pile and the played
+  card, which were drawn across the home lanes. Two players now have the cards
+  beside the board instead.
+- The board could be drawn wider than the screen in portrait and was clipped.
+- The far seat panel hung off the right edge of an iPad.
+- The outermost two cards of a hand were cut off at the edges of a phone.
 
 - Landscape screenshots came out on their side and could not have been
   submitted to the App Store.

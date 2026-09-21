@@ -13,7 +13,6 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 | # | Summary | Severity |
 |---|---|---|
 | ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
-| ISS-013 | A two-player board has no room for the cards in the middle | Minor (visual) |
 | ISS-010 | No hardware keyboard or pointer available to verify M4.7 end to end | Verification gap |
 | ISS-011 | Commit `1d46410` carries a message that does not match its content | Cosmetic (history) |
 
@@ -23,7 +22,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ### ISS-013 — A two-player board has no room for the cards in the middle
 
-- **Status:** OPEN
+- **Status:** FIXED, VERIFIED
 - **Severity:** Minor (visual)
 - **Component:** App / Board
 - **Description:** The home lanes are four squares long whatever the table
@@ -38,13 +37,21 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   honestly to the space available they become too small to read, so the scale
   is now floored (`GameScreen.minimumCentreScale`) and a little crowding
   remains.
-- **What is done:** the centre is now proportioned to the board's own quiet
-  middle rather than to the size of the view, which fixes five and six seats
-  and improves two. The medallion is already correctly absent there (ISS-008).
-- **What is left:** a two-seat table probably needs the centre arranged
-  differently rather than merely smaller — the piles side by side outside the
-  lanes, or moved out of the board altogether. That is design work, not a
-  parameter.
+- **Fix:** two things, in order. First the middle was proportioned to the
+  board's own quiet field rather than to the size of the view, which settles
+  three to six seats. That was not enough for two, where the field is 0.28 of a
+  square: shrinking the cards to fit made them unreadable, which is a worse
+  fault than crowding. So a two-player table now shows the table's own cards
+  **beside** the board — a wooden tray opposite the other player, holding the
+  deck, the played card, the turn and the round (DEC-021).
+- **What did not change:** `BoardGraph`, the rules, and the board itself. Only
+  the presentation adapts, and the decision is written as a rule about
+  available space rather than as a special case for two seats.
+- **Related tests:** `InnerFieldTests` — including that the board's measured
+  proportions are the ones the design was decided on, so a change to the lanes
+  or the track cannot silently invalidate it.
+- **Verified by:** captures of a two-seat table in both orientations, and the
+  app suite at commit `656bc88`.
 - **Related files:** `App/Keezly/Play/GameScreen.swift`,
   `App/Keezly/Board/BoardLayout.swift`
 - **Related tests:** `InnerFieldTests`

@@ -85,13 +85,25 @@ capture and none on any portrait one. It is a capture artefact, not something
 wrong with the interface, and it is settled in M11 where the captures move to
 files.
 
-**The two-player board has been reviewed (ISS-013).** The home lanes are four
-squares long whatever the table size, so on a half-length track they run almost
-to the centre and the cards were drawn across them. The middle is now
-proportioned to the board's own quiet field rather than to the size of the
-view, which fixes five and six seats outright and improves two. Two seats still
-needs the centre *arranged* differently rather than merely made smaller; that
-is recorded, not hidden.
+**The two-player board is solved (ISS-013, DEC-021).** The quiet middle is not
+a constant: measured in square pitches it is 0.28 at two seats, 2.42 at three
+and 4.56 at four. At two seats the home lanes very nearly meet and there is no
+middle at all. Shrinking the cards to fit was tried and made them unreadable,
+which is worse than crowding — so a two-player table shows the table's own
+cards **beside** the board, in a wooden tray opposite the other player. The
+rules and `BoardGraph` are identical for every table size; only the
+presentation adapts, and the decision is written as a rule about available
+space rather than a special case for two.
+
+**A polish pass across the board (DEC-021).** Deeper holes so the track reads,
+stronger but still restrained player colours, a modelled edge with a contact
+shadow, a quieter medallion behind the cards, seat panels made of the board's
+own wood instead of grey system material, and a finer card stock. No redesign —
+the Classic Wood direction and the Dutch ornament are unchanged.
+
+Reviewing the captures found three clipping defects that no test had: the board
+could be drawn wider than the screen, the far seat panel hung off the right
+edge, and two cards were cut off at the edges of a phone. All three are fixed.
 
 **Pointer and keyboard are implemented (M4.7, DEC-020).** Cards lift under the
 pointer, squares highlight, arrows walk the hand and the board, return acts and

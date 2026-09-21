@@ -157,7 +157,7 @@ leak and watching them fail. See `AI.md`.
 |---|---|
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
-| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done; the middle of the board is now proportioned to the board rather than the view, so small tables are no longer crowded (ISS-013); Split View and Stage Manager untested |
+| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done, all table sizes reviewed, three clipping defects fixed; a two-player table has its own presentation (DEC-021); Split View and Stage Manager untested |
 | M4.4 iPhone layout — portrait and both landscape orientations | DONE — phones get their own compact and short-landscape layouts; reviewed on the smallest, standard and largest iPhones, in both orientations, at 4 and 6 seats |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
 | M4.6 Event-driven animation pipeline with input locking | DONE — `BoardPresenter` plays events one at a time, reorders a capture behind the move that caused it, honours Reduce Motion, and settles on the true position on any interruption |
@@ -165,6 +165,7 @@ leak and watching them fail. See `AI.md`.
 
 | M4.8 Centre of the board — draw pile, discard, turn and deal status | DONE |
 | M4.9 Classic Wood material, round milled holes, pawn silhouettes, real playing cards (DEC-018) | DONE |
+| M4.13 Polish pass — hole depth, player colours, board edge, quieter middle, panels in board material, card finish (DEC-021) | DONE — reviewed on iPad at 2, 4 and 6 seats and on iPhone |
 | M4.10 Seat status panels using the spare landscape width (§35) | DONE |
 | M4.11 Deterministic screenshot mode and design-review captures (§87) | DONE — plus fixtures that fast-forward to a playable Jack, a Seven mid-split, a free-for-all table and a mid-match phone |
 | M4.12 Dutch ornament on the Classic Wood board (DEC-019) | DONE — engraved border, centre medallion, home-lane chevrons, one orange detail |
