@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-9a2d4e3  fix(board): proportion the middle to the board instead of the view
+467909c  feat(board): polish hole depth, player colours, board edge and card finish
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -261,9 +261,11 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (80/83, 3 skipped — no keyboard, ISS-010) | 2026-09-20 | `9a2d4e3` |
-| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (80/83, 3 skipped) — `fastlane device_iphone` | 2026-09-20 | `9a2d4e3` |
-| Physical iPad (A16), iOS 27.0 | **PASSED** (80/83, 3 skipped) — `fastlane device_ipad` | 2026-09-20 | `9a2d4e3` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (83 passed, 0 failed, 3 skipped) | 2026-09-21 | `467909c` |
+| Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
+| Physical iPhone — re-run on the polish | **BLOCKED** — device left the wired connection mid-run (ISS-014) | 2026-09-21 | — |
+| Physical iPad (A16), iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
+| Physical iPad — re-run on the polish | **BLOCKED** — the test runner will not start (ISS-014) | 2026-09-21 | — |
 | Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 

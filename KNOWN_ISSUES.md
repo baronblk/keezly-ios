@@ -12,6 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
+| ISS-014 | Neither physical device will start a UI test runner | Blocker (hardware gate) |
 | ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
 | ISS-010 | No hardware keyboard or pointer available to verify M4.7 end to end | Verification gap |
 | ISS-011 | Commit `1d46410` carries a message that does not match its content | Cosmetic (history) |
@@ -55,6 +56,33 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 - **Related files:** `App/Keezly/Play/GameScreen.swift`,
   `App/Keezly/Board/BoardLayout.swift`
 - **Related tests:** `InnerFieldTests`
+
+### ISS-014 — Neither physical device will start a UI test runner
+
+- **Status:** OPEN — blocked on the devices, not on the code
+- **Severity:** Blocker for the hardware gate only
+- **Component:** Device test environment
+- **Description:** Both hardware gates passed earlier the same session at commit
+  `9a2d4e3` (80 passed, 3 skipped, on each device). Re-running them on the
+  polish pass fails before any test executes:
+  - iPhone 17 Pro — `Lost pending connection to the test runner before launch`,
+    and `scripts/devices.sh` now reports it as
+    `unknown / tunnel unavailable`: it has left the wired connection.
+  - iPad (A16) — still `wired / tunnel connected` and reported usable, but
+    `The test runner failed to initialize for UI testing (Timed out while
+    enabling automation mode)`.
+- **What is not the cause:** the build. Both gates build and install; the
+  failure is in starting the runner. The same commit passes 83 tests on the
+  simulator.
+- **Possible contributor:** a hung iPhone run was terminated with `pkill` after
+  31 minutes without progress, which can leave a device's automation mode in a
+  stuck state.
+- **Remedy (needs the devices in hand):** unlock both devices and leave them
+  unlocked, reconnect the iPhone by cable, and restart either device if
+  automation mode stays stuck. Then re-run `bundle exec fastlane device_gate`.
+- **Recorded as BLOCKED, never as passed** (§177): the last genuine hardware
+  result stands at `9a2d4e3` and the polish pass has **not** been verified on
+  hardware.
 
 ### ISS-012 — Landscape captures carry a 25% black margin
 
