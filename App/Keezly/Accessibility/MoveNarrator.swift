@@ -1,0 +1,145 @@
+import Foundation
+import KeezlyCore
+
+/// Puts the board into words.
+///
+/// Written for somebody who cannot see it. "Red pawn" is not enough to play
+/// with: a player needs to know *which* red pawn, where it stands, how far it
+/// has left to go, and what a move would do (§53). So every phrase here
+/// carries a position and, where there is one, a consequence.
+///
+/// Narrates from a `PlayerObservation`, never from a `GameState`. Not for
+/// convenience — it is the same boundary an AI agent plays behind (DEC-014).
+/// A spoken description is a channel like any other, and a blind player must
+/// hear exactly what a sighted one sees: their own hand, everybody's pieces,
+/// and nothing else. Taking the full state here would have made the
+/// accessibility path the one way into the game that leaks.
+///
+/// Returns finished strings rather than `LocalizedStringKey`, because these
+/// phrases are built out of each other — a move contains a pawn, a Seven
+/// contains two legs — and a key cannot be nested inside another key.
+enum MoveNarrator {
+
+    // MARK: - Pieces
+
+    /// A pawn: whose it is, which one, and where it stands.
+    ///
+    /// *Red pawn 2, 11 squares from home.*
+    static func pawn(_ id: PawnID, in observation: PlayerObservation) -> String {
+        let name = seatName(id.seat)
+        let number = id.slot + 1
+        switch state(of: id, in: observation).position {
+        case .waiting:
+            return String(localized: "a11y.pawn.waiting \(name) \(number)")
+        case .home(_, let slot):
+            return String(localized: "a11y.pawn.home \(name) \(number) \(slot + 1)")
+        case .track:
+            let remaining = squaresFromHome(id, in: observation)
+            return String(localized: "a11y.pawn.track \(name) \(number) \(remaining)")
+        }
+    }
+
+    /// How far a pawn still has to travel to be home.
+    ///
+    /// The number a player actually reasons with. A square index means nothing
+    /// without the whole board in your head; "eleven from home" means
+    /// something immediately.
+    static func squaresFromHome(_ id: PawnID, in observation: PlayerObservation) -> Int {
+        let pawn = state(of: id, in: observation)
+        guard let travelled = observation.progress(of: pawn) else {
+            return observation.board.fullJourneyLength
+        }
+        return max(0, observation.board.fullJourneyLength - travelled)
+    }
+
+    private static func state(of id: PawnID, in observation: PlayerObservation) -> PawnState {
+        observation.pawns[id.seat.index * pawnsPerSeat + id.slot]
+    }
+
+    // MARK: - Cards
+
+    /// A card, with what it does in Keezen.
+    ///
+    /// *Seven. Seven squares, splittable across two pawns.*
+    static func card(_ card: Card) -> String {
+        String(localized: "a11y.card \(rankName(card.rank)) \(abilityName(card.rank))")
+    }
+
+    static func rankName(_ rank: CardRank) -> String {
+        String(localized: String.LocalizationValue("rank.\(rank.rawValue)"))
+    }
+
+    /// What the rank does — the part a new player needs and a returning one
+    /// forgets.
+    static func abilityName(_ rank: CardRank) -> String {
+        String(localized: String.LocalizationValue("ability.\(rank.rawValue)"))
+    }
+
+    // MARK: - Moves
+
+    /// A whole move, as an instruction a player could act on.
+    ///
+    /// *Ace — bring red pawn 2 out of the start.*
+    /// *Seven — red pawn 2 three squares, then red pawn 4 four squares.*
+    /// *Jack — swap red pawn 1 with blue pawn 3.*
+    static func move(_ move: Move, in observation: PlayerObservation) -> String {
+        let rank = rankName(move.card.rank)
+        switch move.action {
+        case .enterFromWaiting(let id):
+            return String(localized: "a11y.move.enter \(rank) \(pawn(id, in: observation))")
+        case .advance(let id, let steps, _):
+            return String(localized: "a11y.move.advance \(rank) \(pawn(id, in: observation)) \(steps)")
+        case .moveBackward(let id, let steps):
+            return String(localized: "a11y.move.backward \(rank) \(pawn(id, in: observation)) \(steps)")
+        case .swap(let own, let other):
+            let mine = pawn(own, in: observation)
+            let theirs = pawn(other, in: observation)
+            return String(localized: "a11y.move.swap \(rank) \(mine) \(theirs)")
+        case .split(let steps):
+            return String(localized: "a11y.move.split \(rank) \(splitPhrase(steps, in: observation))")
+        }
+    }
+
+    /// The legs of a Seven, written out in order.
+    private static func splitPhrase(_ steps: [SplitStep], in observation: PlayerObservation) -> String {
+        steps
+            .map { String(localized: "a11y.leg \(pawn($0.pawn, in: observation)) \($0.steps)") }
+            .joined(separator: String(localized: "a11y.leg.separator"))
+    }
+
+    // MARK: - Consequences
+
+    /// What a move would do beyond moving a piece.
+    ///
+    /// Capturing, reaching home and finishing are what a player most wants to
+    /// know before committing — and the hardest things to work out from a
+    /// board you cannot see.
+    static func consequence(preview: MovePreview, in observation: PlayerObservation) -> String? {
+        if !preview.finishedSeats.isEmpty {
+            return String(localized: "a11y.consequence.finishes")
+        }
+        if let captured = preview.captured.first {
+            return String(localized: "a11y.consequence.capture \(pawn(captured, in: observation))")
+        }
+        if let home = preview.reachedHome.first {
+            return String(localized: "a11y.consequence.home \(pawn(home, in: observation))")
+        }
+        return nil
+    }
+
+    // MARK: - Helpers
+
+    static func seatName(_ seat: Seat) -> String {
+        String(localized: String.LocalizationValue(PlayerIdentity.identity(for: seat).nameKey))
+    }
+
+    /// A whole turn's worth of context, for the board itself.
+    ///
+    /// *Your turn as red. 5 cards, 1 pawn home.*
+    static func turnSummary(for observation: PlayerObservation) -> String {
+        let name = seatName(observation.seat)
+        let cards = observation.hand.count
+        let home = observation.homeCount(of: observation.seat)
+        return String(localized: "a11y.turn \(name) \(cards) \(home)")
+    }
+}

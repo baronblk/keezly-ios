@@ -33,6 +33,8 @@ struct GameScreen: View {
     /// said they are holding it — otherwise the cards are on screen at exactly
     /// the moment the device is being passed (§34).
     @State private var seatInHand: Seat?
+    /// Whether the list of legal moves is open (§53).
+    @State private var showsActionList = false
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -189,6 +191,18 @@ struct GameScreen: View {
             }
         }
         .environment(\.boardTheme, theme)
+        // Built when it opens, from the planner's own observation — so the
+        // list is a view of the same position the board is drawing, never a
+        // second answer about what is legal (DEC-004).
+        .sheet(isPresented: $showsActionList) {
+            ActionListView(
+                list: ActionList(observation: planner.observation),
+                mustFold: session.mustFold,
+                onPlay: { submit(.play($0)) },
+                onFold: { submit(.foldHand(seat: session.state.currentSeat)) }
+            )
+            .environment(\.boardTheme, theme)
+        }
         // The screen itself takes focus so that a key press arrives even
         // before the player has focused anything — otherwise the first arrow
         // key on a fresh board would go nowhere. Its own focus ring is
@@ -233,7 +247,13 @@ struct GameScreen: View {
         .onKeyPress(.escape) { handle(.cancel) }
         // The keyboard must never be left pointing at a card that has been
         // played or a square that is no longer legal.
-        .onChange(of: session.state.revision) { _, _ in settleFocus() }
+        .onChange(of: session.state.revision) { _, _ in
+            settleFocus()
+            // The list describes one position. Once the board has moved on it
+            // is describing a board that no longer exists, so it closes rather
+            // than offering moves nobody can make.
+            showsActionList = false
+        }
     }
 
     // MARK: - Layouts
@@ -402,6 +422,31 @@ struct GameScreen: View {
         }
     }
 
+    /// The way in to the second complete input method (§53).
+    ///
+    /// Not hidden behind an accessibility setting. Somebody who finds the
+    /// board fiddly — a small phone, a shaking hand, a bright pavement — is
+    /// served by the same list, and a route that only appears for VoiceOver
+    /// users is a route nobody else can discover.
+    @ViewBuilder
+    private var actionListButton: some View {
+        if session.isAwaitingHuman, !awaitingHandover, session.seatOnTurn != nil {
+            Button {
+                showsActionList = true
+            } label: {
+                Label("a11y.actions.open", systemImage: "list.bullet")
+                    .font(Keezly.Typography.caption.weight(.medium))
+                    .padding(.horizontal, Keezly.Spacing.medium)
+                    .padding(.vertical, Keezly.Spacing.small)
+            }
+            .buttonStyle(.bordered)
+            .tint(.white)
+            .pointerEffect(.automatic)
+            .accessibilityHint("a11y.actions.hint")
+            .accessibilityIdentifier("actions.open")
+        }
+    }
+
     // MARK: - Pieces
 
     private var board: some View {
@@ -440,6 +485,8 @@ struct GameScreen: View {
     @ViewBuilder
     private func hand(availableWidth: CGFloat, cardWidth: CGFloat? = nil) -> some View {
         VStack(spacing: Keezly.Spacing.small) {
+            actionListButton
+
             if session.mustFold {
                 Button {
                     submit(.foldHand(seat: session.state.currentSeat))
