@@ -8,10 +8,10 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-2f7bde9  feat(gamecenter): add a versioned turn envelope over a mockable transport
+a89f861  feat(tutorial): teach the game by playing it
 ```
 
-Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
+Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 
 ---
 
@@ -23,14 +23,19 @@ Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 | M1 — GameCore / Rules | **DONE** |
 | M2 — Complete Move Engine | **DONE** |
 | M3 — AI | **DONE** |
-| **M4 — Gameplay UI (iPad / iPhone)** | **IN PROGRESS** |
+| M4 — Gameplay UI (iPad / iPhone) | **DONE** |
+| M5 — Local Multiplayer / Pass & Play | **DONE** |
+| M6 — Game Center | **IMPLEMENTED, NOT VERIFIED** (MAN-02) |
+| **M7 — Tutorial / Rulebook / Accessibility** | **IN PROGRESS** |
 
 Everything up to and including M3 lives in `KeezlyCore`, which is testable with
-`swift test` alone. M4 is the first milestone that is mostly app-layer work.
+`swift test` alone. From M4 on the work is mostly app-layer.
 
-**The game is playable.** One human against three computer opponents, board and
-hand on screen, moves applied through the engine, verified end to end by UI
-tests rather than by assertion.
+**The game is playable and finishable.** Two to six seats, any mix of people
+and computers sharing one device, partners or everyone for themselves; a match
+saves itself after every accepted action and can be picked up again; a finished
+match says who won and offers the way back. Learning it, looking a rule up and
+playing entirely from a spoken list of moves are all in the app.
 
 ### Status vocabulary
 
@@ -278,6 +283,60 @@ and Stage Manager are untested.
 
 Measured results and sample sizes: `AI.md`.
 
+### Playing screen (M4)
+- Board drawn from `BoardGraph` in two layers: a static `Canvas` for the panel,
+  ordinary views for the pawns, so there is no render loop (§62).
+- Classic Wood with milled holes and a Dutch engraved border, medallion and
+  home-lane chevrons (DEC-018, DEC-019).
+- Three layouts, chosen by the space actually available rather than by size
+  class: a phone stack, a short-landscape row, and a board flanked by seat
+  panels where the width can hold one. The arithmetic is in `PlayLayout` and
+  is tested against every display Keezly runs on.
+- A two-seat table puts the draw pile beside the board rather than shrinking it
+  past reading (DEC-021).
+- `BoardPresenter` plays events one at a time, reorders a capture behind the
+  move that caused it, honours Reduce Motion and settles on the true position
+  on any interruption.
+- Pointer, trackpad and full keyboard access (DEC-020). Key *delivery* is still
+  **NOT VERIFIED — HARDWARE NOT AVAILABLE**.
+- Main menu and table configuration; a finished match reports its result.
+
+### Pass and play (M5)
+- One device round a table, 2–6 seats, people and computers mixed (DEC-022).
+  The hand is *built* only for the seat holding the device, so privacy is a
+  property of the construction rather than of a cover that might fail to draw.
+- Autosave and resume (DEC-023): seed plus accepted actions, written atomically
+  before the animation starts. Restore replays every action through the engine
+  and refuses rather than repairs; a refused save is quarantined, never deleted.
+
+### Game Center (M6) — IMPLEMENTED, NOT VERIFIED
+- One game model. `KeezlyCore` does not import GameKit; exactly one app file
+  does (DEC-024).
+- Versioned turn envelope, explicit seat↔participant mapping, `moveID` +
+  `expectedRevision` idempotency, and a replay-and-compare `load` that refuses
+  a board it cannot reproduce.
+- A two-client harness where the clients share no session state, and a
+  deterministic in-memory transport.
+- The payload compresses from 64,384 bytes to 4,173 — measured, not assumed.
+- **Hidden information is not protected against a modified client (DEC-025)**,
+  demonstrated by `OnlineHiddenInformationTests` rather than assumed either way.
+
+### Learning and accessibility (M7, in progress)
+- **Action list (M7.7):** every legal move as a sentence, playable. It comes
+  from the same `MoveGenerator` as the board, and `ActionListTests` asserts the
+  two move *sets* are equal across two-, four- and six-seat walks.
+- **Narration (M7.6):** pawns, squares and moves put into words from a
+  `PlayerObservation` and never a `GameState`, so the spoken channel obeys the
+  same boundary an AI agent does (DEC-014).
+- **Rulebook (M7.3):** the rules in Keezly's own words, with the rules *this
+  table* plays marked, both readings shown where tables disagree. `RuleFacet`
+  is held against `RuleSet` by reflection, so a new rule option cannot reach
+  the engine undocumented.
+- **Tutorial (M7.2):** ten lessons, each an ordinary match on the real engine.
+  A lesson reads the board before and after a move rather than the tap, so it
+  cannot congratulate a player for something that did not happen; every seed is
+  played through in the tests.
+
 ---
 
 ## In Progress
@@ -288,22 +347,22 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Not Implemented Yet
 
-
-- Statistics, match history, replay playback UI.
+- Onboarding, in-game card help, hints (M7.1, M7.4, M7.5).
+- Statistics, match history, replay playback UI (M9).
 - Bespoke dealing, Seven-leg and Jack-swap choreography (the generic move and
   swap animations exist).
 - Split View and Stage Manager verification.
-- Game Center of any kind.
-- Tutorial, rulebook, hints, accessibility work.
-- Localisation, audio, haptics, app icon, artwork.
-- Screenshot harness; Xcode Cloud workflows.
+- Audio, haptics, app icon, artwork (M8).
+- Dutch and English proof-reading pass (M10.5); the strings themselves exist in
+  all three languages as they are written.
+- Screenshot harness; Xcode Cloud workflows (M11).
 
 ---
 
 ## Tests
 
-`cd Packages/KeezlyCore && swift test` — **137 tests in 12 suites, 0 failures**,
-93.7 s, re-run at the commit above.
+`cd Packages/KeezlyCore && swift test` — **171 tests in 15 suites, 0 failures**,
+94 s, re-run at the commit above.
 
 | Suite | Tests |
 |---|---|
@@ -319,6 +378,9 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 | Hard agent | 13 |
 | AI strength | 8 |
 | Simulation harness | 9 |
+| Online match | 17 |
+| Two clients | 12 |
+| Online hidden information | 5 |
 
 Many are parameterised over seat counts or card ranks, so executed cases exceed
 test-function count. The invariant suite alone plays 221 complete matches.
@@ -330,19 +392,24 @@ Two gated suites, excluded from the default run on purpose:
 | Extended simulation | `KEEZLY_EXTENDED_SIM=1 swift test` | Large AI samples and seat-fairness runs take minutes |
 | Timing | `KEEZLY_TIMING_TESTS=1 swift test` | Wall-clock bounds measure scheduler queueing under a parallel run (see ISS-005) |
 
-| App-level | Result |
+App-level, on the iPad Pro 13" (M5) simulator, iOS 27.0:
+
+| Target | Result |
 |---|---|
-| iPad Pro 13" (M5) simulator, iOS 27.0 | **80 passed, 0 failed, 3 skipped** |
-| Physical iPhone 17 Pro, iOS 27.0 | **80 passed, 0 failed, 3 skipped** |
-| Physical iPad (A16), iOS 27.0 | **80 passed, 0 failed, 3 skipped** |
+| `KeezlyTests` | **142 passed in 17 suites, 0 failed** |
+| `KeezlyUITests` | **37 passed, 0 failed, 3 skipped** |
 
 The three skips are the keyboard tests, which report honestly that no hardware
 keyboard reached the app rather than passing without exercising anything
 (ISS-010).
 
-`fastlane` reports 117 for the same run: it counts parameterised cases, the
-result bundle counts test functions. Both numbers are true; they answer
-different questions.
+Three of the app suites are there to stop a specific kind of lie:
+
+| Suite | What it refuses to let pass |
+|---|---|
+| `ActionListTests` | An accessible move list that offers fewer moves than the engine |
+| `RulebookTests` | A rule option in the engine that no section explains, and a line that shows its lookup key instead of its text |
+| `TutorialTests` | A lesson whose position cannot be reached, or that counts a move it did not ask for |
 
 ---
 
@@ -371,9 +438,20 @@ device run, never trusted from this file — it changed mid-session once already
 
 ## Known Problems
 
-None open. `KNOWN_ISSUES.md` holds five closed entries, including ISS-005,
-which records a **misdiagnosis** worth remembering: a green performance test on
-a position the code short-circuits out of proves nothing.
+None open. `KNOWN_ISSUES.md` holds the closed entries, including ISS-005, which
+records a **misdiagnosis** worth remembering: a green performance test on a
+position the code short-circuits out of proves nothing.
+
+Two defects were found and closed during M7, both worth keeping in mind:
+
+- The playing screen drew the far seat panel past the right edge on a portrait
+  iPad. The arithmetic had been reviewed twice — in landscape, where it happens
+  to fit. It is now in `PlayLayout` with a test across every display size.
+- The rulebook shipped its lookup keys to the screen for one build:
+  `LocalizedStringKey("rules.\(id).title")` takes the *interpolating*
+  initialiser and looks up `rules.%@.title`. The test that was meant to catch
+  it rebuilt the keys itself and so tested nothing. Runtime-assembled keys now
+  go through one function, and the test reads the model's own properties.
 
 ---
 
@@ -422,47 +500,30 @@ DEC-009 byte-stable `Codable` · DEC-010 three version numbers, decoding refuses
 · DEC-011 `de.gcng.keezly` · DEC-012 Bundler-pinned fastlane · DEC-013 signing
 team never committed · DEC-014 agents get an observation, never the state ·
 DEC-015 previews widen the boundary deliberately · DEC-016 SwiftLint gates,
-SwiftFormat allowlists.
+SwiftFormat allowlists · DEC-017 our own board curve · DEC-018 Classic Wood ·
+DEC-019 Dutch ornament, not Dutch souvenir · DEC-020 keyboard logic pure and
+testable · DEC-021 a two-seat table gets its own presentation · DEC-022 privacy
+by construction, not by cover · DEC-023 a save is a seed plus its actions ·
+DEC-024 Game Center is transport, not a second game · DEC-025 friendly online
+play, no anti-cheat claim.
 
 ---
 
 ## Next Steps (concrete)
 
-**M4 continues.** The iPhone pass, the animation pipeline, the screenshot
-fixtures, the Dutch ornament pass and **both** hardware gates are done. What is
-left, in order:
+**M7 continues.** The action list, the narration, the rulebook and the tutorial
+are done. What is left, in order:
 
-1. **Main menu and table configuration**, which is what lets a player choose
-   2–6 seats, teams and opponents rather than getting the built-in four.
-1. **M6 — Game Center**, as far as it goes without the App Store Connect
-   record: the GameKit boundary, the turn envelope, revision and idempotency
-   handling, and a mock transport with deterministic tests. Only the real
-   end-to-end run stays blocked.
+1. **M7.1 / M7.4 / M7.5** — onboarding, in-game card help, and a hint system
+   built on the existing AI evaluation.
+2. **M7.6, the rest** — Dynamic Type at the accessibility sizes, touch-target
+   and contrast review, VoiceOver sort priority.
+3. **M8** — app icon (three concepts compared before one is chosen), haptics,
+   and the audio architecture. Sound assets are marked **ASSET PENDING** rather
+   than shipped poor.
+4. **M9** — replay on the existing `MatchRecord`, local statistics. No
+   competitive leaderboard on online results (DEC-025).
+5. **M10** — the terminology pass over de, nl and en.
 
-Blocked and not startable: anything behind the App Store Connect record
-(MAN-02), and Game Center multi-device (MAN-11/12).
-
-Superseded plan, kept for context:
-
-1. **M4.1 — design system.** Spacing, typography, materials, motion, and
-   player identity. Player identity must be colour **plus** a symbol or shape:
-   colour alone fails colour-blind players (§42).
-2. **M4.2 — board geometry and rendering.** A `BoardLayout` in the app layer
-   that maps `BoardPosition` to coordinates. `KeezlyCore` must stay free of
-   geometry (DEC-001), so this is a new app-layer type, parametric over
-   2–6 seats like the board itself. Verify by screenshotting every seat count
-   on an iPad simulator.
-3. **M4.6 before M4.5** — the event-driven animation pipeline and input
-   locking, because the interaction flow is built on top of it and retrofitting
-   the lock is how double-applied moves happen (§63).
-4. **M4.5 — card interaction**, including the Jack target picker and the Seven
-   sequence builder. The engine already generates only complete, playable
-   Seven sequences, so the builder can offer exactly the legal continuations
-   and never strand a player mid-split (§38).
-5. **M4.3 / M4.4 — adaptive layouts.** iPad landscape first: it is the primary
-   product surface, not a scaled-up phone (§4).
-6. **M4.7 — pointer, trackpad and keyboard** on iPad.
-
-A `MatchSession` (`@Observable`) is needed early: it owns the `GameState`,
-drives AI turns off the main actor, records to `MatchRecord`, and publishes the
-event stream the views animate.
+MAN-02 still blocks TestFlight, Game Center configuration and Xcode Cloud, and
+none of the work above.

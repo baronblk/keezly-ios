@@ -108,6 +108,35 @@ Versioning.
 - **Project memory**: `PROJECT_HANDOUT.md`, `CURRENT_STATE.md`, `ROADMAP.md`,
   `DECISIONS.md`, `ARCHITECTURE.md`, `RULES.md`, `RULE_VARIANTS.md`,
   `KNOWN_ISSUES.md` and this changelog.
+- **Main menu and table configuration** — two to six seats, partners or
+  everyone for themselves, one to six people sharing the device, three opponent
+  strengths, and the table shown as it will be dealt.
+- **Pass and play** — the device goes round the table behind a handover screen.
+  The hand is built only for the seat holding the device, so the cards are not
+  merely covered during a handover; they are not there.
+- **Autosave and resume** — a match is its seed and its accepted actions,
+  written atomically after every accepted action and before the animation
+  starts. Restoring replays every action through the engine and refuses rather
+  than repairs; a save that will not open is quarantined, never deleted.
+- **Game Center groundwork** — a versioned turn envelope over a transport
+  protocol with no GameKit types in it, explicit seat-to-participant mapping,
+  idempotent turns, and a two-client test harness whose clients share no
+  session state. Not verified end to end: that needs the App Store Connect
+  record.
+- **A list of every legal move**, spoken and playable. It is the same moves as
+  the board — the same `MoveGenerator`, asserted by a test comparing the two
+  sets — so a player who cannot use the board is not playing a lesser game.
+- **The board in words** — every pawn named with where it stands and how far it
+  has left to go, every destination with what is already on it, and the start of
+  your turn announced rather than left to be discovered. Narrated from the same
+  information an AI agent gets and no more.
+- **An in-app rulebook** in Keezly's own words, with the rules *this table* is
+  playing marked and both readings shown wherever tables disagree.
+- **A tutorial of ten lessons**, each an ordinary match on the real engine.
+  Nothing is scripted: the lesson watches the board before and after your move,
+  so it cannot congratulate you for a move you did not make.
+- **A way out and a way to look things up** from inside a match, and an ending:
+  a finished match now says who won and offers the way back to the menu.
 
 ### Fixed
 
@@ -117,6 +146,13 @@ Versioning.
 - The board could be drawn wider than the screen in portrait and was clipped.
 - The far seat panel hung off the right edge of an iPad.
 - The outermost two cards of a hand were cut off at the edges of a phone.
+- The far seat panel was drawn past the right edge of a portrait iPad. The
+  arithmetic had been reviewed twice, in landscape, where it happens to fit; it
+  is now a tested calculation rather than a judgement about screenshots.
+- The rulebook showed its lookup keys instead of its text for one build. A
+  string literal with an interpolation in it takes `LocalizedStringKey`'s
+  *interpolating* initialiser, which looked up `rules.%@.title` and found
+  nothing.
 
 - Landscape screenshots came out on their side and could not have been
   submitted to the App Store.
@@ -144,8 +180,8 @@ Versioning.
 
 ## Not yet in this changelog
 
-No main menu or table configuration — the app opens straight into a four-player
-match. No pass & play, autosave, statistics or match history. No Game Center,
-tutorial, rulebook, localisation, audio, haptics or app icon. Xcode Cloud is
-prepared but not configured. See `CURRENT_STATE.md` for exactly what exists and
-`ROADMAP.md` for what is planned.
+No onboarding screens, in-game card help or hints. No statistics, match history
+or replay playback. No audio, haptics or app icon. Game Center is implemented
+but has never been run against a real match. Xcode Cloud is prepared but not
+configured. See `CURRENT_STATE.md` for exactly what exists and what has been
+verified where.

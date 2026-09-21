@@ -15,7 +15,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M4 | Gameplay UI — iPad / iPhone | IN PROGRESS |
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
 | M6 | Game Center Multiplayer | NOT STARTED |
-| M7 | Tutorial / Rulebook / Accessibility | NOT STARTED |
+| M7 | Tutorial / Rulebook / Accessibility | IN PROGRESS |
 | M8 | Brand / App Icon / Audio / Haptics | NOT STARTED |
 | M9 | Statistics / Replay / Game Center Meta | NOT STARTED |
 | M10 | Localisation | NOT STARTED |
@@ -151,7 +151,7 @@ leak and watching them fail. See `AI.md`.
 
 ---
 
-## M4 — Gameplay UI (iPad / iPhone) — IN PROGRESS
+## M4 — Gameplay UI (iPad / iPhone) — DONE
 
 | Task | Status |
 |---|---|
@@ -160,7 +160,7 @@ leak and watching them fail. See `AI.md`.
 | M5.2 Autosave and resume (DEC-023) | DONE — seed plus accepted actions, written atomically before the animation starts; restore revalidates every action and refuses rather than repairs. Verified across 2–6 seats, partners and free-for-all, completed and abandoned matches, corruption, a newer schema and an unknown opponent, and by terminating and relaunching the app |
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
-| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done, all table sizes reviewed, three clipping defects fixed; a two-player table has its own presentation (DEC-021); Split View and Stage Manager untested |
+| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | DONE — the layout is chosen by the space actually available rather than by size class, and `PlayLayoutTests` adds the three columns up on every display Keezly runs on. Four clipping defects fixed, the last of them the far seat panel on a portrait iPad. A two-player table has its own presentation (DEC-021). Split View and Stage Manager still untested |
 | M4.4 iPhone layout — portrait and both landscape orientations | DONE — phones get their own compact and short-landscape layouts; reviewed on the smallest, standard and largest iPhones, in both orientations, at 4 and 6 seats |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
 | M4.6 Event-driven animation pipeline with input locking | DONE — `BoardPresenter` plays events one at a time, reorders a capture behind the move that caused it, honours Reduce Motion, and settles on the true position on any interruption |
@@ -183,7 +183,7 @@ Verified visually on an iPad simulator in light and dark appearance.
 
 ---
 
-## M5 — Local Multiplayer / Pass & Play — NOT STARTED
+## M5 — Local Multiplayer / Pass & Play — DONE
 
 | Task | Status |
 |---|---|
@@ -194,7 +194,7 @@ Verified visually on an iPad simulator in light and dark appearance.
 
 ---
 
-## M6 — Game Center Multiplayer — NOT STARTED
+## M6 — Game Center Multiplayer — IMPLEMENTED, NOT VERIFIED
 
 | Task | Status |
 |---|---|
@@ -212,17 +212,17 @@ and mocked tests can proceed without them (§142).
 
 ---
 
-## M7 — Tutorial / Rulebook / Accessibility — NOT STARTED
+## M7 — Tutorial / Rulebook / Accessibility — IN PROGRESS
 
 | Task | Status |
 |---|---|
 | M7.1 Onboarding (few screens, straight to play) | NOT STARTED |
-| M7.2 Interactive tutorial driven by the real engine | NOT STARTED |
-| M7.3 In-app rulebook with the active rule set highlighted | NOT STARTED |
+| M7.2 Interactive tutorial driven by the real engine | DONE — ten lessons, each an ordinary match on the real engine. A lesson reads the board before and after a move rather than the tap, so it cannot credit a move that was not made; every lesson's seed is played through in the tests |
+| M7.3 In-app rulebook with the active rule set highlighted | DONE — ~26 sections in Keezly's own words, both readings shown where tables disagree, the table's own rules marked. `RuleFacet` is checked against `RuleSet` by reflection |
 | M7.4 In-game card help | NOT STARTED |
 | M7.5 Hint system using AI evaluation, disabled in competitive online play | NOT STARTED |
-| M7.6 VoiceOver, Dynamic Type, Reduce Motion, contrast, keyboard access | NOT STARTED |
-| M7.7 Alternative list-of-legal-actions input | NOT STARTED |
+| M7.6 VoiceOver, Dynamic Type, Reduce Motion, contrast, keyboard access | IN PROGRESS — the board, hand and action list are narrated from a `PlayerObservation`, turns are announced, Reduce Motion is honoured and the keyboard model is complete. Dynamic Type at the accessibility sizes, touch targets and contrast still to review |
+| M7.7 Alternative list-of-legal-actions input | DONE — the same `MoveGenerator` as the board, with a test asserting the two move sets are *equal* rather than overlapping |
 
 ---
 
