@@ -192,3 +192,59 @@ never appear in view code either; they are confined to one adapter.
 The invariant suite plays complete randomised matches and re-checks pawn and
 card conservation after *every* action, which is what catches the class of bug
 that unit tests structurally cannot.
+
+---
+
+## Persistence (DEC-023)
+
+The path a move takes, from a tap to a file:
+
+```
+tap / agent decision
+        │
+        ▼
+  PlayerAction ─────────► GameReducer.apply      validates; refuses illegal moves
+        │                        │
+        │                        ▼
+        │                 GameTransition         new state + the events it caused
+        │                        │
+        ▼                        ▼
+  MatchRecord.append ◄──── accepted action        only ever accepted ones
+        │
+        ▼
+  MatchRecord.note(state)                        status and result, from the state
+        │
+        ▼
+  MatchStore.save ──────► one file, written atomically
+        │
+        ▼
+  pendingEvents ────────► BoardPresenter          the animation starts here,
+                                                  after the move is already saved
+```
+
+Coming back is the same path with a check at every step:
+
+```
+  file ──► SavedMatchEnvelope   version, checksum, who was playing
+        └► MatchRecordEnvelope  schema, rules, checksum
+                  │
+                  ▼
+            replay each action through GameReducer
+                  │
+                  ├─ revision must rise on every action
+                  ├─ final revision must equal the one saved
+                  └─ final checksum must equal the one saved
+                  │
+                  ▼
+            MatchSession(restored:)   no agent runs until the screen begins
+```
+
+Three properties fall out of the shape rather than out of care:
+
+- **No half moves.** The save happens between the engine accepting a move and
+  the board showing it, so an interrupted animation cannot correspond to a
+  partial write.
+- **No drifting snapshot.** There is one source of truth — the actions — and
+  the position is derived from it every time.
+- **No silent repair.** Every failure is typed and refused; the file is kept
+  aside for diagnosis rather than deleted.

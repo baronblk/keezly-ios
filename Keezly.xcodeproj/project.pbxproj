@@ -35,13 +35,16 @@
 		8309DF26E59769918673891D /* BoardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD74967519D049BB59C5FA /* BoardLayout.swift */; };
 		8B724EB7A6C64B30D84E5793 /* TableConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3598D989F36F076D53B3823D /* TableConfigurationTests.swift */; };
 		8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36B25AB04A78E23D9B845676 /* KeezlyCore */; };
+		9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */; };
 		9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */; };
 		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
 		A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF95D494649C4F6D223A28C /* MatchSession.swift */; };
 		A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32529E7548CA1EFE9A4F729 /* HandoverView.swift */; };
+		AA8C0EC4A91FB60B682CE35C /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EB92D3C1A47B55D665EE1FA /* MatchStore.swift */; };
 		B2801BC0A5360759083EB63B /* BoardSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */; };
 		B29A4F858EE41B8D796DB41C /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */; };
 		B586F635085CB018833325F3 /* KeyboardFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963EE8EC7128581D049817F2 /* KeyboardFocus.swift */; };
+		C04441E059560F69B6264AA1 /* SavedMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D6D99B9BC3DE3FC0DFFA5E /* SavedMatch.swift */; };
 		C38467AD832BA4A6AE1C4DAD /* BoardCentreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7312608406A17AE728331F13 /* BoardCentreView.swift */; };
 		CA91E83F0BEFC4381F66886A /* DesignReviewScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5983C639D9EC2271A596DDFB /* DesignReviewScreenshots.swift */; };
 		DF7BFA02380288CCD372B832 /* PlayFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */; };
@@ -70,6 +73,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		03D6D99B9BC3DE3FC0DFFA5E /* SavedMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMatch.swift; sourceTree = "<group>"; };
+		0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStoreTests.swift; sourceTree = "<group>"; };
 		0E264E59919E60235F368F7F /* SuitGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitGlyph.swift; sourceTree = "<group>"; };
 		1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		26B0B7B51FE6EE314EF9AB1A /* BoardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardPresenter.swift; sourceTree = "<group>"; };
@@ -97,6 +102,7 @@
 		897EA5B37322B0549DF70ED6 /* BoardTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTheme.swift; sourceTree = "<group>"; };
 		8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFocusTests.swift; sourceTree = "<group>"; };
 		8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyApp.swift; sourceTree = "<group>"; };
+		8EB92D3C1A47B55D665EE1FA /* MatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStore.swift; sourceTree = "<group>"; };
 		963EE8EC7128581D049817F2 /* KeyboardFocus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardFocus.swift; sourceTree = "<group>"; };
 		A5C6FD419A3ADB18AB0D704C /* KeezlyCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = KeezlyCore; path = Packages/KeezlyCore; sourceTree = SOURCE_ROOT; };
 		A6759043901D352FD92C88C4 /* InnerFieldMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerFieldMeasurement.swift; sourceTree = "<group>"; };
@@ -222,6 +228,15 @@
 			);
 			sourceTree = "<group>";
 		};
+		B911472D005A6B24C5C0309D /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				8EB92D3C1A47B55D665EE1FA /* MatchStore.swift */,
+				03D6D99B9BC3DE3FC0DFFA5E /* SavedMatch.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
 		BE018A5F9F26968F429B0794 /* Config */ = {
 			isa = PBXGroup;
 			children = (
@@ -272,6 +287,7 @@
 				83BBE5FE9640A0E7AB2FB4F4 /* Menu */,
 				2892EB6A903073922444B3E1 /* Play */,
 				8FC222912D478002951C1887 /* Session */,
+				B911472D005A6B24C5C0309D /* Storage */,
 				6ED8C1FD416E628043CC4D29 /* Assets.xcassets */,
 				F01639F69FA03230480F3F8B /* Info.plist */,
 				8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */,
@@ -290,6 +306,7 @@
 				55F880978D3865E445AA5593 /* BoardPresenterTests.swift */,
 				A6759043901D352FD92C88C4 /* InnerFieldMeasurement.swift */,
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
+				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
 				8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */,
 				3598D989F36F076D53B3823D /* TableConfigurationTests.swift */,
 			);
@@ -427,6 +444,7 @@
 				28CC2B89F10507596DD31D50 /* BoardPresenterTests.swift in Sources */,
 				F00D0A89D5E633436368705D /* InnerFieldMeasurement.swift in Sources */,
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
+				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
 				5843618018A82726BBC6F5FC /* PlayFocusTests.swift in Sources */,
 				8B724EB7A6C64B30D84E5793 /* TableConfigurationTests.swift in Sources */,
 			);
@@ -453,11 +471,13 @@
 				B586F635085CB018833325F3 /* KeyboardFocus.swift in Sources */,
 				266BF82ABFD4D13FFE25BEE8 /* MainMenuView.swift in Sources */,
 				A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */,
+				AA8C0EC4A91FB60B682CE35C /* MatchStore.swift in Sources */,
 				74690CFDE17AFB4D550A4628 /* PawnView.swift in Sources */,
 				DF7BFA02380288CCD372B832 /* PlayFocus.swift in Sources */,
 				5D9F39D6B8B9B343FB63EA7B /* PlayPlanner.swift in Sources */,
 				8078C5050C02ADBFE8E93567 /* PlayerIdentity.swift in Sources */,
 				E2304885CB459B1B1D626328 /* RootView.swift in Sources */,
+				C04441E059560F69B6264AA1 /* SavedMatch.swift in Sources */,
 				7E529AAE764EF5BC70A24D00 /* ScreenshotMode.swift in Sources */,
 				4843C9055D768608C2792D20 /* SeatStatusView.swift in Sources */,
 				092103484C74A862ECF89DF8 /* SuitGlyph.swift in Sources */,

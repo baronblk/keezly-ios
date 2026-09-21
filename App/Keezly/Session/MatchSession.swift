@@ -90,6 +90,13 @@ final class MatchSession {
     let roles: [SeatRole]
     /// How long an agent may think. Shortened in tests and in simulation.
     let budget: AIBudget
+    /// Where the match is written after every accepted action. `nil` for a
+    /// session that is not meant to outlive the screen — a test fixture, or a
+    /// deterministic capture.
+    let store: MatchStore?
+    /// What the last save did, if it failed. Surfaced rather than swallowed: a
+    /// match that is quietly not being saved is worse than one that says so.
+    private(set) var saveFailure: String?
 
     private var agents: [Seat: any AIAgent] = [:]
     /// Holds the running agent search.
@@ -113,13 +120,15 @@ final class MatchSession {
         budget: AIBudget = .interactive,
         agentSeed: UInt64 = 0x5EA7_0000_0000_0001,
         fixture: MatchFixture? = nil,
-        fixtureLimit: Int = 600
+        fixtureLimit: Int = 600,
+        store: MatchStore? = nil
     ) {
         precondition(roles.count == configuration.seatCount, "one role per seat is required")
         self.state = GameState.newMatch(configuration: configuration, seed: seed)
         self.record = MatchRecord(configuration: configuration, seed: seed)
         self.roles = roles
         self.budget = budget
+        self.store = store
 
         for (index, role) in roles.enumerated() {
             guard case .computer(let difficulty) = role else { continue }
@@ -129,6 +138,32 @@ final class MatchSession {
 
         if let fixture {
             fixtureReached = fastForward(to: fixture, limit: fixtureLimit)
+        }
+    }
+
+    /// Picks a match up where it was left off.
+    ///
+    /// The state comes from the restore, which has already replayed every
+    /// action through the engine and checked that it produces this exact
+    /// board. Nothing is recomputed here.
+    init(restored: RestoredMatch, budget: AIBudget = .interactive, store: MatchStore?) {
+        state = restored.state
+        record = restored.record
+        roles = restored.roles
+        self.budget = budget
+        self.store = store
+        // Taken from the restored position, not left at its default. A match
+        // that was already won would otherwise come back reporting no result,
+        // and the screen would offer moves in a finished game.
+        result = restored.state.result
+
+        for (index, role) in restored.roles.enumerated() {
+            guard case .computer(let difficulty) = role else { continue }
+            agents[Seat(index)] = Self.makeAgent(
+                difficulty,
+                seed: 0x5EA7_0000_0000_0001 &+ UInt64(index),
+                budget: budget
+            )
         }
     }
 
@@ -279,11 +314,46 @@ final class MatchSession {
         let transition = try GameReducer.apply(action, to: state)
         state = transition.state
         record.append(action)
+        record.note(transition.state)
+
+        // Written here, between the engine accepting the action and the board
+        // beginning to show it. An animation that is interrupted half way can
+        // then never correspond to half a move on disk, because the move was
+        // already whole when it was written (§57).
+        persist()
+
         pendingEvents = transition.events
         result = transition.state.result
         // Closed until the board says it has caught up. The state is already
         // final; this only stops a second tap landing on a stale view (§63).
         isBusy = true
+    }
+
+    /// Writes the match as it now stands.
+    private func persist() {
+        guard let store else { return }
+        do {
+            try store.save(record: record, state: state, roles: roles)
+            saveFailure = nil
+        } catch {
+            saveFailure = error.localizedDescription
+        }
+    }
+
+    /// Writes the opening position, before anybody has moved.
+    ///
+    /// Without this a match closed before its first move would not be there to
+    /// continue, and the deal — which is part of the position — would be lost.
+    func persistOpening() {
+        guard record.actionCount == 0 else { return }
+        record.note(state)
+        persist()
+    }
+
+    /// Marks the match as one the player walked away from, and saves that.
+    func abandon() {
+        record.abandon()
+        persist()
     }
 
     private func continueIfComputerTurn() {

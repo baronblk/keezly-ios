@@ -416,6 +416,75 @@
         }
       }
     },
+    "menu.continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue match"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie fortsetzen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partij hervatten"
+          }
+        }
+      }
+    },
+    "menu.continue.detail %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld players · round %lld"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Spieler · Runde %lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld spelers · ronde %lld"
+          }
+        }
+      }
+    },
+    "menu.restore.failed %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The saved match could not be opened. %@ It has been kept aside."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die gespeicherte Partie ließ sich nicht öffnen. %@ Sie wurde beiseitegelegt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De opgeslagen partij kon niet worden geopend. %@ Hij is apart gezet."
+          }
+        }
+      }
+    },
     "menu.start": {
       "extractionState": "manual",
       "localizations": {

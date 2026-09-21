@@ -14,6 +14,9 @@ struct GameScreen: View {
     /// Classic Wood is the material for 1.0.0 (DEC-018).
     private let theme = BoardTheme.classicWood
 
+    /// Called when the player leaves the match for the menu.
+    var onLeave: () -> Void = {}
+
     @State private var session: MatchSession
     @State private var presenter: BoardPresenter
     @State private var presentation: Task<Void, Never>?
@@ -33,7 +36,8 @@ struct GameScreen: View {
 
     @Environment(\.scenePhase) private var scenePhase
 
-    init(session: MatchSession) {
+    init(session: MatchSession, onLeave: @escaping () -> Void = {}) {
+        self.onLeave = onLeave
         _session = State(initialValue: session)
         _presenter = State(initialValue: BoardPresenter(pawns: session.state.pawns))
     }
@@ -195,8 +199,13 @@ struct GameScreen: View {
         .defaultFocus($focus, .screen)
         .onAppear {
             // A table with one person at it never hands over, so their cards
-            // are theirs from the first deal.
+            // are theirs from the first deal. A pass-and-play table leaves
+            // this unset — including one just restored from disk, where a hand
+            // may have been on screen when the app was last closed. Safety
+            // before convenience: the device is assumed to have changed hands
+            // (§34).
             if !session.isPassAndPlay { seatInHand = session.localSeat }
+            session.persistOpening()
             session.begin()
         }
         // Not on appear: at that point the computers may still be opening, so

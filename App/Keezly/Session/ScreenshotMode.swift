@@ -75,9 +75,21 @@ enum ScreenshotMode {
         GameConfiguration(seatCount: seatCount, teamMode: teamMode)
     }
 
-    /// One human at seat zero, computer opponents elsewhere.
+    /// How many seats are played by a person at the device.
+    ///
+    /// Lets a test set up a deterministic pass-and-play table without driving
+    /// the menu, so the privacy guarantee is checked against a fixed deal
+    /// rather than whatever a random one happened to offer (§34).
+    ///
+    /// `-KEEZLY_HUMANS <n>`
+    static var humanCount: Int {
+        value(for: "-KEEZLY_HUMANS").flatMap(Int.init).map { max(1, min(seatCount, $0)) } ?? 1
+    }
+
+    /// People take the first seats, the computer the rest.
     static var roles: [SeatRole] {
-        [.human] + Array(repeating: SeatRole.computer(.medium), count: seatCount - 1)
+        let people = humanCount
+        return (0..<seatCount).map { $0 < people ? .human : .computer(.medium) }
     }
 
     private static func value(for flag: String) -> String? {

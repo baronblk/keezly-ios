@@ -17,18 +17,20 @@ final class PassAndPlayTests: XCTestCase {
 
     /// A table where every seat is a person, so every single turn is a
     /// handover and there is no computer to wait for.
+    ///
+    /// Set up by launch argument rather than by driving the menu, and with a
+    /// fixed seed: the privacy guarantee must be checked against a known deal,
+    /// not against whatever a random one happens to offer (§87).
     @MainActor
-    private func launchedPassAndPlay(seats: Int = 3) -> XCUIApplication {
+    private func launchedPassAndPlay(seats: Int = 3, seed: Int = 2026) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = []
+        app.launchArguments = [
+            "-KEEZLY_UI_TESTING",
+            "-KEEZLY_SEATS", String(seats),
+            "-KEEZLY_HUMANS", String(seats),
+            "-KEEZLY_SEED", String(seed),
+        ]
         app.launch()
-        XCTAssertTrue(
-            app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),
-            "the app did not open on the menu"
-        )
-        app.descendants(matching: .any)["table.players"].buttons["\(seats)"].tap()
-        app.descendants(matching: .any)["table.people"].buttons["\(seats)"].tap()
-        app.descendants(matching: .any)["menu.start"].tap()
         return app
     }
 
@@ -64,7 +66,7 @@ final class PassAndPlayTests: XCTestCase {
 
     /// The cover comes back for the next player rather than only once.
     @MainActor
-    func testTheCoverReturnsForTheNextPlayer() throws {
+    func testTheCoverReturnsForTheNextPlayer() {
         let app = launchedPassAndPlay()
 
         let ready = app.buttons["handover.ready"]
@@ -99,7 +101,7 @@ final class PassAndPlayTests: XCTestCase {
             }
             if played { break }
         }
-        try XCTSkipUnless(played, "this deal offered no single-tap move to pass the turn with")
+        XCTAssertTrue(played, "the fixed deal offered no move to pass the turn with")
 
         let cover = app.descendants(matching: .any)["handover"]
         XCTAssertTrue(cover.waitForExistence(timeout: 20), "the device was not covered before the next player")
@@ -121,5 +123,96 @@ final class PassAndPlayTests: XCTestCase {
             app.descendants(matching: .any)["handover"].exists,
             "a table with one person was asked to pass the device"
         )
+    }
+}
+
+/// §34, §57 — picking a pass-and-play match up again.
+///
+/// The app is genuinely relaunched between the two halves of these tests, so
+/// what is checked is what a player would meet after closing the app: the
+/// match comes back, and it comes back *covered*.
+final class PassAndPlayResumeTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        continueAfterFailure = false
+    }
+
+    @MainActor
+    private func cards(in app: XCUIApplication) -> [XCUIElement] {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'hand.card.'"))
+            .allElementsBoundByIndex
+    }
+
+    /// Starts a three-person match through the menu — the real path, so the
+    /// match is written to the real store — and takes the device once.
+    @MainActor
+    private func startAndAbandon() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = []
+        app.launch()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),
+            "the app did not open on the menu"
+        )
+        app.descendants(matching: .any)["table.players"].buttons["3"].tap()
+        app.descendants(matching: .any)["table.people"].buttons["3"].tap()
+        app.descendants(matching: .any)["menu.start"].tap()
+
+        let ready = app.buttons["handover.ready"]
+        XCTAssertTrue(ready.waitForExistence(timeout: 20), "the first player was never offered the device")
+        ready.tap()
+        XCTAssertTrue(
+            cards(in: app).first?.waitForExistence(timeout: 15) ?? false,
+            "the hand never appeared before the app was closed"
+        )
+        return app
+    }
+
+    /// Closed with a hand on screen, reopened — and the hand is not there.
+    ///
+    /// This is the case the whole design turns on: safety before convenience.
+    /// Whoever picks the device up next may not be the person who put it down.
+    @MainActor
+    func testAResumedMatchComesBackCovered() {
+        let app = startAndAbandon()
+        app.terminate()
+
+        app.launchArguments = []
+        app.launch()
+
+        let resume = app.descendants(matching: .any)["menu.continue"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 20), "the match was not offered to be continued")
+        resume.tap()
+
+        XCTAssertTrue(
+            app.buttons["handover.ready"].waitForExistence(timeout: 20),
+            "a resumed pass-and-play match did not ask who is holding the device"
+        )
+        XCTAssertEqual(cards(in: app).count, 0, "a hand was on screen before anybody took the device")
+    }
+
+    /// And after taking it, the match really is the one that was saved.
+    @MainActor
+    func testAResumedMatchCarriesOn() {
+        let app = startAndAbandon()
+        app.terminate()
+
+        app.launchArguments = []
+        app.launch()
+        let resume = app.descendants(matching: .any)["menu.continue"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 20))
+        resume.tap()
+
+        let ready = app.buttons["handover.ready"]
+        XCTAssertTrue(ready.waitForExistence(timeout: 20))
+        ready.tap()
+
+        // Five cards is the opening deal, which is where this match was left.
+        let dealt = NSPredicate(format: "count == 5")
+        let query = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'hand.card.'"))
+        expectation(for: dealt, evaluatedWith: query)
+        waitForExpectations(timeout: 20)
     }
 }

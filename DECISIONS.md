@@ -719,3 +719,60 @@ that could disagree.
 **Verified by** a UI test that counts the cards on screen while the cover is up
 and requires zero, on a table where every seat is a person so that every turn
 is a handover.
+
+---
+
+## DEC-023 — A saved match is a seed and a list of moves, checked on the way back
+
+- **Date:** 2026-09-21
+- **Topic:** Persistence
+- **Status:** ACCEPTED
+- **Follows from:** DEC-003 (all randomness seeded), DEC-009 (byte-stable
+  encoding), DEC-010 (three version numbers)
+
+**Decision.** A match is stored as its configuration, its seed and the actions
+the engine accepted, in order. Nothing else. Replaying them reproduces every
+position exactly, because the engine is deterministic — so there are no board
+snapshots to drift out of step with the history that produced them.
+
+**What is stored, and what is not.** Only actions the reducer *accepted*. Not
+taps, not selections, not an animation's progress, not a focus ring, not a move
+that was refused. Persistence describes the game, not the interface.
+
+**When it is written.** After the engine has accepted the action and produced
+the new state, and *before* the board begins to animate it. That ordering is
+the whole reason an interrupted animation can never leave half a move on disk:
+by the time anything is being drawn, the move is already whole in the file.
+
+**How it is written.** `Data.write(options: .atomic)` — a temporary file beside
+the target, then a rename. A rename within a volume either happens or does not,
+so a process killed mid-write leaves the previous save intact. Never half a
+file.
+
+**How it comes back.** Eight checks, in order, and nothing is returned until
+all of them pass: the wrapper decodes, its version is not from the future, its
+checksum matches; the engine's envelope decodes, its schema and rules match,
+its checksum matches; every action is replayed through the real engine and
+validated again; the revision advances on every action and lands exactly where
+it was saved; and the position's checksum matches the one recorded. Only then
+is there a match.
+
+**When a check fails.** A typed error and a refusal. No repair, no partial
+state, no carrying on from a guess. The file is moved aside rather than
+deleted, because it is the only evidence of what went wrong.
+
+**On the boundary.** The *game* facts live in `MatchRecord` — identity, times,
+status, result, the actions. Who is a person and who is the computer lives in
+the app's wrapper, because that is a fact about this device rather than about
+the match. `PersistedRole` mirrors `SeatRole` rather than being it: the stored
+form is a contract with the file, and must not change every time the in-memory
+type does.
+
+**On snapshots.** Not introduced. Restoring a six-player match of several
+hundred moves is measured in a test rather than assumed, with a bound the test
+enforces. If that measurement ever stops holding, the answer is versioned
+checkpoints — decided then, on the numbers, not guessed at now.
+
+**The same record is the replay.** There is no second history. A replay is this
+list of actions played forward; presentation belongs to the screen showing it,
+not to the file.

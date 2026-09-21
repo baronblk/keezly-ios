@@ -13,7 +13,12 @@ struct MainMenuView: View {
     @ScaledMetric(relativeTo: .subheadline) private var labelSize: CGFloat = 15
 
     @Binding var table: TableConfiguration
+    /// The match a player could pick up again, if there is one.
+    var resumable: MatchSummary?
+    /// Why the last attempt to pick one up failed.
+    var restoreFailure: String?
     var onStart: () -> Void
+    var onContinue: () -> Void = {}
 
     var body: some View {
         GeometryReader { proxy in
@@ -23,6 +28,8 @@ struct MainMenuView: View {
                 ScrollView {
                     VStack(spacing: Keezly.Spacing.large) {
                         masthead
+                        if let resumable { continueButton(for: resumable) }
+                        if let restoreFailure { failureNote(restoreFailure) }
                         panel
                         startButton
                     }
@@ -192,6 +199,41 @@ struct MainMenuView: View {
     private func seatLabel(isPerson: Bool, isPartner: Bool, index: Int) -> LocalizedStringKey {
         if isPerson { return "seat.person \(index + 1)" }
         return isPartner ? "seat.partner" : "seat.computer"
+    }
+
+    /// Offered above the table, because picking a match up again is what a
+    /// player who left one in the middle came back for.
+    private func continueButton(for match: MatchSummary) -> some View {
+        Button(action: onContinue) {
+            VStack(spacing: 2) {
+                Text("menu.continue")
+                    .font(.system(size: labelSize * 1.2, weight: .semibold, design: .rounded))
+                Text("menu.continue.detail \(match.seatCount) \(match.round)")
+                    .font(.system(size: labelSize * 0.82, design: .rounded))
+                    .opacity(0.85)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Keezly.Spacing.medium)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .accessibilityIdentifier("menu.continue")
+    }
+
+    /// Said plainly. A saved match that will not open is not the player's
+    /// fault and not something to hide behind a silent empty menu.
+    private func failureNote(_ message: String) -> some View {
+        Text("menu.restore.failed \(message)")
+            .font(.system(size: labelSize * 0.88, design: .rounded))
+            .foregroundStyle(.white.opacity(0.72))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(Keezly.Spacing.medium)
+            .background(
+                RoundedRectangle(cornerRadius: Keezly.Radius.card, style: .continuous)
+                    .fill(Color.black.opacity(0.28))
+            )
+            .accessibilityIdentifier("menu.restore.failed")
     }
 
     private var startButton: some View {
