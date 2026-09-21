@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-467909c  feat(board): polish hole depth, player colours, board edge and card finish
+bc2e9b1  feat(menu): add a main menu with table configuration
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -74,6 +74,17 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**The app opens on a menu (M4.0).** Two to six players, partners or everyone
+for themselves, three opponent strengths, and the seats shown as they will be
+dealt — choosing a table shows what the table will look like rather than only
+setting a number. Partners are offered only where they mean something: at two
+seats the engine would pair a seat with itself, so a two-player table is always
+everyone alone, and the control says so rather than accepting a choice it would
+then ignore.
+
+Nothing else is on the menu. There is no rulebook, tutorial or online button,
+because a menu item that does nothing is worse than a missing one (§36).
 
 **Screenshot orientation is fixed (ISS-009).** Landscape captures come out
 landscape-shaped and upright, and every capture now asserts its own shape, so
@@ -196,7 +207,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Not Implemented Yet
 
-- Main menu and table configuration — the app opens straight into a match.
+
 - Pass & play, autosave, statistics, match history, replay playback UI.
 - Bespoke dealing, Seven-leg and Jack-swap choreography (the generic move and
   swap animations exist).
@@ -261,7 +272,7 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (83 passed, 0 failed, 3 skipped) | 2026-09-21 | `467909c` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (97 passed, 0 failed, 3 skipped) | 2026-09-21 | `bc2e9b1` |
 | Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
 | Physical iPhone — re-run on the polish | **BLOCKED** — device left the wired connection mid-run (ISS-014) | 2026-09-21 | — |
 | Physical iPad (A16), iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
@@ -342,7 +353,8 @@ left, in order:
 
 1. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
-2. **M5 — pass & play and autosave.**
+1. **M5 — pass & play and autosave**, which is what lets the seats the menu
+   already offers be filled by people rather than only by the computer.
 
 Blocked and not startable: anything behind the App Store Connect record
 (MAN-02), and Game Center multi-device (MAN-11/12).
