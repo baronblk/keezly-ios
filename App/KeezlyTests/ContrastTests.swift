@@ -121,22 +121,9 @@ struct ContrastTests {
         let top = UIColor(colour).resolvedColor(with: light)
         let under = UIColor(background).resolvedColor(with: light)
 
-        func components(_ colour: UIColor) -> (CGFloat, CGFloat, CGFloat) {
-            var red: CGFloat = 0
-            var green: CGFloat = 0
-            var blue: CGFloat = 0
-            var unused: CGFloat = 0
-            colour.getRed(&red, green: &green, blue: &blue, alpha: &unused)
-            return (red, green, blue)
-        }
-        let (topRed, topGreen, topBlue) = components(top)
-        let (underRed, underGreen, underBlue) = components(under)
         let mix = CGFloat(alpha)
-        return Color(
-            red: Double(topRed * mix + underRed * (1 - mix)),
-            green: Double(topGreen * mix + underGreen * (1 - mix)),
-            blue: Double(topBlue * mix + underBlue * (1 - mix))
-        )
+        let mixed = components(of: top).blended(with: components(of: under), by: mix)
+        return Color(red: Double(mixed.red), green: Double(mixed.green), blue: Double(mixed.blue))
     }
 
     /// And from each other.
@@ -170,6 +157,28 @@ struct ContrastTests {
                 )
             }
         }
+    }
+
+    /// A colour's channels, so two of them can be mixed.
+    private struct Channels {
+        var red: CGFloat
+        var green: CGFloat
+        var blue: CGFloat
+
+        func blended(with other: Channels, by amount: CGFloat) -> Channels {
+            Channels(
+                red: red * amount + other.red * (1 - amount),
+                green: green * amount + other.green * (1 - amount),
+                blue: blue * amount + other.blue * (1 - amount)
+            )
+        }
+    }
+
+    private func components(of colour: UIColor) -> Channels {
+        var channels = Channels(red: 0, green: 0, blue: 0)
+        var unused: CGFloat = 0
+        colour.getRed(&channels.red, green: &channels.green, blue: &channels.blue, alpha: &unused)
+        return channels
     }
 
     /// A colour's hue in degrees, for telling two seats apart by something
