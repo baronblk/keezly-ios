@@ -159,7 +159,7 @@ Three different claims, which must never be run together:
 |---|---|---|
 | **A** | Keezly does not leak hidden information through its interface or its own agents | **Holds** — tested |
 | **B** | A modified client cannot learn hidden information | **Does not hold** |
-| **C** | A server arbitrates; cheating is prevented | **Not attempted** — there is no server |
+| **C** | Cheating is prevented — by a server, or by a correct multi-party protocol | **Not attempted** — either route would do it; neither is built |
 
 Online play in 1.0.0 is friendly play. Nothing in the app, the store listing or
 the documentation may claim otherwise, and online results are not a sound basis

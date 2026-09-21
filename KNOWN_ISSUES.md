@@ -82,8 +82,8 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   device still knows everything), a commit-and-reveal shuffle (several
   interactive rounds per deal, repeated every round of a 5/4/4 cycle, over a
   transport where players may be offline for days), and a server of our own
-  (the only complete answer, and a product decision in its own right). Set out
-  in full in DEC-025.
+  (one complete answer — a correct multi-party protocol would be another — and
+  a product decision in its own right). Set out in full in DEC-025.
 - **Consequence:** online play in 1.0.0 is friendly play. Nothing may claim
   otherwise, and online results are not a sound basis for a competitive
   leaderboard — a constraint that lands on M9.

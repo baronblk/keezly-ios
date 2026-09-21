@@ -115,7 +115,7 @@ game. Three claims are kept apart, and only the first is made:
 |---|---|---|
 | **A** | Keezly does not leak hidden information through its own interface or agents | **Holds**, tested |
 | **B** | A modified client cannot learn hidden information | **Does not hold** |
-| **C** | A server arbitrates and cheating is prevented | **Not attempted** |
+| **C** | Cheating is prevented — server-authoritative, or a multi-party protocol | **Not attempted**; either would work |
 
 Online play in 1.0.0 is friendly play. Online results are therefore not a sound
 basis for a competitive leaderboard — a constraint that lands on M9.

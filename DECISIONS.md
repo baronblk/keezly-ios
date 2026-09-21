@@ -883,11 +883,13 @@ round in a 5/4/4 cycle, so the ceremony repeats throughout the match, not once;
 and it replaces the seed-and-actions model that autosave, replay and the 4 KB
 payload all rest on.
 
-**A server we run.** The only complete answer to a modified client, because it
-is the only way to have a party that holds the deck and is not a player. It is
-also a backend to build, secure, pay for and keep running, and it is out of
-scope here. Introducing one is a product decision in its own right, not a
-detail of M6.
+**A server we run.** *One* complete answer to a modified client — a party that
+holds the deck and is not a player. Not the only one: a correct multi-party
+protocol of the kind above would also give real hidden-information security,
+without a server. It is simply the more conventional of the two. A backend is
+something to build, secure, pay for and keep running, and it is out of scope
+here. Introducing one is a product decision in its own right, not a detail of
+M6.
 
 **GameKit's own facilities.** `GKTurnBasedMatch.matchData` is shared with every
 participant. `GKTurnBasedExchange` can be addressed to a subset, which might
@@ -909,10 +911,18 @@ Three levels, never conflated:
 |---|---|---|
 | **A** | Keezly does not leak hidden information through its own interface or its own agents | **Holds.** The agent boundary (DEC-014) and the hand-building rule (DEC-022) are tested |
 | **B** | A participant who modifies their client cannot learn hidden information | **Does not hold**, and cannot while the payload carries the seed |
-| **C** | A server arbitrates and cheating is prevented | **Not attempted.** There is no server |
+| **C** | Cheating is prevented — by a server, or by a correct multi-party protocol | **Not attempted.** Either route would do it; neither is built |
 
-**What follows from it.** Nothing in Keezly may claim more than A. Online
-results are not a sound basis for a competitive leaderboard, which is a
-constraint on M9 rather than a detail of this decision. If online play is ever
-to be competitive, that is the moment to pay for a server or for mental poker —
-and to decide it on its own merits, in the open.
+### What Keezly 1.0.0 therefore is
+
+- Game Center is used for **friendly, non-server-authoritative** online play.
+- The interface and Keezly's own agents respect hidden information completely.
+- There is **no anti-cheat guarantee** against a modified client.
+- Competitive online rankings are therefore not built on this foundation.
+- A future competitive variant would need a separate decision between a
+  server-authoritative architecture and a cryptographic multi-party protocol.
+  Both are real answers; choosing between them is its own piece of work, not a
+  footnote to this one.
+
+Nothing in Keezly — the app, the store listing, the documentation — may claim
+more than A.
