@@ -2,6 +2,14 @@ import CoreGraphics
 import Foundation
 import KeezlyCore
 
+/// Where the table's own cards are shown.
+enum CentrePlacement: Equatable {
+    /// In the middle of the board, where a board game puts them (§35).
+    case inside
+    /// Beside the board, for a table whose board has no middle.
+    case beside
+}
+
 /// Turns the engine's topology into coordinates (§9, DEC-001).
 ///
 /// `KeezlyCore` knows that a pawn is seven squares from its home entry; it does
@@ -47,6 +55,37 @@ struct BoardLayout: Sendable {
     /// The board's natural rhythm — ornament is measured in it so that a
     /// two-player board and a six-player one look equally well proportioned.
     var pitch: CGFloat { squareSize / Self.squareFill }
+
+    /// How far the quiet middle reaches, in unit space: the distance from the
+    /// centre to the deepest home square of the nearest seat.
+    var innerFieldRadius: CGFloat {
+        homePoints.compactMap { $0.last.map { hypot($0.x, $0.y) } }.min() ?? 0
+    }
+
+    /// Where the draw pile, the played card and the turn indicator belong.
+    ///
+    /// The home lanes are four squares long whatever the table size, but the
+    /// track is sixteen squares *per seat*. On a two-seat board the lanes
+    /// therefore reach almost to the middle — measured, the quiet field is
+    /// **0.28 of a square pitch**, against 2.4 at three seats and 4.6 at four.
+    /// There is no middle to put anything in.
+    ///
+    /// So a two-player table is presented differently: the cards sit beside
+    /// the board, the way a deck sits on the table next to a small board,
+    /// rather than being shrunk until they are unreadable (ISS-013). Nothing
+    /// about the rules or the board itself changes — `BoardGraph` is untouched
+    /// and the two boards are the same game.
+    var centrePlacement: CentrePlacement {
+        Self.centrePlacement(innerFieldRadius: innerFieldRadius, pitch: pitch)
+    }
+
+    static func centrePlacement(innerFieldRadius: CGFloat, pitch: CGFloat) -> CentrePlacement {
+        guard pitch > 0 else { return .beside }
+        // A pile and a played card need something like a square and a half of
+        // clearance either side of the centre. Below that they would be drawn
+        // across the home lanes.
+        return innerFieldRadius / pitch >= 1.5 ? .inside : .beside
+    }
 
     /// How much of the board is quiet middle, as a fraction of its whole
     /// extent.

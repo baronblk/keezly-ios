@@ -89,6 +89,42 @@ Three things it has to survive, each of which changed the design:
 
 ---
 
+## The polish pass (DEC-021)
+
+The direction was already settled; this was depth and balance, not a redesign.
+
+| Area | What changed |
+|---|---|
+| **Holes** | A shadow cast down by the far rim, a floor that darkens towards the near one, and a brighter lit lip. Three shadings, no gloss — the track reads as drilled wood, and the lane is markedly easier to follow |
+| **Player colours** | Home lanes and waiting trays carry more of the seat's colour, home squares are tinted so they are never mistaken for track, and a start square gets a halo under its ring |
+| **The middle** | The medallion drops to about half its former weight so it sits *behind* the cards, and the pile, the turn and the round have room to read as three things |
+| **The edge** | A lit-to-shaded bevel just inside the rim, and two shadows — a tight contact one and a wide soft one — so the board sits on a dark table rather than floating |
+| **Ornament** | The running border is a little clearer, the medallion a good deal quieter. No new motifs |
+| **Seat panels** | Made of the board's own wood rather than grey system material, with the seat's mark set in as a seal. They belong to the table now |
+| **Cards** | A faint sheen across the stock, a deeper red, a two-line selection border in the card's own ink, and a two-part shadow so a chosen card lifts |
+
+**Air, in the right amount.** The first attempt at calming the middle doubled
+the spacing, and the labels floated away from the cards they belong to. The
+middle has to read as one group of three things, not three separate ones.
+
+### Three layout defects the pass uncovered
+
+Screenshots taken for a design review are worth more than the review:
+
+- **The board could be drawn wider than the screen.** Its size came from the
+  height alone, so in portrait it was clipped. It is now bounded by both
+  dimensions.
+- **The far seat panel hung off the right edge**, twice: first because the
+  padding was left out of the width budget, then because the columns were
+  measured against the raw screen width. Everything is now derived from the
+  width that is actually free.
+- **Two cards were cut off at the edges of a phone.** A fanned card is rotated
+  about its foot and reaches further sideways than the frame it is given, so
+  the hand is now given a frame narrower than the screen by more than its
+  padding.
+
+---
+
 ## Board geometry
 
 `BoardLayout` maps `BoardPosition` to coordinates. `KeezlyCore` holds no

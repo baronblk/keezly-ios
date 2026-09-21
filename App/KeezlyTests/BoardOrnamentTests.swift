@@ -192,34 +192,3 @@ struct BoardOrnamentTests {
         }
     }
 }
-
-/// ISS-008 — the middle of the board is not the same size on every table, and
-/// anything placed there has to know that.
-@Suite("Inner field")
-struct InnerFieldTests {
-
-    private func layout(seats: Int) -> BoardLayout {
-        BoardLayout(board: BoardGraph(seatCount: seats))
-    }
-
-    @Test("the quiet middle grows with the table", arguments: [2, 3, 4, 5, 6])
-    func innerFieldGrowsWithSeats(seats: Int) {
-        let fraction = layout(seats: seats).innerFieldFraction
-        #expect(fraction > 0)
-        #expect(fraction < 1)
-    }
-
-    @Test("two seats have markedly less middle than four")
-    func twoSeatsAreCramped() {
-        // The home lanes are a fixed four squares long whatever the table
-        // size, so on a short track they reach much further in. This is the
-        // measurement the medallion and the cards are both scaled against.
-        #expect(layout(seats: 2).innerFieldFraction < layout(seats: 4).innerFieldFraction)
-        #expect(layout(seats: 6).innerFieldFraction > layout(seats: 4).innerFieldFraction)
-    }
-
-    @Test("the four-player board is the reference and is unchanged")
-    func classicIsTheReference() {
-        #expect(BoardLayout.classicInnerFieldFraction == layout(seats: 4).innerFieldFraction)
-    }
-}

@@ -44,39 +44,32 @@ final class DesignReviewScreenshots: XCTestCase {
 
     /// Captures the app the right way up, and checks that it is.
     ///
-    /// **ISS-009.** Every XCUITest screenshot API on iOS hands back the
-    /// *physical* framebuffer. On a rotated iPad that is still portrait, with
-    /// the interface lying on its side and no orientation recorded in the
-    /// image. `XCUIScreen.main.screenshot()` and `app.screenshot()` behave
-    /// identically, and an element screenshot is cropped from the same buffer,
-    /// so there is nothing to switch to — the buffer has to be turned.
+    /// **ISS-009 and ISS-012.** The two capture sources do *not* behave the
+    /// same way, which is what both defects came down to. Measured on a
+    /// rotated iPad, with `app.frame` reporting 1376×1032:
     ///
-    /// Turned only when it actually disagrees with the orientation that was
-    /// asked for, so that a future Xcode returning a rotated buffer stops the
-    /// correction instead of ruining a good capture. The assertions below are
-    /// what keep that honest, and they are what make ISS-009 unable to come
-    /// back unnoticed.
+    /// | Source | Result |
+    /// |---|---|
+    /// | `app.screenshot()` | 2064×2752 — portrait, and a quarter of it black |
+    /// | `XCUIScreen.main.screenshot()` | 2752×2064 — landscape, complete |
+    ///
+    /// The application element's capture is the region of the *unrotated*
+    /// framebuffer that the element claims, so on a rotated device it comes
+    /// back on its side with the remainder filled in black. The screen's
+    /// capture is the screen. So the screen is what is used.
+    ///
+    /// The turn below is kept as a guard rather than deleted: if a capture ever
+    /// disagrees with the orientation that was asked for it is corrected, and
+    /// the assertions fail loudly if it cannot be. That is what stops ISS-009
+    /// returning unnoticed.
     @MainActor
-    private func attach(_ name: String, from app: XCUIApplication, orientation: UIDeviceOrientation) {
-        let raw = Self.flattened(app.screenshot())
+    private func attach(_ name: String, from _: XCUIApplication, orientation: UIDeviceOrientation) {
+        let raw = Self.flattened(XCUIScreen.main.screenshot())
         let needsTurning = orientation.isLandscape && raw.size.width < raw.size.height
         let image = needsTurning ? Self.turned(raw, clockwise: orientation == .landscapeLeft) : raw
         let size = image.size
 
         if needsTurning {
-            // Reports what the rotation had to work with, so a failure names
-            // its cause instead of leaving the next person to guess.
-            let note = XCTAttachment(
-                string: """
-                requested: \(orientation.rawValue)
-                buffer: \(raw.size) scale \(raw.scale) cgImage: \(raw.cgImage != nil)
-                result: \(size)
-                """
-            )
-            note.name = "\(name)-orientation"
-            note.lifetime = .keepAlways
-            add(note)
-
             XCTAssertNotEqual(
                 size, raw.size,
                 "\(name): the capture could not be turned and is still on its side (ISS-009)"

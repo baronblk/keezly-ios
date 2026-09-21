@@ -637,3 +637,47 @@ shrinks to one question: does iOS deliver the key press? That question is left
 explicitly unanswered rather than assumed — the UI tests that need real keys
 **skip**, and `RELEASE_CHECKLIST.md` carries the hardware gate as NOT VERIFIED.
 A green test that exercised nothing would be worse than a recorded gap (§177).
+
+---
+
+## DEC-021 — A two-player table is presented differently, not built differently
+
+- **Date:** 2026-09-21
+- **Topic:** Board presentation
+- **Status:** ACCEPTED
+- **Extends:** DEC-018, DEC-019
+
+**Context.** The home lanes are four squares long on every board, but the track
+is sixteen squares *per seat*. The quiet middle is therefore not a constant. It
+was measured:
+
+| Seats | Quiet middle, in square pitches |
+|---|---|
+| 2 | **0.28** |
+| 3 | 2.42 |
+| 4 | 4.56 |
+| 5 | 6.70 |
+| 6 | 8.84 |
+
+At two seats the two lanes very nearly meet. There is no middle. The draw pile
+and the played card were being drawn straight across both of them.
+
+**What was rejected.** Shrinking the cards until they fit: tried, and they
+stopped being readable, which is a worse fault than crowding. Also rejected:
+lengthening the track, shortening the lanes, or giving two players a different
+board. The rules and `BoardGraph` are identical for every table size and stay
+that way — two players play the same game on the same board.
+
+**Decision.** The *presentation* adapts. Where the board has no middle, the
+table's own cards are shown **beside** it — a deck on the table next to a small
+board — in the column opposite the other player. Everywhere else they stay in
+the middle, where a board game puts them (§35).
+
+The decision is written as a rule about space, not as a special case for two:
+`BoardLayout.centrePlacement` compares the measured quiet field against what a
+pile and a card need. If the lanes or the track ever change, the decision moves
+with them instead of leaving a stale exception behind.
+
+**Also settled here.** The middle's size on three to six seats is now
+proportioned to the board's own quiet field rather than to the size of the
+view, so a five- or six-player table gets a middle in proportion to its board.

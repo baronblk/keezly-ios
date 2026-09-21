@@ -6,6 +6,10 @@ import SwiftUI
 /// Colour, mark, how many cards are left, who deals, and who is on turn — and
 /// nothing else. No debug information, no scores that do not exist yet.
 struct SeatStatusView: View {
+    /// The panels are part of the table, not app chrome laid over it, so they
+    /// are made of the board's own material.
+    @Environment(\.boardTheme) private var theme
+
     // Chrome text follows the reader's setting (§53). Card ranks and pips
     // deliberately do not: they scale with the card they are printed on, and a
     // rank that outgrew its card would be less readable, not more.
@@ -27,11 +31,14 @@ struct SeatStatusView: View {
 
     var body: some View {
         HStack(spacing: Keezly.Spacing.small) {
+            // A seal rather than a swatch: the seat's colour and mark set
+            // into the panel the way a maker's mark is set into wood.
             ZStack {
-                Circle().fill(identity.color.opacity(0.22))
+                Circle().fill(identity.color.opacity(0.28))
+                Circle().strokeBorder(identity.color.opacity(0.55), lineWidth: 1)
                 MarkShape(mark: identity.mark)
                     .fill(identity.color)
-                    .frame(width: size * 0.5, height: size * 0.5)
+                    .frame(width: size * 0.46, height: size * 0.46)
             }
             .frame(width: size, height: size)
             .overlay(
@@ -40,6 +47,7 @@ struct SeatStatusView: View {
                     lineWidth: 2.5
                 )
             )
+            .shadow(color: .black.opacity(0.18), radius: 1.5, y: 1)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
@@ -80,11 +88,18 @@ struct SeatStatusView: View {
         .padding(.horizontal, Keezly.Spacing.small)
         .padding(.vertical, Keezly.Spacing.tight)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: Keezly.Radius.card, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .opacity(isOnTurn ? 1 : 0.65)
-        )
+        .background {
+            let shape = RoundedRectangle(cornerRadius: Keezly.Radius.card, style: .continuous)
+            shape
+                .fill(theme.surfaceMid.opacity(isOnTurn ? 0.95 : 0.72))
+                .overlay(shape.strokeBorder(theme.edge.opacity(isOnTurn ? 0.5 : 0.3), lineWidth: 1))
+                .overlay(
+                    shape
+                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                        .padding(1)
+                )
+                .shadow(color: .black.opacity(isOnTurn ? 0.28 : 0.16), radius: isOnTurn ? 5 : 3, y: 2)
+        }
         .accessibilityElement(children: .combine)
     }
 }
@@ -97,6 +112,8 @@ struct SeatStatusView: View {
 /// entirely: colour and mark already identify the seat, and they identify it
 /// the same way on the board, so nothing is lost (§42).
 struct SeatChip: View {
+    @Environment(\.boardTheme) private var theme
+
     /// Follows the reader's text size, within reason: a chip may grow, but six
     /// of them still have to fit across a phone, so the mark is capped.
     @ScaledMetric(relativeTo: .caption2) private var countSize: CGFloat = 10
@@ -148,11 +165,13 @@ struct SeatChip: View {
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 4)
-        .background(
-            RoundedRectangle(cornerRadius: Keezly.Radius.small, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .opacity(isOnTurn ? 1 : 0.6)
-        )
+        .background {
+            let shape = RoundedRectangle(cornerRadius: Keezly.Radius.small, style: .continuous)
+            shape
+                .fill(theme.surfaceMid.opacity(isOnTurn ? 0.95 : 0.7))
+                .overlay(shape.strokeBorder(theme.edge.opacity(isOnTurn ? 0.5 : 0.3), lineWidth: 1))
+                .shadow(color: .black.opacity(0.18), radius: 2, y: 1)
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(LocalizedStringKey(identity.nameKey))
         .accessibilityValue("seat.status \(cardCount) \(pawnsHome)")

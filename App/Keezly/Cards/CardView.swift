@@ -43,10 +43,17 @@ struct CardView: View {
             }
         }
         .frame(width: width, height: height)
+        // Two shadows: a tight one that sets the card on the fan, and a soft
+        // one that gives it height. A chosen card lifts on both.
         .shadow(
-            color: .black.opacity(isSelected ? 0.34 : 0.2),
-            radius: width * (isSelected ? 0.15 : 0.07),
-            y: width * (isSelected ? 0.07 : 0.03)
+            color: .black.opacity(isSelected ? 0.3 : 0.22),
+            radius: width * (isSelected ? 0.045 : 0.025),
+            y: width * (isSelected ? 0.02 : 0.012)
+        )
+        .shadow(
+            color: .black.opacity(isSelected ? 0.3 : 0.14),
+            radius: width * (isSelected ? 0.18 : 0.08),
+            y: width * (isSelected ? 0.09 : 0.035)
         )
         .offset(y: isSelected ? -width * 0.18 : 0)
         .keyboardFocusRing(isFocused, cornerRadius: width * 0.14)
@@ -67,8 +74,17 @@ struct CardView: View {
     private var face: some View {
         if faceUp {
             ZStack {
+                // Card stock rather than flat paper: a faint sheen from the
+                // top edge, the way a card catches light when it is held.
                 shape.fill(Keezly.Palette.cardFace)
-                shape.strokeBorder(Keezly.Palette.cardInk.opacity(0.16), lineWidth: max(0.5, width * 0.008))
+                shape.fill(
+                    LinearGradient(
+                        colors: [.white.opacity(0.5), .clear, Keezly.Palette.cardInk.opacity(0.045)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                shape.strokeBorder(Keezly.Palette.cardInk.opacity(0.22), lineWidth: max(0.5, width * 0.009))
 
                 centre
                     .padding(.horizontal, width * 0.2)
@@ -79,7 +95,13 @@ struct CardView: View {
             }
             .overlay {
                 if isSelected {
-                    shape.strokeBorder(ink.opacity(0.5), lineWidth: max(1, width * 0.022))
+                    // Chosen, not merely highlighted: the card's own ink draws
+                    // the border, with a second inner line so the state reads
+                    // at a glance without adding a colour of its own.
+                    shape.strokeBorder(ink.opacity(0.68), lineWidth: max(1.2, width * 0.026))
+                    shape
+                        .strokeBorder(.white.opacity(0.7), lineWidth: max(0.5, width * 0.012))
+                        .padding(max(1, width * 0.026))
                 }
             }
         } else {
@@ -116,7 +138,9 @@ struct CardView: View {
 
     private func keezenHint(_ hint: String) -> some View {
         Text(hint)
-            .font(.system(size: width * 0.115, weight: .semibold, design: .rounded))
+            // The Keezen note, in the corner a real card leaves empty. Kept
+            // secondary by weight as well as by position.
+            .font(.system(size: width * 0.11, weight: .medium, design: .rounded))
             .foregroundStyle(Keezly.Palette.cardInk.opacity(0.42))
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             .padding(.top, height * 0.055)

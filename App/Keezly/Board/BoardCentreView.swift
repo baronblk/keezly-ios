@@ -13,40 +13,77 @@ struct BoardCentreView: View {
     let state: GameState
     let roles: [SeatRole]
     var width: CGFloat
+    /// Laid out down the middle of the board, or across a tray beside it.
+    ///
+    /// A two-seat board has no middle to sit in (ISS-013), so the same
+    /// information is shown as a tray next to the board — the way a deck sits
+    /// on the table beside a small board rather than on it.
+    var axis: Axis = .vertical
 
     private var identity: PlayerIdentity { PlayerIdentity.identity(for: state.currentSeat) }
 
     var body: some View {
-        VStack(spacing: width * 0.06) {
-            HStack(spacing: width * 0.08) {
-                DrawPile(remaining: state.deck.count, width: width * 0.3)
-                DiscardPile(top: state.discardPile.last, width: width * 0.3)
+        Group {
+            if axis == .vertical {
+                // Enough air that the cards, the turn and the round read as
+                // three things rather than one block — but not so much that
+                // they stop reading as one *group*. The first attempt at this
+                // used twice the spacing and the labels floated away from the
+                // cards they belong to.
+                VStack(spacing: width * 0.11) {
+                    piles
+                    turn
+                    round
+                }
+                // Width comes from the piles; the labels are free to be wider
+                // when the reader's text size asks for it. Pinning this to
+                // `width` is what truncated them.
+                .frame(maxWidth: width * 3, alignment: .center)
+            } else {
+                // Beside the board the tray runs across, so a wide screen is
+                // not asked to carry a tall column of nothing.
+                HStack(spacing: width * 0.22) {
+                    piles
+                    VStack(alignment: .leading, spacing: width * 0.08) {
+                        turn
+                        round
+                    }
+                }
             }
-
-            TurnIndicator(
-                identity: identity,
-                isComputer: {
-                    if case .computer = roles[state.currentSeat.index] { return true }
-                    return false
-                }(),
-                finished: state.result != nil,
-                width: width
-            )
-
-            Text("deal.round \(state.deal.roundIndex + 1) \(DealState.cardsPerRound.count)")
-                .font(.system(size: max(10, width * 0.055) * captionScale, weight: .medium, design: .rounded))
-                // Wraps rather than truncates at large text sizes. Half a
-                // sentence tells the reader nothing, and the middle of the
-                // board has room for two lines (§53).
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .foregroundStyle(Keezly.Palette.secondaryText)
         }
-        // Width comes from the piles; the labels are free to be wider when the
-        // reader's text size asks for it. Pinning this to `width` is what
-        // truncated them.
-        .frame(maxWidth: width * 3, alignment: .center)
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var piles: some View {
+        HStack(spacing: width * 0.13) {
+            DrawPile(remaining: state.deck.count, width: width * 0.3)
+            DiscardPile(top: state.discardPile.last, width: width * 0.3)
+        }
+    }
+
+    private var turn: some View {
+        TurnIndicator(
+            identity: identity,
+            isComputer: {
+                if case .computer = roles[state.currentSeat.index] { return true }
+                return false
+            }(),
+            finished: state.result != nil,
+            width: width
+        )
+    }
+
+    private var round: some View {
+        Text("deal.round \(state.deal.roundIndex + 1) \(DealState.cardsPerRound.count)")
+            // The quietest thing in the middle. It answers a question nobody
+            // asks mid-turn, so it recedes until looked for.
+            .font(.system(size: max(9, width * 0.05) * captionScale, weight: .medium, design: .rounded))
+            .opacity(0.72)
+            // Wraps rather than truncates at large text sizes. Half a sentence
+            // tells the reader nothing (§53).
+            .multilineTextAlignment(axis == .vertical ? .center : .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .foregroundStyle(Keezly.Palette.secondaryText)
     }
 }
 

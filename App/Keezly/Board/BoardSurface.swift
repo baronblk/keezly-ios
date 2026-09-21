@@ -41,8 +41,15 @@ struct BoardSurface: View {
     }
 
     private func drawPanel(_ panel: Path, in context: inout GraphicsContext, hole: CGFloat) {
+        // Two shadows rather than one: a tight contact shadow that sits the
+        // board on the table, and a wide soft one that gives it weight. A
+        // single shadow reads either as a sticker or as a smudge.
+        var contact = context
+        contact.addFilter(.shadow(color: .black.opacity(0.55), radius: hole * 0.35, y: hole * 0.14))
+        contact.fill(panel, with: .color(theme.surfaceMid))
+
         var shadowed = context
-        shadowed.addFilter(.shadow(color: .black.opacity(0.4), radius: hole * 0.9, y: hole * 0.35))
+        shadowed.addFilter(.shadow(color: .black.opacity(0.38), radius: hole * 1.6, y: hole * 0.7))
         shadowed.fill(panel, with: .color(theme.surfaceMid))
 
         // A gentle top-to-bottom sheen, as a flat panel catches light.
@@ -55,11 +62,27 @@ struct BoardSurface: View {
                 endPoint: CGPoint(x: bounds.midX, y: bounds.maxY)
             )
         )
-        // The milled edge.
-        context.stroke(panel, with: .color(theme.edge.opacity(0.85)), lineWidth: max(1, hole * 0.09))
+        // The milled edge, then a bevel just inside it: lit along the top,
+        // shaded along the bottom, which is what tells the eye the board has
+        // thickness rather than being a printed shape.
+        context.stroke(panel, with: .color(theme.edge.opacity(0.92)), lineWidth: max(1, hole * 0.11))
+
+        let bevel = closedPath(BoardOrnament.offset(
+            layout.outline(inflatedBy: layout.surfaceMargin),
+            by: -layout.pitch * 0.10
+        ))
         context.stroke(
-            panel.strokedPath(StrokeStyle(lineWidth: hole * 0.06)),
-            with: .color(.white.opacity(0.1))
+            bevel,
+            with: .linearGradient(
+                Gradient(colors: [
+                    .white.opacity(0.30),
+                    .white.opacity(0.06),
+                    .black.opacity(0.16),
+                ]),
+                startPoint: CGPoint(x: bounds.midX, y: bounds.minY),
+                endPoint: CGPoint(x: bounds.midX, y: bounds.maxY)
+            ),
+            lineWidth: max(1, hole * 0.14)
         )
     }
 
@@ -114,8 +137,8 @@ struct BoardSurface: View {
             lane.move(to: first)
             lane.addLine(to: deepest)
             let laneShape = lane.strokedPath(StrokeStyle(lineWidth: hole * 1.6, lineCap: .round))
-            context.fill(laneShape, with: .color(colour.opacity(0.24)))
-            context.stroke(laneShape, with: .color(colour.opacity(0.5)), lineWidth: max(0.75, hole * 0.05))
+            context.fill(laneShape, with: .color(colour.opacity(0.34)))
+            context.stroke(laneShape, with: .color(colour.opacity(0.68)), lineWidth: max(0.9, hole * 0.06))
 
             // The waiting area: a shallow tray.
             let unitRect = layout.waitingTray(for: seat)
@@ -126,8 +149,8 @@ struct BoardSurface: View {
                 height: transform.scaled(unitRect.height)
             )
             let tray = Path(roundedRect: rect, cornerRadius: min(rect.width, rect.height) * 0.28)
-            context.fill(tray, with: .color(colour.opacity(0.18)))
-            context.stroke(tray, with: .color(colour.opacity(0.45)), lineWidth: max(0.75, hole * 0.05))
+            context.fill(tray, with: .color(colour.opacity(0.26)))
+            context.stroke(tray, with: .color(colour.opacity(0.62)), lineWidth: max(0.9, hole * 0.06))
         }
     }
 
@@ -145,30 +168,67 @@ struct BoardSurface: View {
             )
             let circle = Path(ellipseIn: rect)
 
+            // A hole is read from three things: a floor that darkens towards
+            // the near rim, a shadow cast inside it by the far rim, and a lit
+            // lower lip. Strengthened here, but still built from shading —
+            // anything more would read as moulded plastic rather than as wood
+            // that has been drilled.
+            if let seat = homeSeat(of: position) {
+                // A home square is tinted by its seat, so the four squares
+                // that end a journey are never mistaken for track.
+                context.fill(circle, with: .color(PlayerIdentity.identity(for: seat).color.opacity(0.30)))
+            }
             context.fill(
                 circle,
                 with: .linearGradient(
-                    Gradient(colors: [theme.holeShadow, theme.holeFill]),
+                    Gradient(stops: [
+                        .init(color: theme.holeShadow, location: 0),
+                        .init(color: theme.holeShadow.opacity(0.75), location: 0.42),
+                        .init(color: theme.holeFill, location: 1),
+                    ]),
                     startPoint: CGPoint(x: rect.midX, y: rect.minY),
                     endPoint: CGPoint(x: rect.midX, y: rect.maxY)
                 )
             )
-            // The lit lower lip.
+
+            // The shadow the upper rim casts down into the hole.
+            var upperShadow = Path()
+            upperShadow.addArc(
+                center: CGPoint(x: rect.midX, y: rect.midY),
+                radius: hole / 2 - max(0.4, hole * 0.05),
+                startAngle: .degrees(200), endAngle: .degrees(340), clockwise: false
+            )
+            context.stroke(
+                upperShadow,
+                with: .color(.black.opacity(0.28)),
+                lineWidth: max(0.6, hole * 0.11)
+            )
+
+            // The lit lower lip, which is what makes it read as carved.
             var lip = Path()
             lip.addArc(
                 center: CGPoint(x: rect.midX, y: rect.midY),
-                radius: hole / 2, startAngle: .degrees(20), endAngle: .degrees(160), clockwise: false
+                radius: hole / 2 - max(0.3, hole * 0.03),
+                startAngle: .degrees(24), endAngle: .degrees(156), clockwise: false
             )
-            context.stroke(lip, with: .color(theme.holeLip), lineWidth: max(0.5, hole * 0.07))
-            context.stroke(circle, with: .color(theme.edge.opacity(0.35)), lineWidth: max(0.5, hole * 0.04))
+            context.stroke(lip, with: .color(theme.holeLip), lineWidth: max(0.7, hole * 0.095))
+            context.stroke(circle, with: .color(theme.edge.opacity(0.46)), lineWidth: max(0.5, hole * 0.045))
 
             if let seat = startSeat(of: position) {
                 // A start square is special: a pawn on it is untouchable and
                 // blocks the track (§15), so its hole carries a colour ring.
+                let colour = PlayerIdentity.identity(for: seat).color
+                // A halo under the ring lifts the start square off the wood
+                // without a flat block of colour.
+                context.stroke(
+                    Path(ellipseIn: rect.insetBy(dx: -hole * 0.20, dy: -hole * 0.20)),
+                    with: .color(colour.opacity(0.28)),
+                    lineWidth: max(1, hole * 0.16)
+                )
                 context.stroke(
                     Path(ellipseIn: rect.insetBy(dx: -hole * 0.09, dy: -hole * 0.09)),
-                    with: .color(PlayerIdentity.identity(for: seat).color.opacity(0.95)),
-                    lineWidth: max(1, hole * 0.11)
+                    with: .color(colour),
+                    lineWidth: max(1.2, hole * 0.14)
                 )
             }
 
@@ -219,7 +279,7 @@ struct BoardSurface: View {
                 in: &context,
                 width: lineWidth,
                 tint: theme.inlay,
-                strength: 0.30
+                strength: 0.38
             )
         }
 
@@ -256,7 +316,7 @@ struct BoardSurface: View {
                 in: &context,
                 width: max(0.5, hole * 0.05),
                 tint: theme.inlay,
-                strength: motif == .tulip ? 0.34 : 0.26
+                strength: motif == .tulip ? 0.42 : 0.32
             )
         }
     }
@@ -328,9 +388,12 @@ struct BoardSurface: View {
             engrave(
                 Path(ellipseIn: rect),
                 in: &context,
-                width: max(0.5, hole * (inset == 0 ? 0.05 : 0.035)),
+                width: max(0.5, hole * (inset == 0 ? 0.045 : 0.03)),
                 tint: theme.inlay,
-                strength: 0.22
+                // Quieter than the border on purpose. The middle of the board
+                // is where the cards are read, so the ornament there has to
+                // sit behind them rather than beside them.
+                strength: 0.14
             )
         }
 
@@ -356,7 +419,7 @@ struct BoardSurface: View {
                 CGAffineTransform(rotationAngle: angle - .pi / 2)
                     .concatenating(CGAffineTransform(translationX: anchor.x, y: anchor.y))
             )
-            engrave(petal, in: &context, width: max(0.5, hole * 0.045), tint: theme.inlay, strength: 0.26)
+            engrave(petal, in: &context, width: max(0.5, hole * 0.04), tint: theme.inlay, strength: 0.16)
         }
 
         // The one orange detail on the whole board, at the top of the ring:
@@ -364,7 +427,7 @@ struct BoardSurface: View {
         let keystone = CGPoint(x: centre.x, y: centre.y - radius)
         var mark = Path(BoardOrnament.lozenge(size: hole * 0.34))
         mark = mark.applying(CGAffineTransform(translationX: keystone.x, y: keystone.y))
-        context.fill(mark, with: .color(theme.accent.opacity(0.55)))
+        context.fill(mark, with: .color(theme.accent.opacity(0.42)))
     }
 
     /// A closed polyline in unit space, as a path in view space.
@@ -376,6 +439,11 @@ struct BoardSurface: View {
         for point in points.dropFirst() { path.addLine(to: point) }
         path.closeSubpath()
         return path
+    }
+
+    private func homeSeat(of position: BoardPosition) -> Seat? {
+        guard case .home(let seat, _) = position else { return nil }
+        return seat
     }
 
     private func startSeat(of position: BoardPosition) -> Seat? {

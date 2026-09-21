@@ -60,6 +60,32 @@ struct GameScreen: View {
         return min(Self.classicCentreScale, max(Self.minimumCentreScale, scaled))
     }
 
+    /// The table's own cards, when the board has no middle to hold them.
+    ///
+    /// Only a two-seat board reaches this: there the home lanes run almost to
+    /// the centre, leaving a quiet field of about a quarter of one square
+    /// (ISS-013). The same information is shown as a tray beside the board —
+    /// a deck on the table next to a small board — rather than shrunk past
+    /// reading. The board and the rules are identical either way.
+    @ViewBuilder
+    private func tableTray(axis: Axis) -> some View {
+        if layout.centrePlacement == .beside {
+            BoardCentreView(
+                state: session.state,
+                roles: session.roles,
+                width: isCompact ? 74 : 112,
+                axis: axis
+            )
+            .padding(.horizontal, Keezly.Spacing.regular)
+            .padding(.vertical, Keezly.Spacing.small)
+            .background(
+                RoundedRectangle(cornerRadius: Keezly.Radius.panel, style: .continuous)
+                    .fill(Keezly.Palette.board.opacity(0.35))
+            )
+            .accessibilityIdentifier("table.tray")
+        }
+    }
+
     /// The share of the board the middle takes on a four-player table.
     static let classicCentreScale: CGFloat = 0.26
     /// Below this the cards in the middle stop being readable.
@@ -173,6 +199,10 @@ struct GameScreen: View {
     /// the board worth looking at. A phone in landscape is the case.
     static let shortHeightThreshold: CGFloat = 520
 
+    /// Roughly what the opponent strip and the spacings take on a phone,
+    /// before the hand gets what is left.
+    static let phoneChromeHeight: CGFloat = 104
+
     static func describe(_ focus: PlayFocus?) -> String {
         switch focus {
         case .none: "focus:none"
@@ -187,12 +217,28 @@ struct GameScreen: View {
     /// Phone-shaped: the board leads, the hand sits under it within thumb reach,
     /// and the opponents are a single compact row (§5).
     private func compactLayout(size: CGSize) -> some View {
-        VStack(spacing: Keezly.Spacing.small) {
+        // The board is square, so on a tall phone its size is set by the
+        // width and there is height left over. It goes to the cards rather
+        // than to empty table: a card that can be read is worth more than a
+        // gap (§45).
+        let boardSide = size.width - Keezly.Spacing.small * 2
+        let spare = max(0, size.height - boardSide - Self.phoneChromeHeight)
+        // Capped: the fan tilts its outer cards, so its drawn width is a
+        // little more than the frame it is given. Letting the cards grow to
+        // fill the height exactly pushed the outermost two off the screen.
+        let cardWidth = min(110, max(handCardWidth, spare / 1.95))
+
+        return VStack(spacing: Keezly.Spacing.small) {
             opponentStrip
+            tableTray(axis: .horizontal)
             board
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             sevenProgress
-            hand(availableWidth: size.width - Keezly.Spacing.regular * 2)
+            // Narrower than the screen by more than the padding: a fanned
+            // card is rotated about its foot, so it reaches further sideways
+            // than the frame the fan is given. Two of them did so far enough
+            // to be cut off at the edges.
+            hand(availableWidth: size.width - Keezly.Spacing.section, cardWidth: cardWidth)
         }
         .padding(Keezly.Spacing.small)
         // Nothing inside may push the layout wider than the screen: that is
@@ -214,6 +260,7 @@ struct GameScreen: View {
 
             VStack(spacing: Keezly.Spacing.small) {
                 opponentStrip
+                tableTray(axis: .horizontal)
                 Spacer(minLength: 0)
                 sevenProgress
                 hand(availableWidth: sideWidth)
@@ -234,11 +281,19 @@ struct GameScreen: View {
         // left after the hand. Whatever width that leaves goes to the seat
         // panels rather than sitting empty either side of a centred board.
         let handHeight = handCardWidth * 1.45 + handCardWidth * 0.3
-        // Never let the board shrink below most of the smaller screen edge: a
-        // board that has been squeezed out of the way is no longer a board.
-        let floor = min(size.width, size.height) * 0.8
-        let boardSide = max(floor, size.height - handHeight - Keezly.Spacing.section)
-        let sideWidth = max(210, (size.width - boardSide) / 2 - Keezly.Spacing.large)
+        let minimumSide: CGFloat = 210
+        // Everything is measured from the width that is actually free, after
+        // the padding and the gaps between the three columns. Working from
+        // the raw screen width instead pushed the far seat panel off the edge,
+        // and taking the height alone made the board wider than the screen in
+        // portrait, where it was then clipped.
+        let available = size.width - Keezly.Spacing.regular * 2 - Keezly.Spacing.large * 2
+        let heightBudget = size.height - handHeight - Keezly.Spacing.section
+        // Never below most of the smaller screen edge: a board squeezed out of
+        // the way is no longer a board.
+        let floor = min(size.width, size.height) * 0.62
+        let boardSide = max(floor, min(available - minimumSide * 2, heightBudget))
+        let sideWidth = max(minimumSide, (available - boardSide) / 2)
         let opponents = session.state.configuration.seats.filter { $0 != session.localSeat }
         let split = (opponents.count + 1) / 2
 
@@ -260,10 +315,16 @@ struct GameScreen: View {
             // the board well off centre.
             .frame(width: boardSide)
 
-            SeatColumn(
-                seats: Array(opponents.suffix(from: split)),
-                state: session.state, roles: session.roles, localSeat: session.localSeat
-            )
+            // On a two-seat table the far column is empty — one opponent, one
+            // column — so the table's own cards go there: the deck opposite
+            // the other player, with the board between them (ISS-013).
+            ZStack {
+                SeatColumn(
+                    seats: Array(opponents.suffix(from: split)),
+                    state: session.state, roles: session.roles, localSeat: session.localSeat
+                )
+                tableTray(axis: .vertical)
+            }
             .frame(width: sideWidth)
         }
         .padding(Keezly.Spacing.regular)
@@ -317,22 +378,24 @@ struct GameScreen: View {
                 focus: $focus
             )
 
-            GeometryReader { proxy in
-                let side = min(proxy.size.width, proxy.size.height)
-                BoardCentreView(
-                    state: session.state,
-                    roles: session.roles,
-                    width: side * centreScale
-                )
-                .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            if layout.centrePlacement == .inside {
+                GeometryReader { proxy in
+                    let side = min(proxy.size.width, proxy.size.height)
+                    BoardCentreView(
+                        state: session.state,
+                        roles: session.roles,
+                        width: side * centreScale
+                    )
+                    .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+                }
+                .allowsHitTesting(false)
             }
-            .allowsHitTesting(false)
         }
         .animation(Keezly.Motion.step(reduceMotion: reduceMotion), value: session.state.revision)
     }
 
     @ViewBuilder
-    private func hand(availableWidth: CGFloat) -> some View {
+    private func hand(availableWidth: CGFloat, cardWidth: CGFloat? = nil) -> some View {
         VStack(spacing: Keezly.Spacing.small) {
             if session.mustFold {
                 Button {
@@ -355,7 +418,7 @@ struct GameScreen: View {
                     cards: session.state.hand(of: seat).cards,
                     playable: planner.playableCards,
                     selected: selectedCard,
-                    cardWidth: availableWidth < 300 ? shortHandCardWidth : handCardWidth,
+                    cardWidth: cardWidth ?? (availableWidth < 300 ? shortHandCardWidth : handCardWidth),
                     availableWidth: availableWidth,
                     focus: $focus,
                     onSelect: select(card:)
