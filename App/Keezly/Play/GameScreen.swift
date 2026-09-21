@@ -26,6 +26,8 @@ struct GameScreen: View {
     /// the board, the hand, the rules and the refusals are all the real ones,
     /// and this only watches what the player does with them (§52).
     var tutorial: TutorialRun?
+    /// Sound and haptics, as the player has asked for them.
+    var preferences: Preferences
 
     @State var session: MatchSession
     @State var presenter: BoardPresenter
@@ -60,9 +62,15 @@ struct GameScreen: View {
     /// it grows with the reader's setting.
     @ScaledMetric(relativeTo: .body) var chromeHeight: CGFloat = 132
 
-    init(session: MatchSession, onLeave: @escaping () -> Void = {}, tutorial: TutorialRun? = nil) {
+    init(
+        session: MatchSession,
+        onLeave: @escaping () -> Void = {},
+        tutorial: TutorialRun? = nil,
+        preferences: Preferences = Preferences()
+    ) {
         self.onLeave = onLeave
         self.tutorial = tutorial
+        self.preferences = preferences
         _session = State(initialValue: session)
         _presenter = State(initialValue: BoardPresenter(pawns: session.state.pawns))
     }
@@ -259,6 +267,7 @@ struct GameScreen: View {
             // may have been on screen when the app was last closed. Safety
             // before convenience: the device is assumed to have changed hands
             // (§34).
+            Feedback(preferences: preferences).prepare()
             if !session.isPassAndPlay { seatInHand = session.localSeat }
             session.persistOpening()
             session.begin()
@@ -300,6 +309,10 @@ struct GameScreen: View {
 
     func select(card: Card) {
         guard session.isAwaitingHuman else { return }
+        // The one cue that does not come from an event: picking a card up
+        // changes nothing on the board, and is exactly the moment a player
+        // wants confirming.
+        Feedback(preferences: preferences).play(.select)
         // Tapping the selected card again clears it: cancelling before the move
         // is final must always be possible (§37).
         if selectedCard == card, committedLegs.isEmpty {
@@ -458,6 +471,12 @@ struct GameScreen: View {
     func playOutEvents() {
         let events = session.pendingEvents
         guard !events.isEmpty else { return }
+
+        // Felt and heard as the board begins to show it, from the events the
+        // engine produced rather than from the tap that caused them: a move a
+        // computer opponent made lands the same way as one the player made,
+        // and a tap the engine refused produces nothing at all (§43).
+        Feedback(preferences: preferences).play(FeedbackCue.cues(for: events))
 
         let pawns = session.state.pawns
         presentation?.cancel()

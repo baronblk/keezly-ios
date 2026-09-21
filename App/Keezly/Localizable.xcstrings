@@ -2141,6 +2141,29 @@
         }
       }
     },
+    "menu.settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen"
+          }
+        }
+      }
+    },
     "menu.start": {
       "extractionState": "manual",
       "localizations": {
@@ -4897,6 +4920,144 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jij"
+          }
+        }
+      }
+    },
+    "settings.haptics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vibration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vibration"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trillen"
+          }
+        }
+      }
+    },
+    "settings.haptics.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A small knock when a piece goes down, is knocked out or comes home. Quiet by design — a board game is played for an hour at a time."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein kleiner Impuls, wenn eine Figur gesetzt, geschlagen oder ins Ziel gebracht wird. Bewusst zurückhaltend — ein Brettspiel dauert eine Stunde."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een klein stootje als een pion wordt neergezet, geslagen of binnengebracht. Bewust ingetogen — een bordspel duurt een uur."
+          }
+        }
+      }
+    },
+    "settings.sound": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ton"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geluid"
+          }
+        }
+      }
+    },
+    "settings.sound.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The same moments, heard."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieselben Momente, hörbar."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dezelfde momenten, hoorbaar."
+          }
+        }
+      }
+    },
+    "settings.sound.pending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezly has no sounds yet. It will only ever ship audio it owns outright, and a set of stand-in noises heard on every move would be worse than silence."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezly hat noch keine Töne. Es wird nur Audio ausgeliefert, das uns wirklich gehört — und Platzhaltergeräusche, die man bei jedem Zug hört, wären schlechter als Stille."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezly heeft nog geen geluiden. Er wordt alleen audio meegeleverd die echt van ons is; tijdelijke geluidjes die je bij elke zet hoort zouden erger zijn dan stilte."
+          }
+        }
+      }
+    },
+    "settings.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen"
           }
         }
       }

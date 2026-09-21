@@ -22,6 +22,9 @@ struct RootView: View {
     /// Whether to offer the tutorial first. Answered once, on the first match
     /// or lesson, and never asked again.
     @State private var welcome = Welcome()
+    /// Sound and haptics, owned here so one match cannot disagree with the
+    /// next about what the player asked for.
+    @State private var preferences = Preferences()
 
     private let store: MatchStore?
 
@@ -49,11 +52,12 @@ struct RootView: View {
                 GameScreen(
                     session: tutorial.session,
                     onLeave: leaveTutorial,
-                    tutorial: tutorial
+                    tutorial: tutorial,
+                    preferences: preferences
                 )
                 .id(ObjectIdentifier(tutorial.session))
             } else if let session {
-                GameScreen(session: session, onLeave: leaveMatch)
+                GameScreen(session: session, onLeave: leaveMatch, preferences: preferences)
                     // Identity by the session, so starting a different table
                     // builds a new screen rather than reusing the old one's
                     // state against a board of another size.
@@ -69,7 +73,9 @@ struct RootView: View {
                         welcome.noteStarted()
                         tutorial = TutorialRun()
                     },
-                    isNewcomer: welcome.isNewcomer
+                    isNewcomer: welcome.isNewcomer,
+                    preferences: preferences,
+                    hasSound: Feedback(preferences: preferences).hasAnySound
                 )
                 .task { refreshResumable() }
             }

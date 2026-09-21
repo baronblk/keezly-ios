@@ -22,8 +22,13 @@ struct MainMenuView: View {
     var onTutorial: () -> Void = {}
     /// Whether this is somebody's first time here.
     var isNewcomer = false
+    /// The two switches, shared with the rest of the app.
+    var preferences: Preferences
+    /// Whether any sound has a recording behind it yet.
+    var hasSound = false
 
     @State private var showsRules = false
+    @State private var showsSettings = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -292,6 +297,7 @@ struct MainMenuView: View {
             // twice on one screen is how a menu starts to look like a form.
             if !isNewcomer { tutorialButton }
             rulesButton
+            settingsButton
         }
     }
 
@@ -331,6 +337,23 @@ struct MainMenuView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("menu.tutorial")
+    }
+
+    private var settingsButton: some View {
+        Button {
+            showsSettings = true
+        } label: {
+            Text("menu.settings")
+                .font(.system(size: labelSize, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.72))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Keezly.Spacing.small)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("menu.settings")
+        .sheet(isPresented: $showsSettings) {
+            SettingsView(preferences: preferences, hasSound: hasSound)
+        }
     }
 
     /// The rules, before a match rather than only during one.

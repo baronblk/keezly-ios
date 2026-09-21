@@ -16,7 +16,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
 | M6 | Game Center Multiplayer | NOT STARTED |
 | M7 | Tutorial / Rulebook / Accessibility | DONE |
-| M8 | Brand / App Icon / Audio / Haptics | NOT STARTED |
+| M8 | Brand / App Icon / Audio / Haptics | DONE — except the sound recordings, ASSET PENDING |
 | M9 | Statistics / Replay / Game Center Meta | NOT STARTED |
 | M10 | Localisation | NOT STARTED |
 | M11 | CI / QA / Hardening | NOT STARTED |
@@ -226,16 +226,16 @@ and mocked tests can proceed without them (§142).
 
 ---
 
-## M8 — Brand / App Icon / Audio / Haptics — NOT STARTED
+## M8 — Brand / App Icon / Audio / Haptics — DONE (audio ASSET PENDING)
 
 | Task | Status |
 |---|---|
-| M8.1 Three icon concepts, comparison sheet, decision | NOT STARTED |
-| M8.2 Final 1024px master, dark/tinted variants, editable sources | NOT STARTED |
-| M8.3 Icon preview page at 1024/180/120/60/40/29 px | NOT STARTED |
-| M8.4 Original board, pawn and card artwork | NOT STARTED |
-| M8.5 Original sound set, fully disableable | NOT STARTED |
-| M8.6 Haptics, fully disableable | NOT STARTED |
+| M8.1 Three icon concepts, comparison sheet, decision | DONE — corner, table and medallion, each built from the board's own vocabulary, compared through two rounds of refinement. `table` chosen; the reasoning and what the other two failed at are DEC-026 |
+| M8.2 Final 1024px master, dark/tinted variants, editable sources | DONE — the icon *is* the source: `AppIconArtwork` draws it in SwiftUI and `scripts/icon-install.sh` renders the three 1024 files. `scripts/icon-check.sh` fails if they stop matching |
+| M8.3 Icon preview page at 1024/180/120/60/40/29 px | DONE — `scripts/icon-sheet.sh` writes every concept at every size plus the tinted masks; `AppIconTests` fails a concept that flattens at 29 or loses its shape as a mask |
+| M8.4 Original board, pawn and card artwork | DONE in M4 — board, holes, pawn silhouette, ornament and cards are all Keezly's own geometry (DEC-017, DEC-018, DEC-019) |
+| M8.5 Original sound set, fully disableable | **ASSET PENDING** — the architecture, the cues and the switch are built and tested; there are no recordings. Keezly will only ship audio it owns outright (§77), and stand-in noises heard on every move would set the tone of the whole game. The settings screen says so plainly rather than offering a switch that governs nothing |
+| M8.6 Haptics, fully disableable | DONE — seven cues derived from `GameEvent`, so a computer opponent's capture lands like the player's and a refused tap produces nothing. Runs collapse, so a Seven split over seven squares is one knock rather than seven. `FeedbackTests` proves the switch silences the channel |
 
 ---
 
