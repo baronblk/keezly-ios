@@ -1,6 +1,6 @@
 # Keezly — Game Center
 
-**Implementation status: NOT STARTED.** No GameKit code exists.
+**Implementation status: see the table at the end of this file.** The online model, the turn envelope and the transport boundary exist and are tested against a mock; the GameKit adapter is written but has never run against Game Center.
 **Configuration status: NOT CONFIGURED.** Nothing has been set up in App Store
 Connect. See `CURRENT_STATE.md` → Manual Actions (MAN-02, MAN-05, MAN-06).
 
@@ -138,3 +138,61 @@ APIs for Game Activities, multiplayer activities and party codes are actually
 available and documented in the installed SDK. No imaginary API will be
 implemented; if party codes do not fit the turn-based flow, the reason will be
 recorded here rather than left unexplained (§33).
+
+---
+
+## Status, as of M6
+
+Kept apart on purpose, because they are different claims (§167):
+
+| Part | Status |
+|---|---|
+| Turn envelope, revisions, idempotency, validation | **MOCK VERIFIED** — 29 tests against `InMemoryTransport` |
+| Participant mapping, teams at 4 and 6 seats | **MOCK VERIFIED** |
+| Two-client exchange across many turns | **MOCK VERIFIED** — 12 tests, clients sharing nothing but bytes |
+| Several matches at once | **MOCK VERIFIED** |
+| Quitting, finishing, refusing turns after the end | **MOCK VERIFIED** |
+| Payload size against the 64 KiB limit | **MOCK VERIFIED** — measured, 4,173 bytes for 400 moves |
+| Authentication state machine | **TESTED** — as a pure function, without GameKit |
+| `GameCenterTransport` (the GameKit adapter) | **IMPLEMENTED, NOT VERIFIED** — never run against Game Center |
+| A real match between two Apple Accounts | **BLOCKED** — MAN-02, MAN-05, MAN-11, MAN-12 |
+
+## How a turn travels
+
+```
+     device A                    Game Center                  device B
+        │                             │                           │
+  load(matchID) ────────────────────► │                           │
+        │ ◄──────────────── compressed envelope                   │
+        │                                                          │
+  validate: version, checksum, replay every action,               │
+            revision rises and lands where claimed,               │
+            board checksum matches                                │
+        │                                                          │
+  OnlineMove(moveID, expectedRevision, action)                    │
+        │                                                          │
+  apply → accepted / duplicate / stale / out of order / rejected  │
+        │                                                          │
+  only if accepted:                                               │
+  send(envelope, next: participant for the seat now on turn) ───► │
+                                      │ ──────────────────────────►│
+                                      │                    validate again,
+                                      │                    from scratch
+```
+
+Nothing is held between turns. Every operation loads the match, checks it,
+acts, and sends it on — which is what a turn-based game is: the app may be
+closed between any two turns (§27).
+
+## What the adapter still has to be right about
+
+These are the parts no test covers, listed so they are checked first when a
+real match becomes possible:
+
+- Finding a `GKTurnBasedMatch` by the Keezly match id, which lives inside the
+  payload rather than in Game Center's own identifier.
+- Setting every participant's outcome when a match ends, or Game Center leaves
+  it hanging for them.
+- The turn timeout, currently a week.
+- Mapping `gamePlayerID` to the identifiers in `ParticipantMapping` at the
+  moment a match is created.

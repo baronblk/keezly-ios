@@ -776,3 +776,63 @@ checkpoints — decided then, on the numbers, not guessed at now.
 **The same record is the replay.** There is no second history. A replay is this
 list of actions played forward; presentation belongs to the screen showing it,
 not to the file.
+
+---
+
+## DEC-024 — Game Center is a transport, not a second game
+
+- **Date:** 2026-09-21
+- **Topic:** Online play
+- **Status:** ACCEPTED
+- **Follows from:** DEC-023 (a match is a seed and its accepted actions)
+
+**Decision.** There is no online game engine. A match played across devices is
+the same `MatchRecord` as one played on the sofa — configuration, seed,
+accepted actions — and the position is what those replay to. Game Center moves
+bytes; it decides nothing.
+
+**The boundary.** `KeezlyCore` does not import GameKit and never will. Between
+them sits `MatchTransport`, a protocol of five methods with no Apple type in
+sight. Every rule about turns, revisions, duplicates, mappings and validation
+therefore has tests that need no account, no network and no simulator, and the
+GameKit adapter is left with nothing but translation.
+
+**Three fields make a turn safe to receive twice**: a `moveID` of its own, the
+`expectedRevision` it was made against, and the revision it produces. From
+those come five distinct answers — accepted, duplicate, stale, out of order,
+rejected — and each has its own handling. A duplicate is recognised by its
+identity *before* its revision makes it look stale, which is the ordering that
+matters.
+
+**Remote data is a claim, not a position.** An arriving payload is decompressed,
+version-checked, checksum-checked, and then *replayed through the real engine*,
+move by move, with the revision required to rise each time and to land exactly
+where the sender said it would, and the resulting board's checksum compared
+with the one sent. A board that cannot be reproduced from its own history is
+refused.
+
+**Seats are mapped explicitly.** `ParticipantMapping` is written down when the
+match is created and is immutable afterwards. Neither the order Game Center
+returns participants in nor the order callbacks arrive in is ever treated as a
+seat number — that is the classic way an online board game moves the wrong
+player's pieces. Teams come only from `GameConfiguration`; participants stay
+individuals.
+
+**Two clients, not one pretending.** The online tests build two or more
+`OnlineMatchClient`s that share nothing but the transport. What one knows, the
+others learn by loading bytes. A synchronisation fault shows up there rather
+than between two phones after release.
+
+**On size, measured before deciding.** A four-hundred-move six-player match
+came to **64,384 bytes** of JSON against Game Center's 65,536-byte limit — so a
+full six-player match would not have fitted. Compressing the canonical bytes
+brings the same match to **4,173 bytes**, a factor of fifteen, and changes
+nothing about how a match is represented. Compression was chosen over a compact
+binary action format or checkpoints because it is the smallest change that
+works: no second format to version, no new way to disagree with the canonical
+bytes. The size test keeps the number honest.
+
+**What is not decided here.** The GameKit adapter itself is written but has
+never run against Game Center, because that needs an App Store Connect record
+that does not exist (MAN-02). It is the only part of the online path with no
+test, and it is recorded as unproven rather than done.

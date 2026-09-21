@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0344A701FDB8CB0A91E0151D /* GameCenterAuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E336B27DD79B71BBB763188D /* GameCenterAuthenticationTests.swift */; };
 		05E2F7C4D915B34F8A21C6FF /* PassAndPlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */; };
 		092103484C74A862ECF89DF8 /* SuitGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E264E59919E60235F368F7F /* SuitGlyph.swift */; };
 		11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ED8C1FD416E628043CC4D29 /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 		5843618018A82726BBC6F5FC /* PlayFocusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */; };
 		5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */; };
 		5D9F39D6B8B9B343FB63EA7B /* PlayPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B93678F21644FD63C4658C /* PlayPlanner.swift */; };
+		5E1DCA60FB2FB76BA39E6D69 /* GameCenterAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64B06232876C033256A30C1 /* GameCenterAuthentication.swift */; };
 		5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5E0E46A1D3857966A001B9EC /* KeezlyCore */; };
 		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
 		71D9948558D1AD1F37A7F8EE /* BoardOrnament.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */; };
@@ -35,6 +37,7 @@
 		8309DF26E59769918673891D /* BoardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD74967519D049BB59C5FA /* BoardLayout.swift */; };
 		8B724EB7A6C64B30D84E5793 /* TableConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3598D989F36F076D53B3823D /* TableConfigurationTests.swift */; };
 		8EBA0944E1224E18B578DDA0 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36B25AB04A78E23D9B845676 /* KeezlyCore */; };
+		974B12F5B5561828DB83118B /* GameCenterTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5674013E95C6D4890ADEAF /* GameCenterTransport.swift */; };
 		9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */; };
 		9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */; };
 		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
@@ -92,6 +95,7 @@
 		50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLayoutTests.swift; sourceTree = "<group>"; };
 		55F880978D3865E445AA5593 /* BoardPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardPresenterTests.swift; sourceTree = "<group>"; };
 		5983C639D9EC2271A596DDFB /* DesignReviewScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignReviewScreenshots.swift; sourceTree = "<group>"; };
+		5E5674013E95C6D4890ADEAF /* GameCenterTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterTransport.swift; sourceTree = "<group>"; };
 		67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreen.swift; sourceTree = "<group>"; };
 		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
 		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -117,6 +121,8 @@
 		D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardOrnament.swift; sourceTree = "<group>"; };
 		DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFocus.swift; sourceTree = "<group>"; };
 		DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnView.swift; sourceTree = "<group>"; };
+		E336B27DD79B71BBB763188D /* GameCenterAuthenticationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterAuthenticationTests.swift; sourceTree = "<group>"; };
+		E64B06232876C033256A30C1 /* GameCenterAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterAuthentication.swift; sourceTree = "<group>"; };
 		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBF95D494649C4F6D223A28C /* MatchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSession.swift; sourceTree = "<group>"; };
 		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -190,6 +196,15 @@
 				DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */,
 			);
 			path = Board;
+			sourceTree = "<group>";
+		};
+		6E536CEFDB31AFBA0CBAC3C1 /* Online */ = {
+			isa = PBXGroup;
+			children = (
+				E64B06232876C033256A30C1 /* GameCenterAuthentication.swift */,
+				5E5674013E95C6D4890ADEAF /* GameCenterTransport.swift */,
+			);
+			path = Online;
 			sourceTree = "<group>";
 		};
 		826A3F1418E2A0712B696398 /* Packages */ = {
@@ -285,6 +300,7 @@
 				2249E629CB6BDD603AFA93CD /* Cards */,
 				C2CE7554DBA3AF25B7905141 /* DesignSystem */,
 				83BBE5FE9640A0E7AB2FB4F4 /* Menu */,
+				6E536CEFDB31AFBA0CBAC3C1 /* Online */,
 				2892EB6A903073922444B3E1 /* Play */,
 				8FC222912D478002951C1887 /* Session */,
 				B911472D005A6B24C5C0309D /* Storage */,
@@ -304,6 +320,7 @@
 				50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */,
 				79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */,
 				55F880978D3865E445AA5593 /* BoardPresenterTests.swift */,
+				E336B27DD79B71BBB763188D /* GameCenterAuthenticationTests.swift */,
 				A6759043901D352FD92C88C4 /* InnerFieldMeasurement.swift */,
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
@@ -442,6 +459,7 @@
 				579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */,
 				9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */,
 				28CC2B89F10507596DD31D50 /* BoardPresenterTests.swift in Sources */,
+				0344A701FDB8CB0A91E0151D /* GameCenterAuthenticationTests.swift in Sources */,
 				F00D0A89D5E633436368705D /* InnerFieldMeasurement.swift in Sources */,
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
@@ -463,6 +481,8 @@
 				49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */,
 				180EEED18A6C25123E43D24B /* CardFaceArt.swift in Sources */,
 				58241CDF0095935276E260B2 /* CardView.swift in Sources */,
+				5E1DCA60FB2FB76BA39E6D69 /* GameCenterAuthentication.swift in Sources */,
+				974B12F5B5561828DB83118B /* GameCenterTransport.swift in Sources */,
 				B29A4F858EE41B8D796DB41C /* GameScreen.swift in Sources */,
 				EA94C32B2E325833C8916390 /* HandView.swift in Sources */,
 				A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */,
