@@ -47,6 +47,12 @@ struct GameScreen: View {
     @State var showsActionList = false
     /// Whether the rulebook is open.
     @State var showsRules = false
+    /// The card whose rule the player asked about.
+    @State var explaining: CardHelp?
+    /// The suggestion on screen, when one has been asked for.
+    @State var hint: Hint?
+    /// The running request for one.
+    @State var hintSearch: Task<Void, Never>?
 
     @Environment(\.scenePhase) var scenePhase
 
@@ -224,6 +230,7 @@ struct GameScreen: View {
         // Built when it opens, from the planner's own observation — so the
         // list is a view of the same position the board is drawing, never a
         // second answer about what is legal (DEC-004).
+        .sheet(item: $explaining) { CardHelpView(help: $0) }
         .sheet(isPresented: $showsActionList) {
             ActionListView(
                 list: ActionList(observation: planner.observation),
@@ -341,7 +348,33 @@ struct GameScreen: View {
             .post()
     }
 
+    /// Asks for a suggestion, or puts the one on screen away.
+    ///
+    /// Cancellable and cancelled: the request runs off the main actor, and a
+    /// board that has moved on must not be given advice about the board it was.
+    func toggleHint() {
+        hintSearch?.cancel()
+        guard hint == nil else {
+            hint = nil
+            return
+        }
+        let observation = planner.observation
+        let asked = session.state.revision
+        hintSearch = Task { @MainActor in
+            let found = await HintProvider.hint(for: observation)
+            guard !Task.isCancelled, session.state.revision == asked else { return }
+            hint = found
+        }
+    }
+
+    func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hint = nil
+    }
+
     func submit(_ action: PlayerAction) {
+        clearHint()
         let before = session.state
         let outcome = session.submit(action, atRevision: session.state.revision)
         guard case .success = outcome else { return }

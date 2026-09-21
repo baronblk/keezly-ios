@@ -20,6 +20,9 @@ struct HandView: View {
     /// the two without either owning it.
     var focus: FocusState<PlayFocus?>.Binding?
     var onSelect: (Card) -> Void
+    /// Asked for when somebody presses and holds a card: what does this one
+    /// do? Nothing happens if a screen does not offer it.
+    var onExplain: ((Card) -> Void)?
 
     /// Degrees of tilt between neighbouring cards.
     private var tilt: Double { cards.count > 1 ? min(4.5, 16 / Double(cards.count)) : 0 }
@@ -68,9 +71,13 @@ struct HandView: View {
                     guard isLive else { return }
                     onSelect(card)
                 }
+                // A long press asks what the card does, playable or not —
+                // "why can I not play this one?" is the same question (§52).
+                .onLongPressGesture(minimumDuration: 0.4) { onExplain?(card) }
                 .pointerEffect(.lift, enabled: isLive)
                 .focusable(isLive)
                 .keyboardFocus(focus, equals: .card(card))
+                .accessibilityAction(named: Text("a11y.card.explain")) { onExplain?(card) }
             }
         }
         .frame(

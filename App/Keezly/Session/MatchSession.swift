@@ -113,6 +113,15 @@ final class MatchSession {
     /// for nothing.
     nonisolated private let search = SearchHandle()
 
+    /// Whether this match will offer the player a suggestion.
+    ///
+    /// True for everything Keezly currently plays. It exists as a property
+    /// rather than as an assumption because a competitive online match must
+    /// not offer one, and the place to decide that is the session rather than
+    /// a view working it out from the kind of table it is looking at
+    /// (DEC-025).
+    var allowsHints: Bool { true }
+
     /// Whether the requested opening situation was actually reached.
     ///
     /// `nil` when none was asked for. `false` is a real miss — a capture taken

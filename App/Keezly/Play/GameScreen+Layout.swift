@@ -58,6 +58,7 @@ extension GameScreen {
             board
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             sevenProgress
+            hintLine
             // Narrower than the screen by more than the padding: a fanned
             // card is rotated about its foot, so it reaches further sideways
             // than the frame the fan is given. Two of them did so far enough
@@ -122,6 +123,7 @@ extension GameScreen {
             VStack(spacing: Keezly.Spacing.medium) {
                 board.frame(maxHeight: .infinity)
                 sevenProgress
+                hintLine
                 hand(availableWidth: boardSide)
             }
             // Given explicitly so the three columns add up. Left to itself the
@@ -171,6 +173,34 @@ extension GameScreen {
     var sevenProgress: some View {
         if let remaining = planner.remainingSevenSteps, remaining > 0 {
             SevenProgress(remaining: remaining, isCompact: isCompact)
+        }
+    }
+
+    /// The suggestion, once there is one.
+    ///
+    /// Worded as an opinion rather than an instruction, because that is what
+    /// it is: one competent player's move, worked out from exactly what the
+    /// person holding the device can see.
+    @ViewBuilder
+    var hintLine: some View {
+        if let hint {
+            HStack(alignment: .firstTextBaseline, spacing: Keezly.Spacing.small) {
+                Image(systemName: "lightbulb")
+                    .font(.system(size: 13))
+                    .accessibilityHidden(true)
+                Text("hint.suggestion \(hint.spoken)")
+                    .font(Keezly.Typography.caption)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+            }
+            .foregroundStyle(.white.opacity(0.82))
+            .padding(.horizontal, Keezly.Spacing.medium)
+            .padding(.vertical, Keezly.Spacing.small)
+            .frame(maxWidth: 520)
+            .background(Capsule().fill(Color.black.opacity(0.32)))
+            .onTapGesture { clearHint() }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("hint.text")
         }
     }
 
@@ -260,19 +290,32 @@ extension GameScreen {
     @ViewBuilder
     var actionListButton: some View {
         if session.isAwaitingHuman, !awaitingHandover, session.seatOnTurn != nil {
-            Button {
-                showsActionList = true
-            } label: {
-                Label("a11y.actions.open", systemImage: "list.bullet")
-                    .font(Keezly.Typography.caption.weight(.medium))
-                    .padding(.horizontal, Keezly.Spacing.medium)
-                    .padding(.vertical, Keezly.Spacing.small)
+            HStack(spacing: Keezly.Spacing.small) {
+                Button {
+                    showsActionList = true
+                } label: {
+                    Label("a11y.actions.open", systemImage: "list.bullet")
+                        .font(Keezly.Typography.caption.weight(.medium))
+                        .padding(.horizontal, Keezly.Spacing.medium)
+                        .padding(.vertical, Keezly.Spacing.small)
+                }
+                .accessibilityHint("a11y.actions.hint")
+                .accessibilityIdentifier("actions.open")
+
+                if session.allowsHints {
+                    Button(action: toggleHint) {
+                        Label(hint == nil ? "hint.ask" : "hint.dismiss", systemImage: "lightbulb")
+                            .font(Keezly.Typography.caption.weight(.medium))
+                            .padding(.horizontal, Keezly.Spacing.medium)
+                            .padding(.vertical, Keezly.Spacing.small)
+                    }
+                    .accessibilityHint("hint.hint")
+                    .accessibilityIdentifier("hint.ask")
+                }
             }
             .buttonStyle(.bordered)
             .tint(.white)
             .pointerEffect(.automatic)
-            .accessibilityHint("a11y.actions.hint")
-            .accessibilityIdentifier("actions.open")
         }
     }
 
@@ -346,7 +389,8 @@ extension GameScreen {
                     cardWidth: cardWidth ?? (availableWidth < 300 ? shortHandCardWidth : handCardWidth),
                     availableWidth: availableWidth,
                     focus: $focus,
-                    onSelect: select(card:)
+                    onSelect: select(card:),
+                    onExplain: { explaining = CardHelp(rank: $0.rank) }
                 )
                 .disabled(!session.isAwaitingHuman)
                 .opacity(session.isAwaitingHuman ? 1 : 0.55)

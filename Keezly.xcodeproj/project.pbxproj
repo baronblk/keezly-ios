@@ -52,6 +52,7 @@
 		9C350AC7FD9345773A30809D /* GameScreen+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B625843FF9E6179952A9F7 /* GameScreen+Layout.swift */; };
 		9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */; };
 		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
+		A390FB69163B90983BE40A59 /* CardHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10AB2A38F4F82C23C5677AC /* CardHelp.swift */; };
 		A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF95D494649C4F6D223A28C /* MatchSession.swift */; };
 		A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32529E7548CA1EFE9A4F729 /* HandoverView.swift */; };
 		AA8C0EC4A91FB60B682CE35C /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EB92D3C1A47B55D665EE1FA /* MatchStore.swift */; };
@@ -71,7 +72,9 @@
 		E3CFA18060839ED0805FA3FB /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A7AD9526A6D73BF8D94109D3 /* Localizable.xcstrings */; };
 		EA94C32B2E325833C8916390 /* HandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B899A9121779A5665E7D27E6 /* HandView.swift */; };
 		EB5021060F2317DB04D835A3 /* BoardTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 897EA5B37322B0549DF70ED6 /* BoardTheme.swift */; };
+		EF390F2DF62147FAC458AA6A /* HintTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC05E907B3387D5470BB34B /* HintTests.swift */; };
 		F00D0A89D5E633436368705D /* InnerFieldMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6759043901D352FD92C88C4 /* InnerFieldMeasurement.swift */; };
+		FA296424B21AB9956524840F /* Hint.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5DAEEB72289791BD360E6B /* Hint.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,6 +147,7 @@
 		AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerIdentity.swift; sourceTree = "<group>"; };
 		B32529E7548CA1EFE9A4F729 /* HandoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoverView.swift; sourceTree = "<group>"; };
 		B899A9121779A5665E7D27E6 /* HandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandView.swift; sourceTree = "<group>"; };
+		C10AB2A38F4F82C23C5677AC /* CardHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardHelp.swift; sourceTree = "<group>"; };
 		C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchFixtureTests.swift; sourceTree = "<group>"; };
 		C482C27A4DE9D8BA7FA25193 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		C9494E3CF894AD64E24FE743 /* Lesson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lesson.swift; sourceTree = "<group>"; };
@@ -153,12 +157,14 @@
 		E336B27DD79B71BBB763188D /* GameCenterAuthenticationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterAuthenticationTests.swift; sourceTree = "<group>"; };
 		E64B06232876C033256A30C1 /* GameCenterAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterAuthentication.swift; sourceTree = "<group>"; };
 		E67D8019D88234311D0379BB /* KeezlyUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA5DAEEB72289791BD360E6B /* Hint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hint.swift; sourceTree = "<group>"; };
 		EBF95D494649C4F6D223A28C /* MatchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSession.swift; sourceTree = "<group>"; };
 		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F1B93678F21644FD63C4658C /* PlayPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPlanner.swift; sourceTree = "<group>"; };
 		F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassAndPlayTests.swift; sourceTree = "<group>"; };
 		F9A8EFD5BD552AFCE3729032 /* PlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayLayout.swift; sourceTree = "<group>"; };
 		FA0BF630CB2278771597A67A /* MatchEndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEndView.swift; sourceTree = "<group>"; };
+		FBC05E907B3387D5470BB34B /* HintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintTests.swift; sourceTree = "<group>"; };
 		FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyTheme.swift; sourceTree = "<group>"; };
 		FFC69C3AE4E8D6DCED88A698 /* ActionListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -198,9 +204,11 @@
 			isa = PBXGroup;
 			children = (
 				26B0B7B51FE6EE314EF9AB1A /* BoardPresenter.swift */,
+				C10AB2A38F4F82C23C5677AC /* CardHelp.swift */,
 				67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */,
 				94B625843FF9E6179952A9F7 /* GameScreen+Layout.swift */,
 				B32529E7548CA1EFE9A4F729 /* HandoverView.swift */,
+				EA5DAEEB72289791BD360E6B /* Hint.swift */,
 				FA0BF630CB2278771597A67A /* MatchEndView.swift */,
 				DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */,
 				F9A8EFD5BD552AFCE3729032 /* PlayLayout.swift */,
@@ -389,6 +397,7 @@
 				79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */,
 				55F880978D3865E445AA5593 /* BoardPresenterTests.swift */,
 				E336B27DD79B71BBB763188D /* GameCenterAuthenticationTests.swift */,
+				FBC05E907B3387D5470BB34B /* HintTests.swift */,
 				A6759043901D352FD92C88C4 /* InnerFieldMeasurement.swift */,
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
@@ -533,6 +542,7 @@
 				9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */,
 				28CC2B89F10507596DD31D50 /* BoardPresenterTests.swift in Sources */,
 				0344A701FDB8CB0A91E0151D /* GameCenterAuthenticationTests.swift in Sources */,
+				EF390F2DF62147FAC458AA6A /* HintTests.swift in Sources */,
 				F00D0A89D5E633436368705D /* InnerFieldMeasurement.swift in Sources */,
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
@@ -559,6 +569,7 @@
 				EB5021060F2317DB04D835A3 /* BoardTheme.swift in Sources */,
 				49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */,
 				180EEED18A6C25123E43D24B /* CardFaceArt.swift in Sources */,
+				A390FB69163B90983BE40A59 /* CardHelp.swift in Sources */,
 				58241CDF0095935276E260B2 /* CardView.swift in Sources */,
 				5E1DCA60FB2FB76BA39E6D69 /* GameCenterAuthentication.swift in Sources */,
 				974B12F5B5561828DB83118B /* GameCenterTransport.swift in Sources */,
@@ -566,6 +577,7 @@
 				B29A4F858EE41B8D796DB41C /* GameScreen.swift in Sources */,
 				EA94C32B2E325833C8916390 /* HandView.swift in Sources */,
 				A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */,
+				FA296424B21AB9956524840F /* Hint.swift in Sources */,
 				24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */,
 				A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */,
 				B586F635085CB018833325F3 /* KeyboardFocus.swift in Sources */,
