@@ -10,6 +10,7 @@ struct MainMenuView: View {
     @Environment(\.boardTheme) private var theme
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 44
     @ScaledMetric(relativeTo: .subheadline) private var labelSize: CGFloat = 15
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     @Binding var table: TableConfiguration
     /// The match a player could pick up again, if there is one.
@@ -77,7 +78,7 @@ struct MainMenuView: View {
                         Text(verbatim: "\(count)").tag(count)
                     }
                 }
-                .pickerStyle(.segmented)
+                .tableFieldPicker(accessibilitySize: typeSize.isAccessibilitySize)
                 .accessibilityIdentifier("table.players")
             }
 
@@ -86,7 +87,7 @@ struct MainMenuView: View {
                     Text("table.sides.teams").tag(true)
                     Text("table.sides.free").tag(false)
                 }
-                .pickerStyle(.segmented)
+                .tableFieldPicker(accessibilitySize: typeSize.isAccessibilitySize)
                 .disabled(!table.allowsTeams)
                 .accessibilityIdentifier("table.sides")
 
@@ -106,7 +107,7 @@ struct MainMenuView: View {
                         Text(verbatim: "\(count)").tag(count)
                     }
                 }
-                .pickerStyle(.segmented)
+                .tableFieldPicker(accessibilitySize: typeSize.isAccessibilitySize)
                 .accessibilityIdentifier("table.people")
 
                 // What sharing the device actually means at this table. At
@@ -129,7 +130,7 @@ struct MainMenuView: View {
                     Text("ai.medium").tag(AIDifficulty.medium)
                     Text("ai.hard").tag(AIDifficulty.hard)
                 }
-                .pickerStyle(.segmented)
+                .tableFieldPicker(accessibilitySize: typeSize.isAccessibilitySize)
                 .disabled(table.seatedHumans >= table.seatCount)
                 .accessibilityIdentifier("table.opponents")
             }
@@ -156,51 +157,69 @@ struct MainMenuView: View {
                 .font(.system(size: labelSize, weight: .semibold, design: .rounded))
                 .foregroundStyle(Keezly.Palette.secondaryText)
 
-            HStack(spacing: Keezly.Spacing.small) {
-                ForEach(0..<table.seatCount, id: \.self) { index in
-                    let seat = Seat(index)
-                    let identity = PlayerIdentity.identity(for: seat)
-                    let isPerson = index < table.seatedHumans
-                    let isPartner = table.teamMode == .teamsOfTwo
-                        && index != 0
-                        && table.gameConfiguration.areAllied(Seat(0), seat)
-
-                    VStack(spacing: 4) {
-                        ZStack {
-                            Circle().fill(identity.color.opacity(0.28))
-                            Circle().strokeBorder(identity.color.opacity(0.6), lineWidth: 1)
-                            MarkShape(mark: identity.mark)
-                                .fill(identity.color)
-                                .frame(width: 15, height: 15)
+            // A row of labelled swatches is a picture of the table, and at
+            // accessibility text sizes it stops being one: the labels grow
+            // past their swatches and run into each other. There the same
+            // information becomes a list, which reads at any size.
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: Keezly.Spacing.small) {
+                    ForEach(0..<table.seatCount, id: \.self) { index in
+                        HStack(spacing: Keezly.Spacing.small) {
+                            swatch(at: index)
+                            Text(role(at: index))
+                                .font(.system(size: labelSize, weight: .medium, design: .rounded))
+                                .foregroundStyle(Keezly.Palette.secondaryText)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .frame(width: 34, height: 34)
-                        .overlay {
-                            if isPerson {
-                                Circle().strokeBorder(identity.color, lineWidth: 2.5)
-                            }
-                        }
-
-                        Text(
-                            index == 0
-                                ? "seat.you"
-                                : seatLabel(isPerson: isPerson, isPartner: isPartner, index: index)
-                        )
-                            .font(.system(size: labelSize * 0.74, weight: .medium, design: .rounded))
-                            .foregroundStyle(Keezly.Palette.secondaryText)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack(spacing: Keezly.Spacing.small) {
+                    ForEach(0..<table.seatCount, id: \.self) { index in
+                        VStack(spacing: 4) {
+                            swatch(at: index)
+                            Text(role(at: index))
+                                .font(.system(size: labelSize * 0.74, weight: .medium, design: .rounded))
+                                .foregroundStyle(Keezly.Palette.secondaryText)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("table.seats")
     }
 
-    /// What a seat is called in the menu: a person, a partner, or the computer.
-    private func seatLabel(isPerson: Bool, isPartner: Bool, index: Int) -> LocalizedStringKey {
-        if isPerson { return "seat.person \(index + 1)" }
+    /// One seat's colour and mark.
+    private func swatch(at index: Int) -> some View {
+        let identity = PlayerIdentity.identity(for: Seat(index))
+        let isPerson = index < table.seatedHumans
+        return ZStack {
+            Circle().fill(identity.color.opacity(0.28))
+            Circle().strokeBorder(identity.color.opacity(0.6), lineWidth: 1)
+            MarkShape(mark: identity.mark)
+                .fill(identity.color)
+                .frame(width: 15, height: 15)
+        }
+        .frame(width: 34, height: 34)
+        .overlay {
+            if isPerson {
+                Circle().strokeBorder(identity.color, lineWidth: 2.5)
+            }
+        }
+    }
+
+    /// What a seat is called in the menu: you, a person, a partner, or the
+    /// computer.
+    private func role(at index: Int) -> LocalizedStringKey {
+        guard index != 0 else { return "seat.you" }
+        if index < table.seatedHumans { return "seat.person \(index + 1)" }
+        let isPartner = table.teamMode == .teamsOfTwo
+            && table.gameConfiguration.areAllied(Seat(0), Seat(index))
         return isPartner ? "seat.partner" : "seat.computer"
     }
 

@@ -55,6 +55,10 @@ struct GameScreen: View {
     @State var hintSearch: Task<Void, Never>?
 
     @Environment(\.scenePhase) var scenePhase
+    /// Roughly what the opponent strip, the buttons and the spacings take
+    /// above and below the board. Scaled, because all of it is text and all of
+    /// it grows with the reader's setting.
+    @ScaledMetric(relativeTo: .body) var chromeHeight: CGFloat = 132
 
     init(session: MatchSession, onLeave: @escaping () -> Void = {}, tutorial: TutorialRun? = nil) {
         self.onLeave = onLeave

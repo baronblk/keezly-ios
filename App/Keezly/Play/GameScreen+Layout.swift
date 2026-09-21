@@ -15,9 +15,8 @@ extension GameScreen {
     /// the board worth looking at. A phone in landscape is the case.
     static let shortHeightThreshold: CGFloat = 520
 
-    /// Roughly what the opponent strip and the spacings take on a phone,
-    /// before the hand gets what is left.
-    static let phoneChromeHeight: CGFloat = 104
+    /// Below this a board stops being a board, whatever the text size.
+    static let minimumBoardSide: CGFloat = 240
 
     /// How much height the fanned hand takes below the board.
     var handHeight: CGFloat { handCardWidth * 1.45 + handCardWidth * 0.3 }
@@ -43,8 +42,15 @@ extension GameScreen {
         // A portrait iPad reaches this layout too, and an eight-point margin
         // that suits a phone leaves a thirteen-inch board touching the glass.
         let margin = isCompact ? Keezly.Spacing.small : Keezly.Spacing.large
-        let boardSide = size.width - margin * 2
-        let spare = max(0, size.height - boardSide - Self.phoneChromeHeight)
+        // The board would happily take the whole width, but the chrome above
+        // and below it grows with the reader's text size — at the accessibility
+        // sizes a full-width board pushed the hand off the bottom of the
+        // screen. Whatever else happens, the cards stay reachable (§53).
+        let boardSide = max(
+            Self.minimumBoardSide,
+            min(size.width - margin * 2, size.height - chromeHeight - handCardWidth * 1.2)
+        )
+        let spare = max(0, size.height - boardSide - chromeHeight)
         // Capped: the fan tilts its outer cards, so its drawn width is a
         // little more than the frame it is given. Letting the cards grow to
         // fill the height exactly pushed the outermost two off the screen.

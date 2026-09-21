@@ -49,7 +49,17 @@ enum Keezly {
         static let rim = Color("BoardRim", bundle: .main)
 
         static let primaryText = Color.primary
-        static let secondaryText = Color.secondary
+
+        /// Quieter text on one of the app's wooden surfaces.
+        ///
+        /// Fixed rather than `Color.secondary`, which follows the system
+        /// appearance. Every one of these labels sits on the board's own wood,
+        /// which does not — so in light mode the system colour came out at
+        /// **2.88:1** against the panel, below the contrast floor for text of
+        /// any size. This ink clears 4.5:1 on every wooden surface in the app,
+        /// including the deepest, and holds above 3:1 where it is drawn at 72%
+        /// (§53). `ContrastTests` measures all of them.
+        static let secondaryText = Color(hex: 0x40_38_2F)
 
         /// Highlight for a square a selected pawn could move to.
         static let legalTarget = Color("LegalTarget", bundle: .main)

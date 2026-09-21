@@ -12,6 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
+| ISS-016 | A seat colour does not reach 3:1 against the board | Accepted limitation (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
 | ISS-014 | Neither physical device will start a UI test runner | Blocker (hardware gate) |
 | ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
@@ -57,6 +58,44 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 - **Related files:** `App/Keezly/Play/GameScreen.swift`,
   `App/Keezly/Board/BoardLayout.swift`
 - **Related tests:** `InnerFieldTests`
+
+### ISS-016 — A seat colour does not reach 3:1 against the board
+
+- **Status:** OPEN — accepted limitation, measured and recorded
+- **Severity:** Accepted limitation (contrast)
+- **Component:** Design system, board
+- **Measured** by `ContrastTests`, in the light appearance, against the board's
+  own wood:
+
+  | | Ratio |
+  |---|---|
+  | Amber pawn | **1.23:1** |
+  | Green pawn | 2.14:1 |
+  | Blue pawn | 2.41:1 |
+  | Red pawn | 2.50:1 |
+  | The dark outline every piece carries | 2.03:1 |
+
+- **Expected:** WCAG 1.4.11 asks 3:1 for the boundary of a graphical element
+  that carries meaning.
+- **Actual:** Nothing in the current palette reaches it. The board is a light
+  maple panel by design (DEC-018), and pieces on a light board are lighter than
+  3:1 allows unless the board itself is darkened.
+- **Why it is accepted rather than fixed:** the board's appearance is settled
+  and was reviewed and accepted as a whole. More to the point, **colour is not
+  what carries a seat's identity here**: every seat has its own mark on the
+  piece, every piece is named in words by `MoveNarrator` ("red pawn 2, eleven
+  squares from home"), and every move is reachable from the action list without
+  looking at the board at all. A player who cannot separate amber from maple
+  can still play the whole game.
+- **What would fix it:** a materially darker board, or a second "high contrast"
+  board material. Both are design decisions, not adjustments, and neither is in
+  1.0.0.
+- **Guarded:** `ContrastTests.seatColoursAreNotInvisible` fails if any seat gets
+  *weaker* than it is today, so the shortfall cannot quietly grow.
+- **Related files:** `App/Keezly/DesignSystem/PlayerIdentity.swift`,
+  `App/Keezly/Board/PawnView.swift`
+
+---
 
 ### ISS-015 — Online play hides nothing from a modified client
 
