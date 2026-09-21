@@ -191,7 +191,7 @@ struct GameScreen: View {
                         .zIndex(500)
                 } else if proxy.size.height < Self.shortHeightThreshold {
                     shortLayout(size: proxy.size)
-                } else if isCompact {
+                } else if isCompact || !PlayLayout.prefersColumns(size: proxy.size, handHeight: handHeight) {
                     compactLayout(size: proxy.size)
                 } else {
                     wideLayout(size: proxy.size)
@@ -275,6 +275,9 @@ struct GameScreen: View {
     /// before the hand gets what is left.
     static let phoneChromeHeight: CGFloat = 104
 
+    /// How much height the fanned hand takes below the board.
+    private var handHeight: CGFloat { handCardWidth * 1.45 + handCardWidth * 0.3 }
+
     static func describe(_ focus: PlayFocus?) -> String {
         switch focus {
         case .none: "focus:none"
@@ -293,12 +296,17 @@ struct GameScreen: View {
         // width and there is height left over. It goes to the cards rather
         // than to empty table: a card that can be read is worth more than a
         // gap (§45).
-        let boardSide = size.width - Keezly.Spacing.small * 2
+        // A portrait iPad reaches this layout too, and an eight-point margin
+        // that suits a phone leaves a thirteen-inch board touching the glass.
+        let margin = isCompact ? Keezly.Spacing.small : Keezly.Spacing.large
+        let boardSide = size.width - margin * 2
         let spare = max(0, size.height - boardSide - Self.phoneChromeHeight)
         // Capped: the fan tilts its outer cards, so its drawn width is a
         // little more than the frame it is given. Letting the cards grow to
         // fill the height exactly pushed the outermost two off the screen.
-        let cardWidth = min(110, max(handCardWidth, spare / 1.95))
+        // The cap is the card's own readable maximum, which is larger on the
+        // bigger screen for the same reason the board is.
+        let cardWidth = min(isCompact ? 110 : 150, max(handCardWidth, spare / 1.95))
 
         return VStack(spacing: Keezly.Spacing.small) {
             opponentStrip
@@ -312,7 +320,7 @@ struct GameScreen: View {
             // to be cut off at the edges.
             hand(availableWidth: size.width - Keezly.Spacing.section, cardWidth: cardWidth)
         }
-        .padding(Keezly.Spacing.small)
+        .padding(margin)
         // Nothing inside may push the layout wider than the screen: that is
         // what clipped the board on a six-player phone table.
         .frame(width: size.width)
@@ -352,20 +360,11 @@ struct GameScreen: View {
         // The board is square, so in landscape its size is set by the height
         // left after the hand. Whatever width that leaves goes to the seat
         // panels rather than sitting empty either side of a centred board.
-        let handHeight = handCardWidth * 1.45 + handCardWidth * 0.3
-        let minimumSide: CGFloat = 210
-        // Everything is measured from the width that is actually free, after
-        // the padding and the gaps between the three columns. Working from
-        // the raw screen width instead pushed the far seat panel off the edge,
-        // and taking the height alone made the board wider than the screen in
-        // portrait, where it was then clipped.
-        let available = size.width - Keezly.Spacing.regular * 2 - Keezly.Spacing.large * 2
-        let heightBudget = size.height - handHeight - Keezly.Spacing.section
-        // Never below most of the smaller screen edge: a board squeezed out of
-        // the way is no longer a board.
-        let floor = min(size.width, size.height) * 0.62
-        let boardSide = max(floor, min(available - minimumSide * 2, heightBudget))
-        let sideWidth = max(minimumSide, (available - boardSide) / 2)
+        // The arithmetic lives in `PlayLayout`, where it can be added up by a
+        // test rather than by looking at a screenshot.
+        let layout = PlayLayout(size: size, handHeight: handHeight)
+        let boardSide = layout.boardSide
+        let sideWidth = layout.sideWidth
         let opponents = session.state.configuration.seats.filter { $0 != viewpoint }
         let split = (opponents.count + 1) / 2
 

@@ -52,6 +52,14 @@ enum MoveNarrator {
         return max(0, observation.board.fullJourneyLength - travelled)
     }
 
+    /// A pawn named but not placed.
+    ///
+    /// For phrases that already say where it is. "Bring red pawn 1, in the
+    /// start, out of the start" is what saying it twice sounds like.
+    static func pawnName(_ id: PawnID) -> String {
+        String(localized: "a11y.pawn.name \(seatName(id.seat)) \(id.slot + 1)")
+    }
+
     private static func state(of id: PawnID, in observation: PlayerObservation) -> PawnState {
         observation.pawns[id.seat.index * pawnsPerSeat + id.slot]
     }
@@ -137,7 +145,7 @@ enum MoveNarrator {
         let rank = rankName(move.card.rank)
         switch move.action {
         case .enterFromWaiting(let id):
-            return String(localized: "a11y.move.enter \(rank) \(pawn(id, in: observation))")
+            return String(localized: "a11y.move.enter \(rank) \(pawnName(id))")
         case .advance(let id, let steps, _):
             return String(localized: "a11y.move.advance \(rank) \(pawn(id, in: observation)) \(steps)")
         case .moveBackward(let id, let steps):

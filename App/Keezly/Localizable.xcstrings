@@ -123,7 +123,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Knocks out %@."
+            "value": "Knocks %@ out."
           }
         },
         "de": {
@@ -135,7 +135,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Slaat %@."
+            "value": "Slaat %@ eruit."
           }
         }
       }
@@ -181,7 +181,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Brengt %@ in het doel."
+            "value": "Brengt %@ in het huis."
           }
         }
       }
@@ -273,7 +273,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ — %2$@ %3$lld vakjes achteruit"
+            "value": "%1$@ — %2$@ %3$lld vakjes terug"
           }
         }
       }
@@ -290,7 +290,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ — %2$@ herausstellen"
+            "value": "%1$@ — %2$@ aus dem Start holen"
           }
         },
         "nl": {
@@ -342,7 +342,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ — %2$@ wisselen met %3$@"
+            "value": "%1$@ — %2$@ ruilen met %3$@"
           }
         }
       }
@@ -353,19 +353,42 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ pawn %lld, home square %lld"
+            "value": "%1$@ pawn %2$lld, home square %3$lld"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ Figur %lld, Zielfeld %lld"
+            "value": "Figur %2$lld von %1$@, Zielfeld %3$lld"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ pion %lld, doelvakje %lld"
+            "value": "pion %2$lld van %1$@, doelvakje %3$lld"
+          }
+        }
+      }
+    },
+    "a11y.pawn.name %@ %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ pawn %2$lld"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Figur %2$lld von %1$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pion %2$lld van %1$@"
           }
         }
       }
@@ -422,19 +445,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ pawn %lld, %lld squares from home"
+            "value": "%1$@ pawn %2$lld, %3$lld squares from home"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ Figur %lld, %lld Felder vor dem Ziel"
+            "value": "Figur %2$lld von %1$@, %3$lld Felder vor dem Ziel"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ pion %lld, %lld vakjes voor het doel"
+            "value": "pion %2$lld van %1$@, %3$lld vakjes voor het doel"
           }
         }
       }
@@ -445,19 +468,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ pawn %lld, in the start"
+            "value": "%1$@ pawn %2$lld, in the start"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ Figur %lld, im Start"
+            "value": "Figur %2$lld von %1$@, im Start"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ pion %lld, in de start"
+            "value": "pion %2$lld van %1$@, in de start"
           }
         }
       }

@@ -32,6 +32,7 @@
 		5D9F39D6B8B9B343FB63EA7B /* PlayPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B93678F21644FD63C4658C /* PlayPlanner.swift */; };
 		5E1DCA60FB2FB76BA39E6D69 /* GameCenterAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64B06232876C033256A30C1 /* GameCenterAuthentication.swift */; };
 		5E596B214B5827FD7FFD75F2 /* KeezlyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5E0E46A1D3857966A001B9EC /* KeezlyCore */; };
+		5F30FB1DEF21B7CF218EC331 /* PlayLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A8EFD5BD552AFCE3729032 /* PlayLayout.swift */; };
 		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
 		6F76881931D3BEC678981AD8 /* MatchEndView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0BF630CB2278771597A67A /* MatchEndView.swift */; };
 		71D9948558D1AD1F37A7F8EE /* BoardOrnament.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */; };
@@ -53,6 +54,7 @@
 		B2801BC0A5360759083EB63B /* BoardSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */; };
 		B29A4F858EE41B8D796DB41C /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */; };
 		B586F635085CB018833325F3 /* KeyboardFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963EE8EC7128581D049817F2 /* KeyboardFocus.swift */; };
+		BE8D28189EE7D3062AAF189B /* PlayLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76701703452F573EE999F56F /* PlayLayoutTests.swift */; };
 		C04441E059560F69B6264AA1 /* SavedMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D6D99B9BC3DE3FC0DFFA5E /* SavedMatch.swift */; };
 		C38467AD832BA4A6AE1C4DAD /* BoardCentreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7312608406A17AE728331F13 /* BoardCentreView.swift */; };
 		C7F64D09D8F2AB0A20F02ECE /* RulebookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6181BDD1F1E6EEE9241F2EF0 /* RulebookView.swift */; };
@@ -113,6 +115,7 @@
 		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
 		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7312608406A17AE728331F13 /* BoardCentreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardCentreView.swift; sourceTree = "<group>"; };
+		76701703452F573EE999F56F /* PlayLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayLayoutTests.swift; sourceTree = "<group>"; };
 		79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardOrnamentTests.swift; sourceTree = "<group>"; };
 		7C1C747C1DB0AE2483C37347 /* Keezly.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keezly.xcconfig; sourceTree = "<group>"; };
 		7D4398908BBB32AE55426B5D /* ActionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListView.swift; sourceTree = "<group>"; };
@@ -144,6 +147,7 @@
 		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F1B93678F21644FD63C4658C /* PlayPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPlanner.swift; sourceTree = "<group>"; };
 		F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassAndPlayTests.swift; sourceTree = "<group>"; };
+		F9A8EFD5BD552AFCE3729032 /* PlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayLayout.swift; sourceTree = "<group>"; };
 		FA0BF630CB2278771597A67A /* MatchEndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEndView.swift; sourceTree = "<group>"; };
 		FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyTheme.swift; sourceTree = "<group>"; };
 		FFC69C3AE4E8D6DCED88A698 /* ActionListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListTests.swift; sourceTree = "<group>"; };
@@ -188,6 +192,7 @@
 				B32529E7548CA1EFE9A4F729 /* HandoverView.swift */,
 				FA0BF630CB2278771597A67A /* MatchEndView.swift */,
 				DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */,
+				F9A8EFD5BD552AFCE3729032 /* PlayLayout.swift */,
 				F1B93678F21644FD63C4658C /* PlayPlanner.swift */,
 				390FE2938458CED13A70D210 /* SeatStatusView.swift */,
 			);
@@ -367,6 +372,7 @@
 				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
 				317A24C86F2312B7C966802F /* MoveNarratorTests.swift */,
 				8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */,
+				76701703452F573EE999F56F /* PlayLayoutTests.swift */,
 				8596ECB42F680F150CE5C50D /* RulebookTests.swift */,
 				3598D989F36F076D53B3823D /* TableConfigurationTests.swift */,
 			);
@@ -509,6 +515,7 @@
 				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
 				4C65E6C87C4DC459E6205D37 /* MoveNarratorTests.swift in Sources */,
 				5843618018A82726BBC6F5FC /* PlayFocusTests.swift in Sources */,
+				BE8D28189EE7D3062AAF189B /* PlayLayoutTests.swift in Sources */,
 				2C0A88DA471A8016E7C58807 /* RulebookTests.swift in Sources */,
 				8B724EB7A6C64B30D84E5793 /* TableConfigurationTests.swift in Sources */,
 			);
@@ -544,6 +551,7 @@
 				33299AA00BC017E0D3412033 /* MoveNarrator.swift in Sources */,
 				74690CFDE17AFB4D550A4628 /* PawnView.swift in Sources */,
 				DF7BFA02380288CCD372B832 /* PlayFocus.swift in Sources */,
+				5F30FB1DEF21B7CF218EC331 /* PlayLayout.swift in Sources */,
 				5D9F39D6B8B9B343FB63EA7B /* PlayPlanner.swift in Sources */,
 				8078C5050C02ADBFE8E93567 /* PlayerIdentity.swift in Sources */,
 				E2304885CB459B1B1D626328 /* RootView.swift in Sources */,
