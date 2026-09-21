@@ -1106,6 +1106,29 @@
         }
       }
     },
+    "menu.rules": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rules"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeln"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelregels"
+          }
+        }
+      }
+    },
     "menu.start": {
       "extractionState": "manual",
       "localizations": {
@@ -1217,6 +1240,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trekstapel, %lld kaarten"
+          }
+        }
+      }
+    },
+    "play.leave": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlassen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlaten"
+          }
+        }
+      }
+    },
+    "play.leave.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goes back to the menu. The match is saved and can be picked up again."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geht zurück zum Menü. Die Partie ist gespeichert und kann fortgesetzt werden."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gaat terug naar het menu. De partij is opgeslagen en kun je later hervatten."
+          }
+        }
+      }
+    },
+    "play.rules": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rules"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeln"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelregels"
           }
         }
       }
@@ -1516,6 +1608,1938 @@
           "stringUnit": {
             "state": "translated",
             "value": "Negen"
+          }
+        }
+      }
+    },
+    "result.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to the menu"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück zum Menü"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terug naar het menu"
+          }
+        }
+      }
+    },
+    "result.byDefault": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The others left the match."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die übrigen haben die Partie verlassen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De anderen hebben de partij verlaten."
+          }
+        }
+      }
+    },
+    "result.winner %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wins"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ gewinnt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wint"
+          }
+        }
+      }
+    },
+    "result.youWin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You win"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du gewinnst"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jij wint"
+          }
+        }
+      }
+    },
+    "rules.ace.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Either bring a pawn out onto your start square, or move a pawn one square forward. Your choice, every time."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entweder eine Figur auf dein Startfeld holen oder eine Figur ein Feld vorziehen. Jedes Mal deine Wahl."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Óf een pion op je startvakje zetten, óf een pion één vakje vooruit. Elke keer opnieuw jouw keuze."
+          }
+        }
+      }
+    },
+    "rules.ace.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ace"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ass"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aas"
+          }
+        }
+      }
+    },
+    "rules.badge.active": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This table"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Tisch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze tafel"
+          }
+        }
+      }
+    },
+    "rules.badge.classic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traditional"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überliefert"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traditioneel"
+          }
+        }
+      }
+    },
+    "rules.badge.house": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "House rule"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hausregel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huisregel"
+          }
+        }
+      }
+    },
+    "rules.blocking.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A protected start square always blocks. Whether your own pawns elsewhere on the track do the same is a decision for the table."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein geschütztes Startfeld sperrt immer. Ob auch die eigenen Figuren anderswo auf der Bahn sperren, entscheidet der Tisch."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een beschermd startvakje blokkeert altijd. Of je eigen pionnen elders op de baan dat ook doen, bepaalt de tafel."
+          }
+        }
+      }
+    },
+    "rules.blocking.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What blocks the track"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was die Bahn sperrt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat de baan blokkeert"
+          }
+        }
+      }
+    },
+    "rules.capture.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Land exactly on an unprotected pawn and it goes back to its owner's start, however far it had come."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wer genau auf einer ungeschützten Figur landet, schickt sie zurück in ihren Start — ganz gleich, wie weit sie schon gekommen war."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kom je precies op een onbeschermde pion uit, dan gaat die terug naar zijn eigen start, hoe ver hij ook al was."
+          }
+        }
+      }
+    },
+    "rules.capture.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knocking a pawn out"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlagen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slaan"
+          }
+        }
+      }
+    },
+    "rules.chapter.cards": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The cards"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Karten"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De kaarten"
+          }
+        }
+      }
+    },
+    "rules.chapter.ending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ending a match"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Ende"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het einde"
+          }
+        }
+      }
+    },
+    "rules.chapter.game": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The game"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Spiel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het spel"
+          }
+        }
+      }
+    },
+    "rules.chapter.home": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Ziel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het huis"
+          }
+        }
+      }
+    },
+    "rules.chapter.moving": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moving"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zetten"
+          }
+        }
+      }
+    },
+    "rules.chapter.special": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What each card does"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was die Karten können"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat de kaarten doen"
+          }
+        }
+      }
+    },
+    "rules.deal.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cards come in three rounds: five each, then four, then four. That is thirteen apiece and uses the deck up exactly. When every hand is spent the cards are gathered and shuffled, the deal passes one seat clockwise, and a new cycle begins."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gegeben wird in drei Runden: erst fünf, dann vier, dann vier. Das sind dreizehn pro Person und verbraucht das Blatt genau. Sind alle Hände gespielt, werden die Karten eingesammelt und gemischt, das Geben wandert einen Platz im Uhrzeigersinn weiter, und ein neuer Durchgang beginnt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er wordt in drie rondes gedeeld: eerst vijf, dan vier, dan nog eens vier. Dat zijn er dertien per speler en daarmee is het spel precies op. Zijn alle handen gespeeld, dan worden de kaarten verzameld en geschud, schuift het delen één plaats met de klok mee op en begint een nieuwe ronde."
+          }
+        }
+      }
+    },
+    "rules.deal.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The deal"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Geben"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het delen"
+          }
+        }
+      }
+    },
+    "rules.deck.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One full run of ranks per player — ace to king, thirteen cards — so two players share twenty-six and six players seventy-eight. The suits are printed for looks; no rule depends on them, and there are no jokers."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro Person ein vollständiger Satz Werte — Ass bis König, dreizehn Karten. Zu zweit sind das sechsundzwanzig, zu sechst achtundsiebzig. Die Farben sind reine Optik; keine Regel hängt an ihnen, und Joker gibt es nicht."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per speler één volledige reeks waarden — aas tot en met heer, dertien kaarten. Met z'n tweeën zijn dat er zesentwintig, met z'n zessen achtenzeventig. De kleuren zijn er voor het oog; geen enkele regel hangt ervan af, en jokers zitten er niet bij."
+          }
+        }
+      }
+    },
+    "rules.deck.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The deck"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Blatt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het spel kaarten"
+          }
+        }
+      }
+    },
+    "rules.entering.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pawns wait in your start until an ace or a king brings one out onto your start square. Nothing else opens the gate."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Figuren warten im Start, bis ein Ass oder ein König eine davon auf dein Startfeld stellt. Etwas anderes öffnet das Tor nicht."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je pionnen wachten in de start tot een aas of een heer er één op je startvakje zet. Iets anders krijgt ze er niet uit."
+          }
+        }
+      }
+    },
+    "rules.entering.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coming out"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herauskommen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar buiten komen"
+          }
+        }
+      }
+    },
+    "rules.fold.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only when not one card in your hand can be played at all do you throw the whole hand in. You then sit out the rest of this deal round and come back with the next one."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erst wenn keine einzige Karte spielbar ist, wirfst du die ganze Hand ab. Du setzt dann für den Rest dieser Runde aus und bist beim nächsten Geben wieder dabei."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas als geen enkele kaart te spelen is, gooi je je hele hand weg. Je slaat de rest van deze deelronde over en doet bij de volgende weer mee."
+          }
+        }
+      }
+    },
+    "rules.fold.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A dead hand"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine tote Hand"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een dode hand"
+          }
+        }
+      }
+    },
+    "rules.forcedMove.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If any card in your hand gives you a legal move, you must play one — even a move you would rather not make. Holding a good card back is not allowed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn irgendeine Karte auf deiner Hand einen legalen Zug erlaubt, musst du ziehen — auch einen Zug, den du lieber vermeiden würdest. Eine gute Karte zurückzuhalten ist nicht erlaubt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan één van je kaarten een geldige zet opleveren, dan moet je zetten — ook een zet die je liever niet zou doen. Een goede kaart achterhouden mag niet."
+          }
+        }
+      }
+    },
+    "rules.forcedMove.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have to move"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zugzwang"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je moet zetten"
+          }
+        }
+      }
+    },
+    "rules.four.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exactly four squares backward. Never into a home lane and never out of one, and it cannot cross a protected start square. Played at the right moment it is the fastest route there is: step back past your own start and your home entry is right in front of you."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genau vier Felder zurück. Nie in ein Ziel hinein und nie aus einem heraus, und ein geschütztes Startfeld kann sie nicht überqueren. Im richtigen Moment ist sie die schnellste Abkürzung überhaupt: rückwärts an deinem Start vorbei, und die Zieleinfahrt liegt direkt vor dir."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precies vier vakjes achteruit. Nooit een huis in en nooit een huis uit, en langs een beschermd startvakje komt hij niet. Op het juiste moment is het de snelste route die er is: achteruit langs je eigen start en je ingang ligt pal voor je."
+          }
+        }
+      }
+    },
+    "rules.four.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Four"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vier"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vier"
+          }
+        }
+      }
+    },
+    "rules.friendlyCapture.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Landing on a pawn of your own colour, or your partner's, is something tables handle differently. Because you must move when you can, the answer decides whether you can be forced to knock out your own partner."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ob man auf einer eigenen Figur oder der der Partnerin landen darf, wird am Tisch unterschiedlich gehandhabt. Weil Zugzwang herrscht, entscheidet die Antwort, ob du gezwungen sein kannst, die eigene Partnerin zu schlagen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Of je op een pion van je eigen kleur of die van je maat mag landen, verschilt per tafel. Omdat je moet zetten als het kan, bepaalt het antwoord of je gedwongen kunt worden je eigen maat eruit te slaan."
+          }
+        }
+      }
+    },
+    "rules.friendlyCapture.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your own side"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die eigenen Figuren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je eigen kant"
+          }
+        }
+      }
+    },
+    "rules.goal.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring all four of your pawns out of your start, right around the board, and into your own home lane. The first to manage it wins — and playing in partnership, a side wins only once both partners have finished."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring alle vier Figuren aus deinem Start einmal rund ums Brett in dein eigenes Ziel. Wer das zuerst schafft, gewinnt — im Paarspiel erst dann, wenn beide Partner fertig sind."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Breng al je vier pionnen vanuit je start helemaal rond het bord naar je eigen huis. Wie dat het eerst voor elkaar krijgt, wint — bij koppelspel pas als allebei de maten binnen zijn."
+          }
+        }
+      }
+    },
+    "rules.goal.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What you are trying to do"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worum es geht"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waar het om gaat"
+          }
+        }
+      }
+    },
+    "rules.homeEntry.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your home lane needs an exact count. What happens when the number does not fit — whether the pawn simply cannot move or may carry on for another lap — is a decision for the table."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ins Ziel kommt man nur mit genauer Zahl. Was passiert, wenn die Zahl nicht passt — ob die Figur einfach stehen bleibt oder noch eine Runde weiterlaufen darf — entscheidet der Tisch."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je huis in kan alleen met een precies passend aantal. Wat er gebeurt als het niet uitkomt — blijft de pion staan of mag hij nog een ronde door — bepaalt de tafel."
+          }
+        }
+      }
+    },
+    "rules.homeEntry.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting in"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einfahren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar binnen"
+          }
+        }
+      }
+    },
+    "rules.homeOrdering.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A pawn may never jump over one that is already home. Beyond that, whether it may take any square it can reach exactly or has to fill the lane from the back is a choice."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über eine Figur, die schon im Ziel steht, wird nie gesprungen. Darüber hinaus ist es Absprache, ob jedes genau erreichbare Zielfeld erlaubt ist oder von hinten aufgefüllt werden muss."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Over een pion die al binnen is, spring je nooit heen. Verder is het een afspraak of elk precies bereikbaar vakje mag, of dat je van achteren naar voren moet vullen."
+          }
+        }
+      }
+    },
+    "rules.homeOrdering.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which home square"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welches Zielfeld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welk doelvakje"
+          }
+        }
+      }
+    },
+    "rules.homeSafety.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A pawn in a home lane is out of everybody's way: nothing can knock it out and no jack can swap it."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Figur im Ziel ist aus dem Spiel heraus: Nichts kann sie schlagen, kein Bube sie tauschen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een pion in het huis staat buiten schot: niets slaat hem eruit en geen boer ruilt hem weg."
+          }
+        }
+      }
+    },
+    "rules.homeSafety.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safe at home"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Ziel sicher"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binnen is veilig"
+          }
+        }
+      }
+    },
+    "rules.houseRuled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This table changes at least one rule from the traditional game."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An diesem Tisch weicht mindestens eine Regel vom überlieferten Spiel ab."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aan deze tafel wijkt minstens één regel af van het traditionele spel."
+          }
+        }
+      }
+    },
+    "rules.jack.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swap one of your pawns on the track with another player's pawn on the track — a partner's counts. Pawns still waiting, pawns already home and pawns protected on their own start square are all out of reach."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tausche eine deiner Figuren auf der Bahn gegen die Figur einer anderen Person auf der Bahn — die der Partnerin zählt mit. Figuren im Start, Figuren im Ziel und geschützte Figuren auf ihrem eigenen Startfeld sind tabu."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruil een van jouw pionnen op de baan met de pion van een andere speler op de baan — die van je maat telt mee. Pionnen die nog in de start staan, pionnen die al binnen zijn en beschermde pionnen op hun eigen startvakje blijven buiten schot."
+          }
+        }
+      }
+    },
+    "rules.jack.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jack"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bube"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boer"
+          }
+        }
+      }
+    },
+    "rules.jackOwnStart.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That a protected pawn cannot be taken is agreed everywhere. Whether such a pawn may give up its protection voluntarily and do the swapping itself is not."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dass eine geschützte Figur nicht genommen werden kann, ist überall gleich. Ob sie freiwillig auf ihren Schutz verzichten und selbst tauschen darf, ist es nicht."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dat een beschermde pion niet gepakt kan worden, is overal hetzelfde. Of zo'n pion zijn bescherming vrijwillig mag opgeven en zélf mag ruilen, niet."
+          }
+        }
+      }
+    },
+    "rules.jackOwnStart.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The jack and your own start"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bube und eigenes Startfeld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De boer en je eigen start"
+          }
+        }
+      }
+    },
+    "rules.king.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The king brings a pawn out of your start. Whether it can also be spent as thirteen squares forward is the best-known house rule in the game."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der König holt eine Figur aus dem Start. Ob er außerdem als dreizehn Felder gespielt werden darf, ist die bekannteste Hausregel des Spiels."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De heer haalt een pion uit je start. Of je hem daarnaast als dertien vakjes mag spelen, is de bekendste huisregel van het spel."
+          }
+        }
+      }
+    },
+    "rules.king.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "King"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "König"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heer"
+          }
+        }
+      }
+    },
+    "rules.leaving.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giving up in partnership play forfeits the match for your side. In a free-for-all your pawns come off the board and the others play on; whoever is left at the end wins. This one is Keezly's own policy rather than a traditional rule."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wer im Paarspiel aufgibt, verliert die Partie für das ganze Paar. Spielt jede für sich, verschwinden deine Figuren vom Brett und die übrigen spielen weiter; wer übrig bleibt, gewinnt. Das ist eine Festlegung von Keezly, keine überlieferte Regel."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie bij koppelspel opgeeft, verliest de partij voor het hele koppel. Speelt iedereen voor zichzelf, dan gaan je pionnen van het bord en spelen de anderen door; wie overblijft, wint. Dit is een keuze van Keezly, geen overgeleverde regel."
+          }
+        }
+      }
+    },
+    "rules.leaving.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leaving a match"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Partie verlassen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een partij verlaten"
+          }
+        }
+      }
+    },
+    "rules.moving.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Most cards simply move one pawn that many squares forward: two to ten as printed, a queen twelve. A pawn travels almost the whole way round and then turns off at its own home entry, the square just before its start."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die meisten Karten ziehen eine Figur einfach so viele Felder vor, wie aufgedruckt sind: zwei bis zehn, die Dame zwölf. Eine Figur läuft fast einmal ganz herum und biegt dann an ihrer Zieleinfahrt ab — dem Feld direkt vor ihrem eigenen Start."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De meeste kaarten zetten een pion gewoon zoveel vakjes vooruit als erop staat: twee tot en met tien, de vrouw twaalf. Een pion loopt bijna helemaal rond en slaat dan af bij zijn eigen ingang — het vakje net vóór zijn start."
+          }
+        }
+      }
+    },
+    "rules.moving.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moving forward"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorwärts ziehen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vooruit zetten"
+          }
+        }
+      }
+    },
+    "rules.option.friendlyCapture.captureAllowed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your own pawns can be knocked out too"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auch eigene Figuren können geschlagen werden"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ook je eigen pionnen kunnen eruit"
+          }
+        }
+      }
+    },
+    "rules.option.friendlyCapture.landingForbidden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Landing on your own side is not allowed"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf eigenen Figuren zu landen ist nicht erlaubt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Op je eigen kant landen mag niet"
+          }
+        }
+      }
+    },
+    "rules.option.homeEntry.allowExtraLap": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "May go round once more"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darf noch eine Runde laufen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mag nog een ronde door"
+          }
+        }
+      }
+    },
+    "rules.option.homeEntry.exactCountOnly": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exact count, or the pawn stays put"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genaue Zahl, sonst bleibt die Figur stehen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precies passend, anders blijft de pion staan"
+          }
+        }
+      }
+    },
+    "rules.option.homeOrdering.anyReachableWithoutJumping": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any square you can reach exactly"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedes genau erreichbare Feld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elk vakje dat je precies bereikt"
+          }
+        }
+      }
+    },
+    "rules.option.homeOrdering.strictBackToFront": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fill the lane from the back"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von hinten auffüllen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Van achteren naar voren vullen"
+          }
+        }
+      }
+    },
+    "rules.option.jackOwnStart.mayBeSwapSource": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A protected pawn may swap itself away"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine geschützte Figur darf selbst tauschen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een beschermde pion mag zichzelf wegruilen"
+          }
+        }
+      }
+    },
+    "rules.option.jackOwnStart.mayNotBeSwapSource": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Protection works both ways"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Schutz gilt in beide Richtungen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De bescherming werkt beide kanten op"
+          }
+        }
+      }
+    },
+    "rules.option.king.enterOnly": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brings a pawn out only"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Holt nur eine Figur heraus"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haalt alleen een pion naar buiten"
+          }
+        }
+      }
+    },
+    "rules.option.king.enterOrAdvance13": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brings a pawn out, or moves thirteen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Holt eine Figur heraus oder zieht dreizehn"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haalt een pion naar buiten, of zet dertien"
+          }
+        }
+      }
+    },
+    "rules.option.ownPawnBlocking.blocking": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your own pawns block as well"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auch eigene Figuren sperren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je eigen pionnen blokkeren ook"
+          }
+        }
+      }
+    },
+    "rules.option.ownPawnBlocking.passable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only protected start squares block"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur geschützte Startfelder sperren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alleen beschermde startvakjes blokkeren"
+          }
+        }
+      }
+    },
+    "rules.preset.houseRules": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "House rules"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hausregeln"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huisregels"
+          }
+        }
+      }
+    },
+    "rules.preset.keezlyClassic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezly Classic"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezly Klassisch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezly Klassiek"
+          }
+        }
+      }
+    },
+    "rules.preset.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rules in play"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geltende Regeln"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geldende regels"
+          }
+        }
+      }
+    },
+    "rules.preset.tournament": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tournament"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turnier"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toernooi"
+          }
+        }
+      }
+    },
+    "rules.queen.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twelve squares forward, and nothing else."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwölf Felder vor, sonst nichts."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twaalf vakjes vooruit, meer niet."
+          }
+        }
+      }
+    },
+    "rules.queen.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Queen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dame"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vrouw"
+          }
+        }
+      }
+    },
+    "rules.seven.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seven steps in all. Spend them with one pawn, or split them across two — one and six, two and five, three and four, either way round. Every step has to be used and each part must be legal in its turn, so a seven that cannot be spent in full cannot be played at all. If the first part brings your last pawn home, the rest may be played with your partner's."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sieben Schritte insgesamt. Entweder mit einer Figur oder auf zwei verteilt — eins und sechs, zwei und fünf, drei und vier, in beliebiger Reihenfolge. Alle Schritte müssen verbraucht werden, und jeder Teil muss für sich legal sein; eine Sieben, die nicht vollständig aufgeht, ist unspielbar. Bringt der erste Teil deine letzte Figur ins Ziel, darf der Rest mit einer Figur der Partnerin gezogen werden."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeven stappen in totaal. Zet ze met één pion, of verdeel ze over twee — één en zes, twee en vijf, drie en vier, in beide volgordes. Alle stappen moeten op, en elk deel moet op zichzelf mogen; een zeven die niet helemaal past, kun je helemaal niet spelen. Brengt het eerste deel je laatste pion binnen, dan mag de rest met een pion van je maat."
+          }
+        }
+      }
+    },
+    "rules.seven.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sieben"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeven"
+          }
+        }
+      }
+    },
+    "rules.start.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A pawn standing on its own start square is untouchable: it cannot be knocked out, it cannot be swapped, and no pawn may pass it in either direction — not even one of your own. While it stands there you cannot bring another pawn out either."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Figur auf ihrem eigenen Startfeld ist unantastbar: Sie kann nicht geschlagen und nicht getauscht werden, und keine Figur kommt an ihr vorbei — in keiner Richtung, auch keine eigene. Solange sie dort steht, kommt auch keine weitere Figur heraus."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een pion op zijn eigen startvakje is onaantastbaar: hij kan niet geslagen worden, niet geruild, en geen enkele pion mag er in welke richting dan ook voorbij — ook die van jezelf niet. Zolang hij daar staat, komt er ook geen tweede pion naar buiten."
+          }
+        }
+      }
+    },
+    "rules.start.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The protected start square"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das geschützte Startfeld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het beschermde startvakje"
+          }
+        }
+      }
+    },
+    "rules.table.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two to six players, each with a colour, four pawns, a start square and a home lane of their own. The track belongs to everybody: every player adds sixteen squares to it, so four players go round sixty-four. Play runs clockwise."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwei bis sechs Personen, jede mit einer Farbe, vier Figuren, einem eigenen Startfeld und einem eigenen Ziel. Die Bahn gehört allen: Jede Person bringt sechzehn Felder ein, zu viert sind es also vierundsechzig. Gespielt wird im Uhrzeigersinn."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twee tot zes spelers, elk met een kleur, vier pionnen, een eigen startvakje en een eigen huis. De baan is van iedereen: elke speler voegt er zestien vakjes aan toe, dus met z'n vieren ga je vierenzestig rond. Er wordt met de klok mee gespeeld."
+          }
+        }
+      }
+    },
+    "rules.table.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The table"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Tisch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De tafel"
+          }
+        }
+      }
+    },
+    "rules.teams.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "With four or six players you can play in pairs, always sitting opposite your partner. Once your own four pawns are home you carry on playing — with your partner's pawns. The side wins when everybody on it has finished. With two, three or five players, and at four or six if you choose it, everyone plays for themselves."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viert oder zu sechst könnt ihr in Paaren spielen; die Partnerin sitzt immer gegenüber. Sind die eigenen vier Figuren im Ziel, spielst du weiter — mit den Figuren deiner Partnerin. Das Paar gewinnt, wenn beide fertig sind. Zu zweit, zu dritt und zu fünft — und zu viert oder zu sechst, wenn ihr es so wählt — spielt jede für sich."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Met vier of zes spelers kun je in koppels spelen; je maat zit altijd tegenover je. Zijn je eigen vier pionnen binnen, dan speel je gewoon door — met de pionnen van je maat. Het koppel wint zodra allebei klaar zijn. Met twee, drie of vijf spelers, en met vier of zes als je daarvoor kiest, speelt iedereen voor zichzelf."
+          }
+        }
+      }
+    },
+    "rules.teams.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partners"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partner"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maten"
+          }
+        }
+      }
+    },
+    "rules.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rules"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeln"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelregels"
+          }
+        }
+      }
+    },
+    "rules.turnOrder.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The player to the dealer's left opens, and the turn passes clockwise. On your turn you play exactly one card and make the move it allows."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links von der Geberin wird eröffnet, danach geht es im Uhrzeigersinn weiter. Wer dran ist, spielt genau eine Karte und führt den Zug aus, den sie erlaubt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links van de deler wordt geopend, daarna gaat het met de klok mee. Wie aan zet is, speelt precies één kaart en doet de zet die daarbij hoort."
+          }
+        }
+      }
+    },
+    "rules.turnOrder.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whose turn it is"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wer dran ist"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie aan zet is"
+          }
+        }
+      }
+    },
+    "rules.variation.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tables disagree about this one."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier sind sich die Tische nicht einig."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hierover verschillen de tafels van mening."
+          }
+        }
+      }
+    },
+    "rules.winning.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All four of your pawns home. In partnership play the side wins only when every player on it has done it."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle vier Figuren im Ziel. Im Paarspiel gewinnt das Paar erst, wenn beide so weit sind."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al je vier pionnen binnen. Bij koppelspel wint het koppel pas als allebei zover zijn."
+          }
+        }
+      }
+    },
+    "rules.winning.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Winning"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewinnen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Winnen"
           }
         }
       }

@@ -119,8 +119,11 @@ enum MoveNarrator {
     }
 
     /// The card's name alone, for phrases that go on to say what the move is.
+    ///
+    /// The key is built into a variable first: interpolating it straight into
+    /// `String(localized:)` would look up `rank.%lld` and speak the key.
     static func rankName(_ rank: CardRank) -> String {
-        String(localized: String.LocalizationValue("rank.\(rank.rawValue)"))
+        Rulebook.text("rank.\(rank.rawValue)")
     }
 
     // MARK: - Moves
@@ -178,7 +181,7 @@ enum MoveNarrator {
     // MARK: - Helpers
 
     static func seatName(_ seat: Seat) -> String {
-        String(localized: String.LocalizationValue(PlayerIdentity.identity(for: seat).nameKey))
+        Rulebook.text(PlayerIdentity.identity(for: seat).nameKey)
     }
 
     /// A whole turn's worth of context, for the board itself.

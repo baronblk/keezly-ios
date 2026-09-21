@@ -35,6 +35,8 @@ struct GameScreen: View {
     @State private var seatInHand: Seat?
     /// Whether the list of legal moves is open (§53).
     @State private var showsActionList = false
+    /// Whether the rulebook is open.
+    @State private var showsRules = false
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -161,6 +163,8 @@ struct GameScreen: View {
                 // alone. A phone in landscape reports a regular width on some
                 // models, and stacking a board above a hand there left the
                 // board the size of a postage stamp.
+                matchControls
+
                 if ScreenshotMode.showsFocusProbe {
                     // A probe, not a feature: it exists only under the test
                     // launch argument and reports where focus actually is, so
@@ -177,7 +181,11 @@ struct GameScreen: View {
                         .zIndex(999)
                 }
 
-                if awaitingHandover, let seat = session.seatOnTurn {
+                if let result = session.result {
+                    MatchEndView(result: result, localSeat: session.localSeat, onLeave: onLeave)
+                        .transition(.opacity)
+                        .zIndex(600)
+                } else if awaitingHandover, let seat = session.seatOnTurn {
                     HandoverView(seat: seat) { seatInHand = seat }
                         .transition(.opacity)
                         .zIndex(500)
@@ -420,6 +428,50 @@ struct GameScreen: View {
     private var sevenProgress: some View {
         if let remaining = planner.remainingSevenSteps, remaining > 0 {
             SevenProgress(remaining: remaining, isCompact: isCompact)
+        }
+    }
+
+    /// The two things that must be reachable from any position: the way out,
+    /// and the rules.
+    ///
+    /// Small and in the corner rather than in a bar of its own — the board is
+    /// what the screen is for — but never behind a gesture. A match a player
+    /// cannot leave is a match they have to force-quit, and a rule argument
+    /// mid-turn is exactly when the rulebook is wanted.
+    @ViewBuilder
+    private var matchControls: some View {
+        if session.result == nil, !awaitingHandover {
+            HStack(spacing: Keezly.Spacing.small) {
+                Button(action: onLeave) {
+                    Label("play.leave", systemImage: "chevron.backward")
+                        .labelStyle(.iconOnly)
+                        .frame(width: Keezly.Target.minimum, height: Keezly.Target.minimum)
+                }
+                .accessibilityLabel("play.leave")
+                .accessibilityHint("play.leave.hint")
+                .accessibilityIdentifier("play.leave")
+
+                Spacer()
+
+                Button {
+                    showsRules = true
+                } label: {
+                    Label("play.rules", systemImage: "book")
+                        .labelStyle(.iconOnly)
+                        .frame(width: Keezly.Target.minimum, height: Keezly.Target.minimum)
+                }
+                .accessibilityLabel("play.rules")
+                .accessibilityIdentifier("play.rules")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.white.opacity(0.7))
+            .pointerEffect(.highlight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .padding(.horizontal, Keezly.Spacing.small)
+            .zIndex(400)
+            .sheet(isPresented: $showsRules) {
+                RulebookView(rules: session.state.configuration.ruleSet)
+            }
         }
     }
 

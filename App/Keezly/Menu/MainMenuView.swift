@@ -5,8 +5,7 @@ import SwiftUI
 ///
 /// Laid out as the table itself rather than as a settings form: the board's
 /// wood, the same seals that mark a seat, and one thing to do. Only what works
-/// is here — there is no rulebook, tutorial or online button, because a menu
-/// item that does nothing is worse than a missing one (§36).
+/// is here — a menu item that does nothing is worse than a missing one (§36).
 struct MainMenuView: View {
     @Environment(\.boardTheme) private var theme
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 44
@@ -20,6 +19,8 @@ struct MainMenuView: View {
     var onStart: () -> Void
     var onContinue: () -> Void = {}
 
+    @State private var showsRules = false
+
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -32,6 +33,7 @@ struct MainMenuView: View {
                         if let restoreFailure { failureNote(restoreFailure) }
                         panel
                         startButton
+                        rulesButton
                     }
                     .frame(maxWidth: 560)
                     .padding(.horizontal, Keezly.Spacing.large)
@@ -255,6 +257,31 @@ struct MainMenuView: View {
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .accessibilityIdentifier("menu.start")
+    }
+
+    /// The rules, before a match rather than only during one.
+    ///
+    /// Half a Keezen table learned the game from somebody else, and the
+    /// argument usually starts before the first card. Shown with the rules the
+    /// configured table would actually play under, not a generic sheet.
+    private var rulesButton: some View {
+        Button {
+            showsRules = true
+        } label: {
+            Text("menu.rules")
+                .font(.system(size: labelSize, weight: .medium, design: .rounded))
+                // Quiet on purpose. A filled control here would compete with
+                // the two that actually start a game, and a greyed slab on the
+                // dark table reads as disabled.
+                .foregroundStyle(.white.opacity(0.72))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Keezly.Spacing.small)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("menu.rules")
+        .sheet(isPresented: $showsRules) {
+            RulebookView(rules: table.gameConfiguration.ruleSet)
+        }
     }
 
     @ViewBuilder

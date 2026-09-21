@@ -74,6 +74,24 @@ struct MoveNarratorTests {
         }
     }
 
+    /// Names built from data must come back as words, not as lookup keys.
+    ///
+    /// `rank.\(rawValue)` and a seat's name key are assembled at runtime, and
+    /// interpolating one straight into `String(localized:)` silently looks up
+    /// `rank.%lld` — which resolves to nothing and speaks the key aloud.
+    @Test("names assembled at runtime resolve to real words")
+    func runtimeKeysResolve() {
+        for rank in CardRank.allCases {
+            let name = MoveNarrator.rankName(rank)
+            #expect(!name.hasPrefix("rank."), "a rank speaks its key: \(name)")
+            #expect(!MoveNarrator.card(rank).hasPrefix("card."), "a card speaks its key")
+        }
+        for index in 0..<6 {
+            let name = MoveNarrator.seatName(Seat(index))
+            #expect(!name.hasPrefix("seat."), "a seat speaks its key: \(name)")
+        }
+    }
+
     // MARK: - And nothing more
 
     /// **The narrator can only talk about cards the listener holds.**
