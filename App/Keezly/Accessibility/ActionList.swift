@@ -82,5 +82,5 @@ struct ActionListGroup: Identifiable, Hashable {
 
     /// What the card is and what it does, spoken once for the whole group
     /// rather than repeated on every row.
-    var spoken: String { MoveNarrator.card(card) }
+    var spoken: String { MoveNarrator.card(card.rank) }
 }

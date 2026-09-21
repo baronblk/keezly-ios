@@ -225,6 +225,7 @@ struct GameScreen: View {
         // Not on appear: at that point the computers may still be opening, so
         // there is nothing a human could focus yet.
         .onChange(of: session.isAwaitingHuman) { _, awaiting in
+            announceTurn(awaiting)
             guard awaiting, ScreenshotMode.forcesInitialFocus, focus == .screen || focus == nil else { return }
             focus = ring.first ?? .screen
         }
@@ -463,7 +464,10 @@ struct GameScreen: View {
                 emphasised: presenter.emphasised,
                 onSelectPawn: select(pawn:),
                 onSelectTarget: tap(target:),
-                focus: $focus
+                focus: $focus,
+                // The planner's own observation, so what is spoken and what is
+                // playable come from one source (DEC-014).
+                narration: planner.observation
             )
 
             if layout.centrePlacement == .inside {
@@ -551,6 +555,21 @@ struct GameScreen: View {
             committedLegs.append(leg)
             selectedPawn = nil
         }
+    }
+
+    /// Says whose turn it is, once, when it becomes a person's turn.
+    ///
+    /// A sighted player sees the board settle and their cards light up. A
+    /// listener gets nothing at all unless something says so — and the
+    /// computers' turns go past in silence, so the first they would otherwise
+    /// know is when they went looking (§53).
+    ///
+    /// A no-op when VoiceOver is not running, so there is nothing to gate on.
+    private func announceTurn(_ awaiting: Bool) {
+        guard awaiting, !awaitingHandover, session.seatOnTurn != nil else { return }
+        AccessibilityNotification
+            .Announcement(MoveNarrator.turnSummary(for: planner.observation))
+            .post()
     }
 
     private func submit(_ action: PlayerAction) {

@@ -117,29 +117,6 @@
         }
       }
     },
-    "a11y.card %@ %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@. %@."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@. %@."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@. %@."
-          }
-        }
-      }
-    },
     "a11y.consequence.capture %@": {
       "extractionState": "manual",
       "localizations": {
@@ -393,6 +370,52 @@
         }
       }
     },
+    "a11y.pawn.selectable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "can be moved"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kann ziehen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kan zetten"
+          }
+        }
+      }
+    },
+    "a11y.pawn.selected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "selected"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ausgewählt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "geselecteerd"
+          }
+        }
+      }
+    },
     "a11y.pawn.track %@ %lld %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -439,6 +462,121 @@
         }
       }
     },
+    "a11y.square.home %@ %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ home square %2$lld"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zielfeld %2$lld von %1$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "doelvakje %2$lld van %1$@"
+          }
+        }
+      }
+    },
+    "a11y.square.occupied %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "occupied by %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "besetzt von %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bezet door %@"
+          }
+        }
+      }
+    },
+    "a11y.square.start %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "start of %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start von %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "start van %@"
+          }
+        }
+      }
+    },
+    "a11y.square.track %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld squares from your home"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Felder vor deinem Ziel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld vakjes voor jouw doel"
+          }
+        }
+      }
+    },
+    "a11y.target %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move here — %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hierher ziehen — %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hierheen — %@"
+          }
+        }
+      }
+    },
     "a11y.turn %@ %lld %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -458,305 +596,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jij bent aan zet als %1$@. %2$lld kaarten, %3$lld pionnen thuis."
-          }
-        }
-      }
-    },
-    "ability.1": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "brings a pawn out, or moves one square"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "setzt eine Figur heraus oder zieht ein Feld"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zet een pion uit of gaat één vakje"
-          }
-        }
-      }
-    },
-    "ability.10": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ten squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zehn Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "tien vakjes"
-          }
-        }
-      }
-    },
-    "ability.11": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "swaps two pawns"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "tauscht zwei Figuren"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "wisselt twee pionnen"
-          }
-        }
-      }
-    },
-    "ability.12": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "twelve squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zwölf Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "twaalf vakjes"
-          }
-        }
-      }
-    },
-    "ability.13": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "brings a pawn out"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "setzt eine Figur heraus"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zet een pion uit"
-          }
-        }
-      }
-    },
-    "ability.2": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "two squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zwei Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "twee vakjes"
-          }
-        }
-      }
-    },
-    "ability.3": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "three squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "drei Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "drie vakjes"
-          }
-        }
-      }
-    },
-    "ability.4": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "four squares backward"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "vier Felder rückwärts"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "vier vakjes achteruit"
-          }
-        }
-      }
-    },
-    "ability.5": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "five squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "fünf Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "vijf vakjes"
-          }
-        }
-      }
-    },
-    "ability.6": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "six squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "sechs Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zes vakjes"
-          }
-        }
-      }
-    },
-    "ability.7": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "seven squares, splittable across two pawns"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "sieben Felder, auf zwei Figuren aufteilbar"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zeven vakjes, te verdelen over twee pionnen"
-          }
-        }
-      }
-    },
-    "ability.8": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "eight squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "acht Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "acht vakjes"
-          }
-        }
-      }
-    },
-    "ability.9": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "nine squares"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "neun Felder"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "negen vakjes"
           }
         }
       }

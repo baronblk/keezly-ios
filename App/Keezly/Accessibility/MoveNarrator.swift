@@ -56,23 +56,71 @@ enum MoveNarrator {
         observation.pawns[id.seat.index * pawnsPerSeat + id.slot]
     }
 
+    /// How a pawn is offering itself right now, if it is.
+    ///
+    /// Spoken as a value rather than folded into the label, so VoiceOver reads
+    /// the piece the same way every time and only adds what has changed.
+    static func pawnState(selectable: Bool, selected: Bool) -> String? {
+        if selected { return String(localized: "a11y.pawn.selected") }
+        if selectable { return String(localized: "a11y.pawn.selectable") }
+        return nil
+    }
+
+    // MARK: - Squares
+
+    /// A square, from the point of view of the player being spoken to.
+    ///
+    /// Distances are counted towards *their* home, because that is the only
+    /// frame in which a number on this board means anything: "square 31" is
+    /// arithmetic, "nine from home" is a decision.
+    static func square(_ position: BoardPosition, in observation: PlayerObservation) -> String {
+        switch position {
+        case .waiting(let seat, _):
+            return String(localized: "a11y.square.start \(seatName(seat))")
+        case .home(let seat, let slot):
+            return String(localized: "a11y.square.home \(seatName(seat)) \(slot + 1)")
+        case .track(let index):
+            let travelled = observation.board.progress(ofTrackIndex: index, for: observation.seat)
+            let remaining = max(0, observation.board.fullJourneyLength - travelled)
+            return String(localized: "a11y.square.track \(remaining)")
+        }
+    }
+
+    /// Who is standing on a square, when somebody is.
+    ///
+    /// The thing a sighted player sees at a glance and a listener otherwise
+    /// only finds out after the move: that the square they are about to take
+    /// is occupied.
+    static func occupant(of position: BoardPosition, in observation: PlayerObservation) -> String? {
+        guard let standing = observation.pawns.first(where: { $0.position == position }) else { return nil }
+        return String(localized: "a11y.square.occupied \(pawn(standing.id, in: observation))")
+    }
+
     // MARK: - Cards
 
     /// A card, with what it does in Keezen.
     ///
-    /// *Seven. Seven squares, splittable across two pawns.*
-    static func card(_ card: Card) -> String {
-        String(localized: "a11y.card \(rankName(card.rank)) \(abilityName(card.rank))")
+    /// *Seven. Seven steps, split across one or two pawns.*
+    ///
+    /// The hand and the action list say this the same way because they say it
+    /// with the same function. A card described one way when it is held and
+    /// another when it is listed is two vocabularies for one object, and a
+    /// listener has to learn both.
+    static func card(_ rank: CardRank) -> String {
+        switch rank {
+        case .ace: String(localized: "card.ace.spoken")
+        case .king: String(localized: "card.king.spoken")
+        case .queen: String(localized: "card.queen.spoken")
+        case .jack: String(localized: "card.jack.spoken")
+        case .four: String(localized: "card.four.spoken")
+        case .seven: String(localized: "card.seven.spoken")
+        default: String(localized: "card.number.spoken \(rank.rawValue)")
+        }
     }
 
+    /// The card's name alone, for phrases that go on to say what the move is.
     static func rankName(_ rank: CardRank) -> String {
         String(localized: String.LocalizationValue("rank.\(rank.rawValue)"))
-    }
-
-    /// What the rank does — the part a new player needs and a returning one
-    /// forgets.
-    static func abilityName(_ rank: CardRank) -> String {
-        String(localized: String.LocalizationValue("ability.\(rank.rawValue)"))
     }
 
     // MARK: - Moves

@@ -174,17 +174,10 @@ struct CardView: View {
     }
 
     /// Spoken description. A rank alone is ambiguous aloud, so each says what
-    /// it does (§53).
+    /// it does (§53). Held in `MoveNarrator` so the hand, the action list and
+    /// the rulebook all describe a card with one set of words.
     static func accessibilityLabel(for rank: CardRank) -> String {
-        switch rank {
-        case .ace: String(localized: "card.ace.spoken")
-        case .king: String(localized: "card.king.spoken")
-        case .queen: String(localized: "card.queen.spoken")
-        case .jack: String(localized: "card.jack.spoken")
-        case .four: String(localized: "card.four.spoken")
-        case .seven: String(localized: "card.seven.spoken")
-        default: String(localized: "card.number.spoken \(rank.rawValue)")
-        }
+        MoveNarrator.card(rank)
     }
 }
 

@@ -26,6 +26,13 @@ struct BoardView: View {
     var onSelectTarget: ((BoardPosition) -> Void)?
     /// Where the keyboard is, shared with the hand.
     var focus: FocusState<PlayFocus?>.Binding?
+    /// What the player being spoken to can see, for VoiceOver.
+    ///
+    /// The true position, not the animated one: `pawns` may be part-way
+    /// through a move, and a board read aloud mid-animation would describe a
+    /// square nobody is on yet. Optional so a preview or a screenshot fixture
+    /// can draw a board without one (§53).
+    var narration: PlayerObservation?
 
     @Environment(\.boardTheme) private var theme
 
@@ -62,7 +69,10 @@ struct BoardView: View {
                         .accessibilityIdentifier(
                             "target.\(legTargets.contains(target) ? "leg." : "")\(Self.identifier(for: target))"
                         )
-                        .accessibilityLabel("board.target")
+                        .accessibilityLabel(targetLabel(for: target))
+                        .accessibilityValue(narration.flatMap {
+                            MoveNarrator.occupant(of: target, in: $0)
+                        } ?? "")
                         .accessibilityAddTraits(.isButton)
                 }
 
@@ -91,10 +101,35 @@ struct BoardView: View {
                     .focusable(selectablePawns.contains(pawn.id))
                     .keyboardFocus(focus, equals: .pawn(pawn.id))
                     .accessibilityIdentifier("pawn.\(pawn.id.seat.index).\(pawn.id.slot)")
+                    .accessibilityLabel(pawnLabel(for: pawn.id))
+                    .accessibilityValue(
+                        MoveNarrator.pawnState(
+                            selectable: selectablePawns.contains(pawn.id),
+                            selected: selectedPawn == pawn.id
+                        ) ?? ""
+                    )
+                    .accessibilityAddTraits(selectablePawns.contains(pawn.id) ? .isButton : [])
                 }
             }
         }
         .aspectRatio(layout.contentBounds.width / layout.contentBounds.height, contentMode: .fit)
+    }
+
+    /// A square offered as a destination.
+    ///
+    /// Falls back to a bare "move here" without an observation, which is what
+    /// a preview gets — never nothing, because an unlabelled button is the one
+    /// outcome VoiceOver cannot work around.
+    private func targetLabel(for target: BoardPosition) -> String {
+        guard let narration else { return String(localized: "board.target") }
+        return String(localized: "a11y.target \(MoveNarrator.square(target, in: narration))")
+    }
+
+    private func pawnLabel(for id: PawnID) -> String {
+        guard let narration else {
+            return MoveNarrator.seatName(id.seat)
+        }
+        return MoveNarrator.pawn(id, in: narration)
     }
 }
 

@@ -21,6 +21,7 @@
 		385911464D67283C726D556D /* ActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4398908BBB32AE55426B5D /* ActionListView.swift */; };
 		4843C9055D768608C2792D20 /* SeatStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390FE2938458CED13A70D210 /* SeatStatusView.swift */; };
 		49012D04AB6CD87D59AA1FF6 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEDEA71E4EDAE226EDA9951 /* BoardView.swift */; };
+		4C65E6C87C4DC459E6205D37 /* MoveNarratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317A24C86F2312B7C966802F /* MoveNarratorTests.swift */; };
 		579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */; };
 		57F4E1E655774F92236C605D /* TableConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0F80DAAFFF9A71C6AC7E01 /* TableConfiguration.swift */; };
 		58241CDF0095935276E260B2 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C482C27A4DE9D8BA7FA25193 /* CardView.swift */; };
@@ -91,6 +92,7 @@
 		2B7A5D5762F62794C05527AF /* CardFaceArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardFaceArt.swift; sourceTree = "<group>"; };
 		2DC0E53379721916E392C04F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		2F5615D1F3AA72616536C39E /* ScreenshotMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMode.swift; sourceTree = "<group>"; };
+		317A24C86F2312B7C966802F /* MoveNarratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveNarratorTests.swift; sourceTree = "<group>"; };
 		32C34A7B19CE230B87432042 /* PlayFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFlowTests.swift; sourceTree = "<group>"; };
 		3598D989F36F076D53B3823D /* TableConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableConfigurationTests.swift; sourceTree = "<group>"; };
 		390FE2938458CED13A70D210 /* SeatStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeatStatusView.swift; sourceTree = "<group>"; };
@@ -344,6 +346,7 @@
 				A6759043901D352FD92C88C4 /* InnerFieldMeasurement.swift */,
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
+				317A24C86F2312B7C966802F /* MoveNarratorTests.swift */,
 				8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */,
 				3598D989F36F076D53B3823D /* TableConfigurationTests.swift */,
 			);
@@ -484,6 +487,7 @@
 				F00D0A89D5E633436368705D /* InnerFieldMeasurement.swift in Sources */,
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
+				4C65E6C87C4DC459E6205D37 /* MoveNarratorTests.swift in Sources */,
 				5843618018A82726BBC6F5FC /* PlayFocusTests.swift in Sources */,
 				8B724EB7A6C64B30D84E5793 /* TableConfigurationTests.swift in Sources */,
 			);
