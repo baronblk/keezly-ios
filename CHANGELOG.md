@@ -137,6 +137,24 @@ Versioning.
   so it cannot congratulate you for a move you did not make.
 - **A way out and a way to look things up** from inside a match, and an ending:
   a finished match now says who won and offers the way back to the menu.
+- **An app icon**, drawn in code. Three concepts compared at every size an icon
+  is really seen at; four pieces round an engraved ring won because it is still
+  four pieces at 29 points.
+- **Haptics** — seven cues taken from what the engine did rather than from what
+  was tapped, so a computer opponent's capture lands in the hand the same way
+  as your own. Quiet by design, and switchable off.
+- **Settings**, with the two switches Keezly has. Sound is listed and disabled,
+  with a sentence saying why: there are no recordings yet, and stand-in noises
+  heard on every move would be worse than silence.
+- **A list of every match on the device**, with what became of each one, and
+  the statistics they add up to — derived from the matches rather than kept
+  beside them.
+- **Replay.** Watch a finished match back: play, pause, step either way, scrub,
+  three speeds. Built on the seed and the accepted actions, and unable to
+  change the match it is showing.
+- **Ten achievements**, worked out by replaying a finished match and reading
+  the engine's own events. Nothing reports them to Game Center yet.
+- **German, Dutch and English** throughout, with one word per thing in each.
 
 ### Fixed
 
@@ -153,6 +171,13 @@ Versioning.
   string literal with an interpolation in it takes `LocalizedStringKey`'s
   *interpolating* initialiser, which looked up `rules.%@.title` and found
   nothing.
+- Quiet text on the app's wooden panels measured 2.88:1 against them — below
+  the contrast floor for text of any size. It had been reviewed by eye several
+  times. Now a fixed ink above 4.5:1, and measured by a test rather than judged.
+- At the largest accessibility text sizes the segmented pickers stopped
+  growing, the seat preview ran into itself, and the hand was pushed off the
+  bottom of the screen.
+- A spoken card description consumed two numbers where only one was given.
 
 - Landscape screenshots came out on their side and could not have been
   submitted to the App Store.
@@ -180,8 +205,8 @@ Versioning.
 
 ## Not yet in this changelog
 
-No onboarding screens, in-game card help or hints. No statistics, match history
-or replay playback. No audio, haptics or app icon. Game Center is implemented
-but has never been run against a real match. Xcode Cloud is prepared but not
-configured. See `CURRENT_STATE.md` for exactly what exists and what has been
-verified where.
+No sound: the architecture ships, the recordings do not. Achievements are
+worked out but reported nowhere. Game Center is implemented and tested against
+a mock two-client harness, and has never been run against a real match. Xcode
+Cloud is prepared but not configured. See `CURRENT_STATE.md` for exactly what
+exists and what has been verified where.

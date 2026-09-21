@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-a89f861  feat(tutorial): teach the game by playing it
+1a03343  feat(l10n): gate the String Catalog, and say one thing one way per language
 ```
 
 Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -26,16 +26,24 @@ Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 | M4 — Gameplay UI (iPad / iPhone) | **DONE** |
 | M5 — Local Multiplayer / Pass & Play | **DONE** |
 | M6 — Game Center | **IMPLEMENTED, NOT VERIFIED** (MAN-02) |
-| **M7 — Tutorial / Rulebook / Accessibility** | **IN PROGRESS** |
+| M7 — Tutorial / Rulebook / Accessibility | **DONE** |
+| M8 — Brand / App Icon / Audio / Haptics | **DONE** — audio **ASSET PENDING** |
+| M9 — Statistics / Replay / Game Center Meta | **DONE** — reporting **BLOCKED** (MAN-02) |
+| M10 — Localisation | **DONE** |
+| **M11 — CI / QA / Hardening** | **NOT STARTED** |
 
 Everything up to and including M3 lives in `KeezlyCore`, which is testable with
 `swift test` alone. From M4 on the work is mostly app-layer.
 
-**The game is playable and finishable.** Two to six seats, any mix of people
-and computers sharing one device, partners or everyone for themselves; a match
-saves itself after every accepted action and can be picked up again; a finished
-match says who won and offers the way back. Learning it, looking a rule up and
-playing entirely from a spoken list of moves are all in the app.
+**The game is complete as a game.** Two to six seats, any mix of people and
+computers sharing one device, in pairs or everyone for themselves; a match
+saves itself after every accepted action, can be picked up again, says who won
+and can be watched back afterwards. It teaches itself in ten lessons, answers a
+rule question without leaving the board, can be played entirely from a spoken
+list of moves, and speaks German, Dutch and English.
+
+What is left before a release is release work: CI, the device gates, and the
+App Store Connect record everything online depends on.
 
 ### Status vocabulary
 
@@ -337,6 +345,38 @@ Measured results and sample sizes: `AI.md`.
   cannot congratulate a player for something that did not happen; every seed is
   played through in the tests.
 
+### Brand and feedback (M8)
+- The app icon is **code**: `AppIconArtwork` draws it, three concepts were
+  compared at every size an icon is drawn at, and `table` was chosen (DEC-026).
+  `scripts/icon-check.sh` fails if the committed PNGs stop matching the source.
+- Seven haptic cues derived from `GameEvent`, so a computer opponent's capture
+  lands like the player's and a refused tap produces nothing. Runs collapse: a
+  Seven split over seven squares is one knock.
+- Sound is **ASSET PENDING**. The architecture, the cues and the switch exist;
+  there are no recordings, and the settings screen says so rather than offering
+  a switch that governs nothing (§77).
+
+### History, replay and achievements (M9)
+- Every saved match is listed, newest first, each already replayed and verified
+  by the store before it appears. A finished match opens in the replay; an
+  unfinished one is picked up.
+- **Replay** is the seed and the accepted actions — the same two things a save
+  is. Play, pause, step either way, scrub, three speeds. `ReplayRun` holds no
+  store, so watching a match cannot change it.
+- Statistics are **derived** from the saved matches, never kept beside them.
+- Ten achievements, worked out by replaying a finished record and reading the
+  engine's own events. Nothing reports them anywhere: that needs MAN-02.
+- **No leaderboards**, deliberately: online results cannot be ranked honestly
+  while a modified client can read every hand (DEC-025).
+
+### Localisation (M10)
+- German, Dutch and English, 283 keys, every one translated.
+- `scripts/strings-check.sh` gates the catalogue without a simulator: missing
+  or untranslated entries, keys the code asks for that do not exist, and
+  placeholders that do not match the English. It found a string consuming two
+  arguments where the call site passes one.
+- One word per thing, per language, enforced by the same script.
+
 ---
 
 ## In Progress
@@ -347,15 +387,12 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Not Implemented Yet
 
-- Onboarding, in-game card help, hints (M7.1, M7.4, M7.5).
-- Statistics, match history, replay playback UI (M9).
-- Bespoke dealing, Seven-leg and Jack-swap choreography (the generic move and
-  swap animations exist).
+- Sound recordings (M8.5) — the architecture ships, the audio does not.
+- Reporting achievements to Game Center (M9.4) — blocked on MAN-02.
+- Bespoke dealing, Seven-leg and Jack-swap choreography; the generic move and
+  swap animations exist.
 - Split View and Stage Manager verification.
-- Audio, haptics, app icon, artwork (M8).
-- Dutch and English proof-reading pass (M10.5); the strings themselves exist in
-  all three languages as they are written.
-- Screenshot harness; Xcode Cloud workflows (M11).
+- Screenshot harness and Xcode Cloud workflows (M11).
 
 ---
 
@@ -396,20 +433,34 @@ App-level, on the iPad Pro 13" (M5) simulator, iOS 27.0:
 
 | Target | Result |
 |---|---|
-| `KeezlyTests` | **142 passed in 17 suites, 0 failed** |
+| `KeezlyTests` | **199 passed in 25 suites, 0 failed** |
 | `KeezlyUITests` | **37 passed, 0 failed, 3 skipped** |
 
 The three skips are the keyboard tests, which report honestly that no hardware
 keyboard reached the app rather than passing without exercising anything
 (ISS-010).
 
-Three of the app suites are there to stop a specific kind of lie:
+Several of the app suites exist to stop a specific kind of lie:
 
 | Suite | What it refuses to let pass |
 |---|---|
 | `ActionListTests` | An accessible move list that offers fewer moves than the engine |
-| `RulebookTests` | A rule option in the engine that no section explains, and a line that shows its lookup key instead of its text |
+| `RulebookTests` | A rule option the engine has that no section explains, and a line that shows its lookup key instead of its text |
 | `TutorialTests` | A lesson whose position cannot be reached, or that counts a move it did not ask for |
+| `HintTests` | A hint that names a card the player is not holding |
+| `ContrastTests` | Text below the contrast floor, measured rather than judged |
+| `PlayLayoutTests` | A layout that does not add up on a display Keezly runs on |
+| `ReplayTests` | A replay that writes to the record, or disagrees with itself between routes |
+| `AchievementTests` | An achievement earned by the wrong seat, or by an abandoned match |
+| `AppIconTests` | An icon concept that flattens at 29 points or loses its shape as a mask |
+
+Three checks run without a simulator and can gate a pull request:
+
+| Script | What it checks |
+|---|---|
+| `scripts/strings-check.sh` | Every key translated in all three languages, no key the code asks for that is missing, placeholders matching the English, and one word per thing per language |
+| `scripts/icon-check.sh` | The committed app icon is still what its source renders |
+| `scripts/icon-sheet.sh` | Produces the comparison sheet a decision was made from |
 
 ---
 
@@ -438,20 +489,33 @@ device run, never trusted from this file — it changed mid-session once already
 
 ## Known Problems
 
-None open. `KNOWN_ISSUES.md` holds the closed entries, including ISS-005, which
-records a **misdiagnosis** worth remembering: a green performance test on a
-position the code short-circuits out of proves nothing.
+`KNOWN_ISSUES.md` holds the detail. One new entry, accepted with its numbers
+rather than papered over:
 
-Two defects were found and closed during M7, both worth keeping in mind:
+- **ISS-016** — a seat colour does not reach 3:1 against the board. Amber is
+  the weakest at 1.23:1 and nothing in the palette reaches the bar without
+  darkening the board, which is settled (DEC-018). What carries a seat's
+  identity is the mark on the piece, the narration and the action list, not the
+  hue. Guarded against getting worse.
+
+Defects found and closed during M7–M10, each worth keeping in mind because each
+one passed a review that was looking at the wrong thing:
 
 - The playing screen drew the far seat panel past the right edge on a portrait
-  iPad. The arithmetic had been reviewed twice — in landscape, where it happens
-  to fit. It is now in `PlayLayout` with a test across every display size.
+  iPad. The arithmetic had been reviewed twice — in landscape, where it fits.
+  It is now `PlayLayout`, with a test across every display size.
 - The rulebook shipped its lookup keys to the screen for one build:
   `LocalizedStringKey("rules.\(id).title")` takes the *interpolating*
-  initialiser and looks up `rules.%@.title`. The test that was meant to catch
-  it rebuilt the keys itself and so tested nothing. Runtime-assembled keys now
-  go through one function, and the test reads the model's own properties.
+  initialiser. The test meant to catch it rebuilt the keys itself and so tested
+  nothing; it now reads the model's own properties.
+- `Keezly.Palette.secondaryText` was `Color.secondary`, which follows the
+  system appearance while the wood it sits on does not: **2.88:1** in light
+  mode. Now a fixed ink above 4.5:1 everywhere, measured by a test.
+- At the largest accessibility text size the segmented pickers stopped growing,
+  the seat preview piled up, and the hand was pushed off the bottom of the
+  screen. Found by turning the setting on rather than by reading the code.
+- `card.number.spoken` consumed two arguments where the call site passes one.
+  Found by the String Catalog check, not by reading the string.
 
 ---
 
@@ -511,19 +575,20 @@ play, no anti-cheat claim.
 
 ## Next Steps (concrete)
 
-**M7 continues.** The action list, the narration, the rulebook and the tutorial
-are done. What is left, in order:
+M0 to M10 are done. What is left is release work.
 
-1. **M7.1 / M7.4 / M7.5** — onboarding, in-game card help, and a hint system
-   built on the existing AI evaluation.
-2. **M7.6, the rest** — Dynamic Type at the accessibility sizes, touch-target
-   and contrast review, VoiceOver sort priority.
-3. **M8** — app icon (three concepts compared before one is chosen), haptics,
-   and the audio architecture. Sound assets are marked **ASSET PENDING** rather
-   than shipped poor.
-4. **M9** — replay on the existing `MatchRecord`, local statistics. No
-   competitive leaderboard on online results (DEC-025).
-5. **M10** — the terminology pass over de, nl and en.
+1. **M11 — CI / QA / Hardening.** The Xcode Cloud workflows, the screenshot
+   harness, and ISS-012 fixed at the cause in the capture pipeline rather than
+   by cropping. The three simulator-free scripts above are ready to be gates.
+2. **Device gates.** Both physical devices are paired and both passed before
+   M7; ISS-014 has blocked re-running them since. They need re-running against
+   this work before anything is called verified on hardware.
+3. **M12 — Release candidate.** Blocked on MAN-02, which also blocks
+   TestFlight, Game Center configuration and Xcode Cloud.
 
-MAN-02 still blocks TestFlight, Game Center configuration and Xcode Cloud, and
-none of the work above.
+Two things will stay honestly incomplete until somebody unblocks them:
+
+| | Why |
+|---|---|
+| Sound | **ASSET PENDING.** Keezly will only ship audio it owns outright (§77) |
+| Game Center, end to end | **BLOCKED** on MAN-02. Implemented and tested against a mock two-client harness; never run against a real match |
