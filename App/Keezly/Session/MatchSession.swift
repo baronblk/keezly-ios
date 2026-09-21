@@ -32,13 +32,19 @@ private final class SearchHandle: @unchecked Sendable {
 /// Jack, which needs two pawns on the track, and the Seven, which needs
 /// somewhere to spend seven steps — have no legal move to show at all. A
 /// capture of those interfaces has to start from a match in progress.
-enum MatchFixture: Equatable {
+enum MatchFixture: Hashable, Sendable {
     /// Play a fixed number of actions, whoever they fall to.
     case movesPlayed(Int)
     /// Play until the local seat is on turn holding a playable card of this
     /// rank. A Seven only counts when it can genuinely be split across two
     /// pawns, since a single-leg Seven shows none of the split interface.
     case localCanPlay(CardRank)
+    /// Play until the local seat is on turn with a move that would knock
+    /// somebody out.
+    case localCanCapture
+    /// Play until the local seat is on turn with a move that would put a pawn
+    /// into its home lane.
+    case localCanReachHome
 }
 
 /// Who is sitting in a seat.
@@ -238,12 +244,7 @@ final class MatchSession {
         for step in 0..<limit {
             if result != nil { return false }
 
-            switch fixture {
-            case .movesPlayed(let count):
-                if step == count { return true }
-            case .localCanPlay(let rank):
-                if localSeatCanPlay(rank) { return true }
-            }
+            if hasArrived(at: fixture, afterSteps: step) { return true }
 
             let seat = state.currentSeat
             let moves = MoveGenerator.legalMoves(in: state, for: seat)
@@ -260,6 +261,30 @@ final class MatchSession {
         // Ran out of moves without arriving. Say so rather than leaving the
         // caller to guess from a board that looks plausible.
         return false
+    }
+
+    private func hasArrived(at fixture: MatchFixture, afterSteps step: Int) -> Bool {
+        switch fixture {
+        case .movesPlayed(let count):
+            return step == count
+        case .localCanPlay(let rank):
+            return localSeatCanPlay(rank)
+        case .localCanCapture:
+            return localSeatHasMove { !$0.preview.captured.isEmpty }
+        case .localCanReachHome:
+            return localSeatHasMove { !$0.preview.reachedHome.isEmpty }
+        }
+    }
+
+    /// Whether the local seat is on turn with a move whose effect matches.
+    ///
+    /// Asked of the engine's own preview rather than worked out here, so a
+    /// fixture cannot come to rest on a position that only looks right.
+    private func localSeatHasMove(
+        where matches: ((move: Move, preview: MovePreview)) -> Bool
+    ) -> Bool {
+        guard result == nil, let seat = localSeat, state.currentSeat == seat else { return false }
+        return PlayerObservation(of: state, for: seat).previewAll().contains(where: matches)
     }
 
     /// Whether the person holding the device is on turn and could play `rank`.

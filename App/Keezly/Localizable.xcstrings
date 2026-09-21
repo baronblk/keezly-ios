@@ -1060,6 +1060,880 @@
         }
       }
     },
+    "lesson.again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set it up again"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch einmal aufbauen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opnieuw opzetten"
+          }
+        }
+      }
+    },
+    "lesson.capture.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Land exactly on somebody else's pawn and it goes straight back to its own corner, however far it had come. Nothing about this is polite, and you cannot avoid it either: if you have a legal move, you have to play one."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Landest du genau auf der Figur einer anderen Person, geht sie sofort zurück in ihre Ecke — ganz gleich, wie weit sie schon war. Das ist nicht unhöflich, sondern das Spiel: Wer ziehen kann, muss ziehen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kom je precies op de pion van een ander uit, dan gaat die meteen terug naar zijn eigen hoek, hoe ver hij ook al was. Dat hoort erbij, en je kunt er niet omheen: kun je zetten, dan moet je zetten."
+          }
+        }
+      }
+    },
+    "lesson.capture.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knock an opponent's pawn out."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlag eine gegnerische Figur."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sla een pion van een tegenstander eruit."
+          }
+        }
+      }
+    },
+    "lesson.capture.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knocking one out"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlagen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eruit slaan"
+          }
+        }
+      }
+    },
+    "lesson.counter %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld of %2$lld"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld von %2$lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld van %2$lld"
+          }
+        }
+      }
+    },
+    "lesson.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That's it."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genau so."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precies goed."
+          }
+        }
+      }
+    },
+    "lesson.entering.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A pawn cannot start walking on its own. Only an ace or a king lifts one out of your corner and on to your start square — the one with the ring around it. You have a king in your hand."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Figur kommt nicht von allein los. Nur ein Ass oder ein König holt eine aus deiner Ecke auf dein Startfeld — das mit dem Ring darum. Du hast einen König auf der Hand."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een pion komt niet vanzelf op gang. Alleen een aas of een heer haalt er één uit je hoek naar je startvakje — dat met de ring eromheen. Je hebt een heer in je hand."
+          }
+        }
+      }
+    },
+    "lesson.entering.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play the king and bring a pawn out."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiel den König und stell eine Figur heraus."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speel de heer en zet een pion naar buiten."
+          }
+        }
+      }
+    },
+    "lesson.entering.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting out"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herauskommen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar buiten komen"
+          }
+        }
+      }
+    },
+    "lesson.finish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start playing"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los spielen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beginnen met spelen"
+          }
+        }
+      }
+    },
+    "lesson.four.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A four is the only card that walks a pawn the other way — exactly four squares back. It sounds like a punishment and it is a gift: four squares back from your own start square puts you right next to your home lane, instead of a whole lap away."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Vier ist die einzige Karte, die rückwärts zieht — genau vier Felder zurück. Das klingt nach Strafe und ist ein Geschenk: Vier Felder zurück von deinem Startfeld, und du stehst direkt vor deinem Ziel statt eine ganze Runde davor."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De vier is de enige kaart die achteruit gaat — precies vier vakjes terug. Dat klinkt als straf en is een cadeau: vier vakjes terug vanaf je eigen startvakje en je staat pal voor je huis in plaats van een hele ronde ervoor."
+          }
+        }
+      }
+    },
+    "lesson.four.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play the four."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiel die Vier."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speel de vier."
+          }
+        }
+      }
+    },
+    "lesson.four.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The four goes backwards"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Vier geht rückwärts"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De vier gaat achteruit"
+          }
+        }
+      }
+    },
+    "lesson.goal.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your four pawns start in the corner in your colour. They travel right round the board and turn off into the four squares of your own home lane. Get all four in and you have won. Have a look at the board — your colour is red, at the bottom."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine vier Figuren stehen in der Ecke in deiner Farbe. Sie laufen einmal ums ganze Brett und biegen dann in die vier Felder deines eigenen Ziels ab. Alle vier drin heißt gewonnen. Sieh dir das Brett in Ruhe an — deine Farbe ist Rot, unten."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je vier pionnen staan in de hoek in jouw kleur. Ze gaan één keer helemaal rond het bord en slaan dan af naar de vier vakjes van je eigen huis. Alle vier binnen is gewonnen. Bekijk het bord rustig — jouw kleur is rood, onderaan."
+          }
+        }
+      }
+    },
+    "lesson.goal.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where you are going"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worum es geht"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waar het om gaat"
+          }
+        }
+      }
+    },
+    "lesson.home.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The home lane needs an exact count. Too many and the move simply is not allowed, so the last few squares often take longer than the whole lap before them. Once a pawn is in, nothing can touch it again."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ins Ziel kommt man nur mit genauer Zahl. Zu viel, und der Zug ist schlicht nicht erlaubt — die letzten Felder dauern deshalb oft länger als die ganze Runde davor. Drinnen ist eine Figur unantastbar."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je huis in kan alleen met een precies passend aantal. Te veel en de zet mag gewoon niet, dus de laatste vakjes duren vaak langer dan de hele ronde ervoor. Eenmaal binnen is een pion onaantastbaar."
+          }
+        }
+      }
+    },
+    "lesson.home.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring a pawn into your home lane."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bring eine Figur in dein Ziel."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Breng een pion in je huis."
+          }
+        }
+      }
+    },
+    "lesson.home.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting in"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einfahren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar binnen"
+          }
+        }
+      }
+    },
+    "lesson.impossible": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The board moved on."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Brett ist weitergezogen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het bord is verder gegaan."
+          }
+        }
+      }
+    },
+    "lesson.impossible.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This lesson is no longer possible in this position — nothing went wrong, the game simply carried on. It can be set up again."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In dieser Stellung geht die Lektion nicht mehr — nichts ist schiefgelaufen, das Spiel ist einfach weitergegangen. Sie lässt sich neu aufbauen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In deze stelling kan de les niet meer — er is niets misgegaan, het spel ging gewoon door. Je kunt hem opnieuw opzetten."
+          }
+        }
+      }
+    },
+    "lesson.jack.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A jack exchanges one of your pawns on the track with somebody else's. Neither pawn moves forward — they simply change places, which can be worth far more than twelve squares. A pawn safe on its own start square is out of reach."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Bube tauscht eine deiner Figuren auf der Bahn gegen die einer anderen Person. Keine der beiden zieht vor — sie tauschen einfach die Plätze, was mehr wert sein kann als zwölf Felder. Eine geschützte Figur auf ihrem Startfeld ist tabu."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een boer ruilt een van jouw pionnen op de baan met die van iemand anders. Geen van beide gaat vooruit — ze wisselen gewoon van plek, en dat kan meer waard zijn dan twaalf vakjes. Een beschermde pion op zijn startvakje blijft buiten schot."
+          }
+        }
+      }
+    },
+    "lesson.jack.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swap with a jack."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tausch mit dem Buben."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruil met de boer."
+          }
+        }
+      }
+    },
+    "lesson.jack.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The jack swaps"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Bube tauscht"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De boer ruilt"
+          }
+        }
+      }
+    },
+    "lesson.moving.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Most cards just move a pawn that many squares forward: a five moves five, a queen moves twelve. You always move in the same direction, and you go almost the whole way round before your own home lane comes up."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die meisten Karten ziehen eine Figur einfach so viele Felder vor: Eine Fünf fünf, eine Dame zwölf. Die Richtung ist immer dieselbe, und es geht fast einmal ganz herum, bevor dein eigenes Ziel kommt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De meeste kaarten zetten een pion gewoon zoveel vakjes vooruit: een vijf vijf, een vrouw twaalf. De richting is altijd dezelfde, en je gaat bijna helemaal rond voordat je eigen huis in zicht komt."
+          }
+        }
+      }
+    },
+    "lesson.moving.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move a pawn forward."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zieh eine Figur vor."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet een pion vooruit."
+          }
+        }
+      }
+    },
+    "lesson.moving.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walking round"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorwärts ziehen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vooruit lopen"
+          }
+        }
+      }
+    },
+    "lesson.next": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next lesson"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Lektion"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende les"
+          }
+        }
+      }
+    },
+    "lesson.protection.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A pawn standing on its own start square is safe and solid. It cannot be knocked out, it cannot be swapped away, and nothing gets past it — not even another pawn of the same colour. It is the strongest square on the board, and also the one that stops you bringing the next pawn out."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Figur auf ihrem eigenen Startfeld steht sicher und im Weg. Sie kann nicht geschlagen und nicht weggetauscht werden, und niemand kommt an ihr vorbei — auch keine Figur derselben Farbe. Das stärkste Feld auf dem Brett — und zugleich das, welches die nächste eigene Figur am Herauskommen hindert."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een pion op zijn eigen startvakje staat veilig én in de weg. Hij kan niet geslagen worden, niet weggeruild, en niemand komt erlangs — ook geen pion van dezelfde kleur. Het sterkste vakje van het bord, en tegelijk het vakje dat je volgende pion tegenhoudt."
+          }
+        }
+      }
+    },
+    "lesson.protection.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The square nobody passes"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Feld, an dem niemand vorbeikommt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het vakje waar niemand langs komt"
+          }
+        }
+      }
+    },
+    "lesson.read": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verstanden"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Begrepen"
+          }
+        }
+      }
+    },
+    "lesson.seven.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A seven is seven steps, and you may spread them over two pawns — three and four, one and six, however you like. All seven have to be used, and each part has to be a legal move in its own right."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Sieben sind sieben Schritte, und du darfst sie auf zwei Figuren verteilen — drei und vier, eins und sechs, wie du willst. Alle sieben müssen verbraucht werden, und jeder Teil muss für sich erlaubt sein."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een zeven is zeven stappen, en je mag ze over twee pionnen verdelen — drie en vier, één en zes, net wat je wilt. Alle zeven moeten op, en elk deel moet op zichzelf mogen."
+          }
+        }
+      }
+    },
+    "lesson.seven.task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split the seven across two pawns."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teil die Sieben auf zwei Figuren auf."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verdeel de zeven over twee pionnen."
+          }
+        }
+      }
+    },
+    "lesson.seven.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Splitting a seven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Sieben aufteilen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De zeven verdelen"
+          }
+        }
+      }
+    },
+    "lesson.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überspringen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overslaan"
+          }
+        }
+      }
+    },
+    "lesson.teams.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At four or six players you sit opposite your partner and win or lose together. When your own four pawns are home you keep playing — with your partner's. And because you must move when you can, you will sometimes have to knock your own partner out. That is the game, not bad manners."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viert oder zu sechst sitzt deine Partnerin gegenüber, und ihr gewinnt oder verliert gemeinsam. Sind deine eigenen vier Figuren im Ziel, spielst du weiter — mit ihren. Und weil Zugzwang herrscht, wirst du sie manchmal selbst schlagen müssen. Das gehört dazu."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Met vier of zes spelers zit je maat tegenover je en win of verlies je samen. Zijn je eigen vier pionnen binnen, dan speel je door — met die van je maat. En omdat je moet zetten als het kan, sla je soms je eigen maat eruit. Dat hoort bij het spel."
+          }
+        }
+      }
+    },
+    "lesson.teams.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playing as a pair"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu zweit gegen zwei"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Samen spelen"
+          }
+        }
+      }
+    },
+    "lesson.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This lesson could not be set up."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Lektion ließ sich nicht aufbauen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze les kon niet worden opgezet."
+          }
+        }
+      }
+    },
+    "lesson.unavailable.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The position it needs was not reached. That is a fault in the lesson, not in your play — skip it and carry on."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die benötigte Stellung wurde nicht erreicht. Das ist ein Fehler der Lektion, nicht deines Spiels — überspring sie einfach."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De benodigde stelling werd niet bereikt. Dat ligt aan de les, niet aan jouw spel — sla hem over en ga door."
+          }
+        }
+      }
+    },
     "menu.continue": {
       "extractionState": "manual",
       "localizations": {
@@ -1194,6 +2068,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Het Nederlandse bordspel, voor twee tot zes spelers."
+          }
+        }
+      }
+    },
+    "menu.tutorial": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn to play"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielen lernen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leren spelen"
           }
         }
       }

@@ -17,6 +17,8 @@ struct RootView: View {
     /// swallowed: a match that will not open is something the player is
     /// entitled to know about (§57).
     @State private var restoreFailure: String?
+    /// A run through the tutorial, when one is going on.
+    @State private var tutorial: TutorialRun?
 
     private let store: MatchStore?
 
@@ -38,7 +40,16 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if let session {
+            if let tutorial {
+                // The ordinary playing screen, with a lesson watching. Rebuilt
+                // per lesson, because each one is its own match.
+                GameScreen(
+                    session: tutorial.session,
+                    onLeave: leaveTutorial,
+                    tutorial: tutorial
+                )
+                .id(ObjectIdentifier(tutorial.session))
+            } else if let session {
                 GameScreen(session: session, onLeave: leaveMatch)
                     // Identity by the session, so starting a different table
                     // builds a new screen rather than reusing the old one's
@@ -50,7 +61,8 @@ struct RootView: View {
                     resumable: resumable,
                     restoreFailure: restoreFailure,
                     onStart: start,
-                    onContinue: resume
+                    onContinue: resume,
+                    onTutorial: { tutorial = TutorialRun() }
                 )
                 .task { refreshResumable() }
             }
@@ -92,6 +104,11 @@ struct RootView: View {
 
     private func leaveMatch() {
         session = nil
+        refreshResumable()
+    }
+
+    private func leaveTutorial() {
+        tutorial = nil
         refreshResumable()
     }
 }

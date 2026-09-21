@@ -18,6 +18,7 @@ struct MainMenuView: View {
     var restoreFailure: String?
     var onStart: () -> Void
     var onContinue: () -> Void = {}
+    var onTutorial: () -> Void = {}
 
     @State private var showsRules = false
 
@@ -33,7 +34,7 @@ struct MainMenuView: View {
                         if let restoreFailure { failureNote(restoreFailure) }
                         panel
                         startButton
-                        rulesButton
+                        secondaryActions
                     }
                     .frame(maxWidth: 560)
                     .padding(.horizontal, Keezly.Spacing.large)
@@ -257,6 +258,29 @@ struct MainMenuView: View {
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .accessibilityIdentifier("menu.start")
+    }
+
+    /// Learning the game and looking it up, side by side and quiet.
+    ///
+    /// Both are secondary to starting a match, and neither should look like a
+    /// third way of starting one.
+    private var secondaryActions: some View {
+        HStack(spacing: Keezly.Spacing.large) {
+            tutorialButton
+            rulesButton
+        }
+    }
+
+    private var tutorialButton: some View {
+        Button(action: onTutorial) {
+            Text("menu.tutorial")
+                .font(.system(size: labelSize, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.72))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Keezly.Spacing.small)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("menu.tutorial")
     }
 
     /// The rules, before a match rather than only during one.
