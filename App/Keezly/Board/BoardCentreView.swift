@@ -113,7 +113,7 @@ private struct DrawPile: View {
                     .offset(x: CGFloat(layer) * width * 0.022, y: CGFloat(layer) * -width * 0.022)
             }
 
-            Text("\(remaining)")
+            Text(remaining, format: .number)
                 .font(.system(size: width * 0.2, weight: .bold, design: .rounded))
                 .foregroundStyle(Keezly.Palette.cardInk)
                 .padding(.horizontal, width * 0.11)

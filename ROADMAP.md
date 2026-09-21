@@ -18,7 +18,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M7 | Tutorial / Rulebook / Accessibility | DONE |
 | M8 | Brand / App Icon / Audio / Haptics | DONE — except the sound recordings, ASSET PENDING |
 | M9 | Statistics / Replay / Game Center Meta | DONE — reporting to Game Center blocked on MAN-02 |
-| M10 | Localisation | NOT STARTED |
+| M10 | Localisation | DONE |
 | M11 | CI / QA / Hardening | NOT STARTED |
 | M12 | Release Candidate 1.0.0 | NOT STARTED |
 
@@ -253,15 +253,15 @@ and mocked tests can proceed without them (§142).
 
 ---
 
-## M10 — Localisation — NOT STARTED
+## M10 — Localisation — DONE
 
 | Task | Status |
 |---|---|
-| M10.1 String Catalog, no hardcoded visible strings | NOT STARTED |
-| M10.2 Dutch (nl-NL) | NOT STARTED |
-| M10.3 German (de-DE) | NOT STARTED |
-| M10.4 English (en) | NOT STARTED |
-| M10.5 Terminology review per language | NOT STARTED |
+| M10.1 String Catalog, no hardcoded visible strings | DONE — 283 keys, every one translated in all three languages. `scripts/strings-check.sh` gates it: it fails on a missing or untranslated entry, on a key the code asks for that the catalogue does not have, and on a translation whose placeholders do not match the English — which is how it found `card.number.spoken` consuming two arguments where the call site passes one |
+| M10.2 Dutch (nl-NL) | DONE |
+| M10.3 German (de-DE) | DONE |
+| M10.4 English (en) | DONE |
+| M10.5 Terminology review per language | DONE — one word per thing, per language, now enforced by the same script. The Dutch had been saying both *huis* and *doelvakje* for the home lane, which is the sound of a translation rather than of somebody who plays the game; and the menu label *Partijen* read as "matches" next to a button that opens the match list. Dutch now says **huis**, **binnen**, **pion**, **koppel/maat**; German **Ziel**, **Figur**, **Paare** — *Parteien* is what political parties are called |
 
 ---
 
