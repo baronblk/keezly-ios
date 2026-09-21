@@ -19,6 +19,9 @@ struct RootView: View {
     @State private var restoreFailure: String?
     /// A run through the tutorial, when one is going on.
     @State private var tutorial: TutorialRun?
+    /// Whether to offer the tutorial first. Answered once, on the first match
+    /// or lesson, and never asked again.
+    @State private var welcome = Welcome()
 
     private let store: MatchStore?
 
@@ -62,7 +65,11 @@ struct RootView: View {
                     restoreFailure: restoreFailure,
                     onStart: start,
                     onContinue: resume,
-                    onTutorial: { tutorial = TutorialRun() }
+                    onTutorial: {
+                        welcome.noteStarted()
+                        tutorial = TutorialRun()
+                    },
+                    isNewcomer: welcome.isNewcomer
                 )
                 .task { refreshResumable() }
             }
@@ -75,6 +82,7 @@ struct RootView: View {
     }
 
     private func start() {
+        welcome.noteStarted()
         restoreFailure = nil
         session = MatchSession(
             configuration: table.gameConfiguration,

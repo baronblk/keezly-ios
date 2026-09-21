@@ -2210,6 +2210,29 @@
         }
       }
     },
+    "menu.welcome": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New to Keezen? Ten short lessons on a real board."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keezen noch nie gespielt? Zehn kurze Lektionen am echten Brett."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog nooit gekeezd? Tien korte lessen op een echt bord."
+          }
+        }
+      }
+    },
     "pile.discard %@": {
       "extractionState": "manual",
       "localizations": {

@@ -15,7 +15,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M4 | Gameplay UI — iPad / iPhone | IN PROGRESS |
 | M5 | Local Multiplayer / Pass & Play | NOT STARTED |
 | M6 | Game Center Multiplayer | NOT STARTED |
-| M7 | Tutorial / Rulebook / Accessibility | IN PROGRESS |
+| M7 | Tutorial / Rulebook / Accessibility | DONE |
 | M8 | Brand / App Icon / Audio / Haptics | NOT STARTED |
 | M9 | Statistics / Replay / Game Center Meta | NOT STARTED |
 | M10 | Localisation | NOT STARTED |
@@ -212,16 +212,16 @@ and mocked tests can proceed without them (§142).
 
 ---
 
-## M7 — Tutorial / Rulebook / Accessibility — IN PROGRESS
+## M7 — Tutorial / Rulebook / Accessibility — DONE
 
 | Task | Status |
 |---|---|
-| M7.1 Onboarding (few screens, straight to play) | NOT STARTED |
+| M7.1 Onboarding (few screens, straight to play) | DONE — as one line and one button rather than screens. Until a first match or lesson has been started, learning the game is the loudest thing on the menu; afterwards it goes quiet and stays quiet. A board game somebody has to swipe through three screens to reach is one they open once (§36) |
 | M7.2 Interactive tutorial driven by the real engine | DONE — ten lessons, each an ordinary match on the real engine. A lesson reads the board before and after a move rather than the tap, so it cannot credit a move that was not made; every lesson's seed is played through in the tests |
 | M7.3 In-app rulebook with the active rule set highlighted | DONE — ~26 sections in Keezly's own words, both readings shown where tables disagree, the table's own rules marked. `RuleFacet` is checked against `RuleSet` by reflection |
-| M7.4 In-game card help | NOT STARTED |
-| M7.5 Hint system using AI evaluation, disabled in competitive online play | NOT STARTED |
-| M7.6 VoiceOver, Dynamic Type, Reduce Motion, contrast, keyboard access | IN PROGRESS — the board, hand and action list are narrated from a `PlayerObservation`, turns are announced, Reduce Motion is honoured and the keyboard model is complete. Dynamic Type at the accessibility sizes, touch targets and contrast still to review |
+| M7.4 In-game card help | DONE — a long press on a card opens the rulebook's own words about it, playable or not, because "why can I not play this one?" is the same question |
+| M7.5 Hint system using AI evaluation, disabled in competitive online play | DONE — the hint is a computer opponent handed the player's own `PlayerObservation`, so it cannot see a card the player cannot see. `MatchSession.allowsHints` is where a competitive online match would turn it off (DEC-025) |
+| M7.6 VoiceOver, Dynamic Type, Reduce Motion, contrast, keyboard access | DONE — narration from a `PlayerObservation`, announced turns, Reduce Motion honoured, the keyboard model complete. Reviewed at the largest accessibility text size on a real simulator, which turned up three defects (segmented pickers that cap their growth, a seat preview that piles up, a hand pushed off the bottom of the screen), all fixed. Contrast is now measured by `ContrastTests` rather than judged: the secondary ink went from 2.88:1 to over 4.5:1, and the one shortfall that cannot be fixed without darkening the board is recorded as ISS-016 |
 | M7.7 Alternative list-of-legal-actions input | DONE — the same `MoveGenerator` as the board, with a test asserting the two move sets are *equal* rather than overlapping |
 
 ---

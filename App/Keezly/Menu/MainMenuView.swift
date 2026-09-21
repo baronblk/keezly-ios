@@ -20,6 +20,8 @@ struct MainMenuView: View {
     var onStart: () -> Void
     var onContinue: () -> Void = {}
     var onTutorial: () -> Void = {}
+    /// Whether this is somebody's first time here.
+    var isNewcomer = false
 
     @State private var showsRules = false
 
@@ -31,6 +33,7 @@ struct MainMenuView: View {
                 ScrollView {
                     VStack(spacing: Keezly.Spacing.large) {
                         masthead
+                        if isNewcomer { welcome }
                         if let resumable { continueButton(for: resumable) }
                         if let restoreFailure { failureNote(restoreFailure) }
                         panel
@@ -285,9 +288,37 @@ struct MainMenuView: View {
     /// third way of starting one.
     private var secondaryActions: some View {
         HStack(spacing: Keezly.Spacing.large) {
-            tutorialButton
+            // Already offered loudly at the top for a newcomer; offering it
+            // twice on one screen is how a menu starts to look like a form.
+            if !isNewcomer { tutorialButton }
             rulesButton
         }
+    }
+
+    /// The whole of Keezly's onboarding.
+    ///
+    /// One line and one button, shown until a first match or lesson has been
+    /// started. A board game somebody has to swipe through three screens to
+    /// reach is a board game they open once (§36).
+    private var welcome: some View {
+        VStack(spacing: Keezly.Spacing.small) {
+            Text("menu.welcome")
+                .font(.system(size: labelSize, design: .rounded))
+                .foregroundStyle(.white.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button(action: onTutorial) {
+                Text("menu.tutorial")
+                    .font(.system(size: labelSize * 1.1, weight: .semibold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Keezly.Spacing.medium)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .accessibilityIdentifier("menu.tutorial")
+        }
+        .accessibilityIdentifier("menu.welcome")
     }
 
     private var tutorialButton: some View {
