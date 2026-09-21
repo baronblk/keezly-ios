@@ -141,6 +141,36 @@ recorded here rather than left unexplained (§33).
 
 ---
 
+## Fairness: what is and is not protected (DEC-025)
+
+**Every participant's device can reconstruct every hand and the remaining deck.**
+Demonstrated by `OnlineHiddenInformationTests`, from the payload alone, using
+nothing but the app's own loading path.
+
+The cause is structural, not an oversight. Game Center gives every participant
+the same `matchData`; that data carries the seed and the accepted moves,
+because that is what makes the match reproducible and what lets a receiver
+revalidate every remote move against the real engine. Reproducing the match
+reproduces the deal.
+
+Three different claims, which must never be run together:
+
+| | Claim | Status |
+|---|---|---|
+| **A** | Keezly does not leak hidden information through its interface or its own agents | **Holds** — tested |
+| **B** | A modified client cannot learn hidden information | **Does not hold** |
+| **C** | A server arbitrates; cheating is prevented | **Not attempted** — there is no server |
+
+Online play in 1.0.0 is friendly play. Nothing in the app, the store listing or
+the documentation may claim otherwise, and online results are not a sound basis
+for a competitive leaderboard (a constraint on M9).
+
+The options evaluated — per-player encrypted hands, commit-and-reveal shuffles,
+a server of our own, and GameKit's exchanges — are set out in DEC-025 with the
+reason each was not taken.
+
+---
+
 ## Status, as of M6
 
 Kept apart on purpose, because they are different claims (§167):
@@ -156,6 +186,7 @@ Kept apart on purpose, because they are different claims (§167):
 | Authentication state machine | **TESTED** — as a pure function, without GameKit |
 | `GameCenterTransport` (the GameKit adapter) | **IMPLEMENTED, NOT VERIFIED** — never run against Game Center |
 | A real match between two Apple Accounts | **BLOCKED** — MAN-02, MAN-05, MAN-11, MAN-12 |
+| Hidden information against a modified client | **NOT PROTECTED** — by design, see DEC-025 |
 
 ## How a turn travels
 

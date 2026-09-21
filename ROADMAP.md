@@ -203,6 +203,7 @@ Verified visually on an iPad simulator in light and dark appearance.
 | M6.3 Turn-based match lifecycle: create, invite, automatch, resume, rematch | NOT STARTED |
 | M6.4 `OnlineMatchEnvelope` with revision guards and size checking | NOT STARTED |
 | M6.5 Idempotent turn submission (duplicate/stale callback handling) | **MOCK VERIFIED** — moveID, expectedRevision and resultingRevision give five distinct outcomes; duplicates are recognised by identity before revision |
+| M6.9 Online hidden-information threat model (DEC-025) | DONE — demonstrated by test that a participant can reconstruct every hand and the deck; limitation accepted and documented, not claimed away |
 | M6.6 Resignation policy incl. team forfeit | NOT STARTED |
 | M6.7 Error-case matrix (offline, signed out, match gone, backgrounded upload) | NOT STARTED |
 

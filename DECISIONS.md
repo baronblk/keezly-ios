@@ -836,3 +836,83 @@ bytes. The size test keeps the number honest.
 never run against Game Center, because that needs an App Store Connect record
 that does not exist (MAN-02). It is the only part of the online path with no
 test, and it is recorded as unproven rather than done.
+
+---
+
+## DEC-025 — Online play hides nothing from a modified client, and says so
+
+- **Date:** 2026-09-21
+- **Topic:** Online fairness
+- **Status:** ACCEPTED, with a known limitation
+- **Follows from:** DEC-023, DEC-024
+
+**The finding, demonstrated.** Every Game Center participant receives the same
+`matchData`. It carries the seed and the accepted actions, because that is what
+makes a match reproducible. Replaying them reproduces the *whole* position —
+including every opponent's hand and the order of the undealt deck.
+`OnlineHiddenInformationTests` shows this with running code: from the payload
+alone, and using nothing but the app's own `load`, every hand is reconstructed
+exactly and the remaining deck is read in order.
+
+This is not a bug and not a UI problem. "The interface does not show the cards"
+is no answer at all: for online fairness what counts is what is *present on the
+device*, and all of it is.
+
+**Why it is hard rather than careless.** Determinism and hidden information
+pull against each other. The replay-and-compare check that makes a remote move
+trustworthy — every action revalidated by the real engine, the board required
+to match the one that was sent — works precisely *because* the receiver can
+reproduce the whole game. Take the seed away and that check goes with it.
+
+### The options, evaluated
+
+**Public state plus per-player encrypted hands.** Each player publishes a
+public key; the dealing device encrypts each hand to its owner. It fails on two
+counts. The dealing device still knows every hand, so it can cheat and nothing
+detects that. And the seed cannot remain in the payload — which removes the
+replay validation. It buys secrecy from honest participants only, which is what
+we already have.
+
+**Deck commitments, stepwise reveal, commit-and-reveal shuffle.** The
+cryptographically real answer — the mental-poker family — where the players
+jointly shuffle so that nobody knows the deck and a card can be revealed to
+exactly one player. Sound in principle. Three reasons it is not right for
+1.0.0: it needs several interactive rounds *before a hand can be played*, over
+a transport where a player may be offline for days (§27); Keezen redeals every
+round in a 5/4/4 cycle, so the ceremony repeats throughout the match, not once;
+and it replaces the seed-and-actions model that autosave, replay and the 4 KB
+payload all rest on.
+
+**A server we run.** The only complete answer to a modified client, because it
+is the only way to have a party that holds the deck and is not a player. It is
+also a backend to build, secure, pay for and keep running, and it is out of
+scope here. Introducing one is a product decision in its own right, not a
+detail of M6.
+
+**GameKit's own facilities.** `GKTurnBasedMatch.matchData` is shared with every
+participant. `GKTurnBasedExchange` can be addressed to a subset, which might
+carry a hand to one player — but its resolution merges into the same shared
+match data, and it does not solve the deeper problem that some *player's*
+device must do the dealing. Whether an exchange-based scheme could be made to
+work has not been established: it cannot be tested without a real Game Center
+account (MAN-02), so it is recorded as unexplored rather than ruled out.
+
+### Decision
+
+The limitation is accepted and written down rather than papered over. Online
+play in 1.0.0 is **friendly play**: it is safe against Keezly itself leaking
+information, and it is not safe against a participant who modifies their client.
+
+Three levels, never conflated:
+
+| | Claim | Status |
+|---|---|---|
+| **A** | Keezly does not leak hidden information through its own interface or its own agents | **Holds.** The agent boundary (DEC-014) and the hand-building rule (DEC-022) are tested |
+| **B** | A participant who modifies their client cannot learn hidden information | **Does not hold**, and cannot while the payload carries the seed |
+| **C** | A server arbitrates and cheating is prevented | **Not attempted.** There is no server |
+
+**What follows from it.** Nothing in Keezly may claim more than A. Online
+results are not a sound basis for a competitive leaderboard, which is a
+constraint on M9 rather than a detail of this decision. If online play is ever
+to be competitive, that is the moment to pay for a server or for mental poker —
+and to decide it on its own merits, in the open.

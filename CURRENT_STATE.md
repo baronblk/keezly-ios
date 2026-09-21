@@ -89,6 +89,7 @@ against a mock with no account, no network and no simulator.
 | Authentication state machine | **TESTED** as a pure function |
 | `GameCenterTransport`, the GameKit adapter | **IMPLEMENTED, NOT VERIFIED** |
 | A real match between two Apple Accounts | **BLOCKED** — MAN-02, MAN-05, MAN-11, MAN-12 |
+| Hidden information against a modified client | **NOT PROTECTED** — accepted, DEC-025 |
 
 A turn carries its own `moveID`, the revision it was made against and the one
 it produces, which gives five distinct answers — accepted, duplicate, stale,
@@ -100,7 +101,26 @@ checksum-checked, then **replayed through the real engine**, with the revision
 required to rise at every action and to land exactly where the sender claimed,
 and the resulting board's checksum compared with the one sent.
 
-**A size problem was found before it could ship.** A four-hundred-move
+****A fairness limitation was found and is written down, not argued away
+(ISS-015, DEC-025).** Every participant receives the same match data, which
+carries the seed and the accepted moves — so every device can reconstruct every
+opponent's hand and the order of the undealt deck. A test demonstrates it from
+the payload alone, using nothing but the app's own loading path.
+
+It is structural rather than careless: the replay-and-compare check that makes
+a remote move trustworthy works *because* the receiver can reproduce the whole
+game. Three claims are kept apart, and only the first is made:
+
+| | Claim | Status |
+|---|---|---|
+| **A** | Keezly does not leak hidden information through its own interface or agents | **Holds**, tested |
+| **B** | A modified client cannot learn hidden information | **Does not hold** |
+| **C** | A server arbitrates and cheating is prevented | **Not attempted** |
+
+Online play in 1.0.0 is friendly play. Online results are therefore not a sound
+basis for a competitive leaderboard — a constraint that lands on M9.
+
+**A size problem was found before it could ship.**** A four-hundred-move
 six-player match came to **64,384 bytes** of JSON against Game Center's
 65,536-byte limit — a full six-player match would not have fitted. Compressing
 the canonical bytes brings the same match to **4,173 bytes**. A test holds the

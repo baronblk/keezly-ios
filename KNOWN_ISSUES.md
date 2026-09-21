@@ -12,6 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
+| ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
 | ISS-014 | Neither physical device will start a UI test runner | Blocker (hardware gate) |
 | ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
 | ISS-010 | No hardware keyboard or pointer available to verify M4.7 end to end | Verification gap |
@@ -56,6 +57,36 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 - **Related files:** `App/Keezly/Play/GameScreen.swift`,
   `App/Keezly/Board/BoardLayout.swift`
 - **Related tests:** `InnerFieldTests`
+
+### ISS-015 — Online play hides nothing from a modified client
+
+- **Status:** OPEN — accepted limitation, recorded rather than fixed (DEC-025)
+- **Severity:** Fairness. Not a defect in the code; a property of the design
+- **Component:** Online play
+- **Description:** Every Game Center participant receives the same match data,
+  which carries the seed and the accepted moves. Replaying them reproduces the
+  whole position, including every opponent's hand and the order of the undealt
+  deck.
+- **Reproduction:** `OnlineHiddenInformationTests`. From the payload alone,
+  using the app's own `OnlineMatchEnvelope.load`, every hand is reconstructed
+  exactly and the remaining deck is read in order. No privileged access, no
+  side channel, no bug.
+- **Why it is not simply fixed:** the replay-and-compare check that makes a
+  remote move trustworthy works *because* the receiver can reproduce the whole
+  game. Remove the seed and that check goes too. Determinism and hidden
+  information are in direct conflict here.
+- **What does hold:** Keezly does not leak hidden information through its own
+  interface or its own agents. That is a real guarantee and it is tested — it
+  is simply a different guarantee.
+- **Options considered and not taken:** per-player encrypted hands (the dealing
+  device still knows everything), a commit-and-reveal shuffle (several
+  interactive rounds per deal, repeated every round of a 5/4/4 cycle, over a
+  transport where players may be offline for days), and a server of our own
+  (the only complete answer, and a product decision in its own right). Set out
+  in full in DEC-025.
+- **Consequence:** online play in 1.0.0 is friendly play. Nothing may claim
+  otherwise, and online results are not a sound basis for a competitive
+  leaderboard — a constraint that lands on M9.
 
 ### ISS-014 — Neither physical device will start a UI test runner
 
