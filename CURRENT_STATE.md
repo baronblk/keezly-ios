@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-bfbac24  feat(pass-and-play): add the privacy handover flow
+820b7d5  feat(persistence): autosave and resume from seed plus accepted actions
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -74,6 +74,23 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**A match survives the app being closed (M5, DEC-023).** It is stored as its
+configuration, its seed and the actions the engine accepted — nothing else, and
+certainly no taps, selections or animation progress. Replaying them reproduces
+the position exactly.
+
+Written between the engine accepting a move and the board beginning to show it,
+atomically, so an interrupted animation can never correspond to half a move on
+disk. Coming back runs eight checks in order — wrapper version and checksum,
+engine schema, rules and checksum, every action revalidated by the real engine,
+the revision rising on each and landing exactly where it was saved, and the
+position's own checksum. Any failure is a typed refusal; the file is moved
+aside rather than deleted, because it is the only evidence of what went wrong.
+
+**A resumed pass-and-play match comes back covered**, even if a hand was on
+screen when the app was closed. Verified by a UI test that really terminates
+and relaunches the app, then counts the cards on screen: zero.
 
 **Pass & play works, and keeps its one promise (M5, DEC-022).** Up to six
 people share the device. Before each person's turn the board is covered by a
@@ -221,7 +238,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 ## Not Implemented Yet
 
 
-- Autosave, resume, statistics, match history, replay playback UI.
+- Statistics, match history, replay playback UI.
 - Bespoke dealing, Seven-leg and Jack-swap choreography (the generic move and
   swap animations exist).
 - Split View and Stage Manager verification.
@@ -285,7 +302,7 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (108 passed, 0 failed, 4 skipped) | 2026-09-21 | `bfbac24` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (132 passed, 0 failed, 3 skipped) | 2026-09-21 | `820b7d5` |
 | Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
 | Physical iPhone — re-run on the polish | **BLOCKED** — device left the wired connection mid-run (ISS-014) | 2026-09-21 | — |
 | Physical iPad (A16), iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
@@ -366,8 +383,10 @@ left, in order:
 
 1. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
-1. **M5 — autosave and resume**, so a match survives the app being closed.
-   Pass & play itself is done.
+1. **M6 — Game Center**, as far as it goes without the App Store Connect
+   record: the GameKit boundary, the turn envelope, revision and idempotency
+   handling, and a mock transport with deterministic tests. Only the real
+   end-to-end run stays blocked.
 
 Blocked and not startable: anything behind the App Store Connect record
 (MAN-02), and Game Center multi-device (MAN-11/12).

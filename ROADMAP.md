@@ -156,6 +156,8 @@ leak and watching them fail. See `AI.md`.
 | Task | Status |
 |---|---|
 | M4.0 Main menu and table configuration | DONE — 2–6 seats, one to six people sharing the device, partners or everyone alone, three opponent strengths, and the table shown as it will be dealt |
+| M5.1 Pass & play with a privacy handover (DEC-022) | DONE — the hand is built only for the seat holding the device; a UI test counts the cards on screen during a handover and requires zero |
+| M5.2 Autosave and resume (DEC-023) | DONE — seed plus accepted actions, written atomically before the animation starts; restore revalidates every action and refuses rather than repairs. Verified across 2–6 seats, partners and free-for-all, completed and abandoned matches, corruption, a newer schema and an unknown opponent, and by terminating and relaunching the app |
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
 | M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | IN PROGRESS — landscape and portrait done, all table sizes reviewed, three clipping defects fixed; a two-player table has its own presentation (DEC-021); Split View and Stage Manager untested |
