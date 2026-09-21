@@ -48,6 +48,11 @@ struct MatchSummary: Hashable, Sendable, Codable {
     let round: Int
     let actionCount: Int
     let revision: Int
+    /// Who won, when the match is over; empty otherwise.
+    ///
+    /// Written from the validated state at save time, so the history list can
+    /// say who won without replaying every match to find out.
+    let winningSeats: [Int]
 
     var isPassAndPlay: Bool { roles.count(where: { $0 == .person }) > 1 }
     var peopleCount: Int { roles.count(where: { $0 == .person }) }
@@ -64,7 +69,68 @@ struct MatchSummary: Hashable, Sendable, Codable {
         round = state.deal.roundIndex + 1
         actionCount = record.actionCount
         revision = state.revision
+        winningSeats = state.result?.winningSeats.map(\.index) ?? []
     }
+
+    /// Decoded leniently in one place only.
+    ///
+    /// `winningSeats` arrived after the first matches were saved. A file
+    /// written before it exists is not damaged and must still open, so the
+    /// field defaults to empty rather than failing the decode — and an old
+    /// completed match simply says "finished" instead of who won, which is
+    /// true of what was written down.
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        matchID = try container.decode(String.self, forKey: .matchID)
+        createdAt = try container.decode(Int.self, forKey: .createdAt)
+        updatedAt = try container.decode(Int.self, forKey: .updatedAt)
+        seatCount = try container.decode(Int.self, forKey: .seatCount)
+        teamMode = try container.decode(TeamMode.self, forKey: .teamMode)
+        status = try container.decode(MatchStatus.self, forKey: .status)
+        roles = try container.decode([PersistedRole].self, forKey: .roles)
+        currentSeat = try container.decode(Int.self, forKey: .currentSeat)
+        round = try container.decode(Int.self, forKey: .round)
+        actionCount = try container.decode(Int.self, forKey: .actionCount)
+        revision = try container.decode(Int.self, forKey: .revision)
+        winningSeats = try container.decodeIfPresent([Int].self, forKey: .winningSeats) ?? []
+    }
+
+    /// Built field by field. Used by tests to describe a table without
+    /// playing one out, and by nothing in the app.
+    init(
+        matchID: String,
+        createdAt: Int,
+        updatedAt: Int,
+        seatCount: Int,
+        teamMode: TeamMode,
+        status: MatchStatus,
+        roles: [PersistedRole],
+        currentSeat: Int,
+        round: Int,
+        actionCount: Int,
+        revision: Int,
+        winningSeats: [Int]
+    ) {
+        self.matchID = matchID
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.seatCount = seatCount
+        self.teamMode = teamMode
+        self.status = status
+        self.roles = roles
+        self.currentSeat = currentSeat
+        self.round = round
+        self.actionCount = actionCount
+        self.revision = revision
+        self.winningSeats = winningSeats
+    }
+
+    /// The winner, for a table where one seat wins. `nil` when the match is
+    /// unfinished, or was saved before winners were recorded.
+    var winningSeat: Int? { winningSeats.first }
+
+    /// Whether the person holding the device — seat 0 — won.
+    var didLocalSeatWin: Bool { winningSeats.contains(0) }
 }
 
 /// One saved match, as it sits on disk.

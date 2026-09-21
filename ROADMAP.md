@@ -17,7 +17,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M6 | Game Center Multiplayer | NOT STARTED |
 | M7 | Tutorial / Rulebook / Accessibility | DONE |
 | M8 | Brand / App Icon / Audio / Haptics | DONE — except the sound recordings, ASSET PENDING |
-| M9 | Statistics / Replay / Game Center Meta | NOT STARTED |
+| M9 | Statistics / Replay / Game Center Meta | DONE — reporting to Game Center blocked on MAN-02 |
 | M10 | Localisation | NOT STARTED |
 | M11 | CI / QA / Hardening | NOT STARTED |
 | M12 | Release Candidate 1.0.0 | NOT STARTED |
@@ -239,15 +239,15 @@ and mocked tests can proceed without them (§142).
 
 ---
 
-## M9 — Statistics / Replay / Game Center Meta — NOT STARTED
+## M9 — Statistics / Replay / Game Center Meta — DONE (reporting BLOCKED)
 
 | Task | Status |
 |---|---|
-| M9.1 Local statistics | NOT STARTED |
-| M9.2 Match history with sensible bounds | NOT STARTED |
-| M9.3 Replay (play/pause/step/speed) built on the event stream | PARTIAL — the engine side is done (`MatchRecord`); the playback UI waits on M4 |
-| M9.4 Achievements (`docs/GAME_CENTER_ACHIEVEMENTS.md`) | NOT STARTED |
-| M9.5 Leaderboards (`docs/GAME_CENTER_LEADERBOARDS.md`) | NOT STARTED |
+| M9.1 Local statistics | DONE — derived from the saved matches rather than kept beside them, so there is no tally to drift out of step with the games that were actually played |
+| M9.2 Match history with sensible bounds | DONE — every saved match, newest first, each one already replayed and verified by the store before it is listed. A finished match opens in the replay, an unfinished one is picked up |
+| M9.3 Replay (play/pause/step/speed) built on the event stream | DONE — seed plus accepted actions, no second representation. Play, pause, step either way, scrub, three speeds; the record is never written to. Stepping backwards was **measured at 59 ms** rebuilding from the opening, which is what justified checkpoints; with them it lands inside a frame |
+| M9.4 Achievements (`docs/GAME_CENTER_ACHIEVEMENTS.md`) | **IMPLEMENTED, NOT VERIFIED** — ten achievements worked out by replaying a finished record and reading its `GameEvent`s, tested across seat counts and both team modes. Nothing reports them anywhere yet: that needs MAN-02, then MAN-05 and MAN-06 |
+| M9.5 Leaderboards (`docs/GAME_CENTER_LEADERBOARDS.md`) | **NOT BUILT — deliberate.** Online results cannot be ranked honestly while a modified client can read every hand (DEC-025), and a local ladder over a game with this much luck in it would mostly be reporting the deals. The match history says what actually happened instead |
 
 **Depends on** M2.10 (move log) for replay.
 

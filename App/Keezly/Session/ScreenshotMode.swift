@@ -49,6 +49,15 @@ enum ScreenshotMode {
     /// screenshot would be a genuine mistake.
     static var showsFocusProbe: Bool { arguments.contains("-KEEZLY_DEBUG_FOCUS") }
 
+    /// `-KEEZLY_REPLAY` — open a played-out match in the replay screen instead
+    /// of playing one.
+    ///
+    /// The replay screen is otherwise only reachable from a *finished* match,
+    /// which takes an hour to produce by hand. This plays one out with the
+    /// fixture machinery and hands the record to the replay, so the screen can
+    /// be looked at and captured deterministically (§87).
+    static var showsReplay: Bool { arguments.contains("-KEEZLY_REPLAY") }
+
     /// Puts the keyboard somewhere at launch.
     ///
     /// iOS gives a view focus only when a hardware keyboard or Full Keyboard

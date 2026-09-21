@@ -25,6 +25,10 @@ struct RootView: View {
     /// Sound and haptics, owned here so one match cannot disagree with the
     /// next about what the player asked for.
     @State private var preferences = Preferences()
+    /// A match being watched back, when one is.
+    @State private var replay: ReplayRun?
+    /// Every match on the device, refreshed when the menu appears.
+    @State private var matches: [MatchSummary] = []
 
     private let store: MatchStore?
 
@@ -34,7 +38,16 @@ struct RootView: View {
         // not turn up in the list.
         store = ScreenshotMode.isActive ? nil : MatchStore()
 
-        if ScreenshotMode.isActive {
+        if ScreenshotMode.isActive, ScreenshotMode.showsReplay {
+            // A whole match, played out, then handed to the replay.
+            let played = MatchSession(
+                configuration: ScreenshotMode.configuration,
+                seed: ScreenshotMode.seed,
+                roles: ScreenshotMode.roles,
+                fixture: .movesPlayed(900)
+            )
+            _replay = State(initialValue: ReplayRun(record: played.record, roles: played.roles))
+        } else if ScreenshotMode.isActive {
             _session = State(initialValue: MatchSession(
                 configuration: ScreenshotMode.configuration,
                 seed: ScreenshotMode.seed,
@@ -46,7 +59,10 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if let tutorial {
+            if let replay {
+                ReplayScreen(replay: replay, onLeave: { self.replay = nil })
+                    .id(ObjectIdentifier(replay))
+            } else if let tutorial {
                 // The ordinary playing screen, with a lesson watching. Rebuilt
                 // per lesson, because each one is its own match.
                 GameScreen(
@@ -75,7 +91,10 @@ struct RootView: View {
                     },
                     isNewcomer: welcome.isNewcomer,
                     preferences: preferences,
-                    hasSound: Feedback(preferences: preferences).hasAnySound
+                    hasSound: Feedback(preferences: preferences).hasAnySound,
+                    matches: matches,
+                    onWatch: watch,
+                    onOpen: open
                 )
                 .task { refreshResumable() }
             }
@@ -84,7 +103,38 @@ struct RootView: View {
     }
 
     private func refreshResumable() {
-        resumable = store?.mostRecentActive()
+        matches = store?.list() ?? []
+        resumable = matches.first { $0.status == .active }
+    }
+
+    /// Opens a finished match to be watched back.
+    ///
+    /// Restored through the same validated path as playing one: a match that
+    /// will not replay is not one to watch either (DEC-023).
+    private func watch(_ summary: MatchSummary) {
+        guard let store else { return }
+        do {
+            let restored = try store.restore(matchID: summary.matchID)
+            replay = ReplayRun(record: restored.record, roles: restored.roles)
+            restoreFailure = nil
+        } catch {
+            store.quarantine(matchID: summary.matchID)
+            restoreFailure = error.localizedDescription
+            refreshResumable()
+        }
+    }
+
+    /// Picks a particular match up, rather than the most recent one.
+    private func open(_ summary: MatchSummary) {
+        guard let store else { return }
+        do {
+            session = MatchSession(restored: try store.restore(matchID: summary.matchID), store: store)
+            restoreFailure = nil
+        } catch {
+            store.quarantine(matchID: summary.matchID)
+            restoreFailure = error.localizedDescription
+            refreshResumable()
+        }
     }
 
     private func start() {

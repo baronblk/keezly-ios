@@ -26,9 +26,14 @@ struct MainMenuView: View {
     var preferences: Preferences
     /// Whether any sound has a recording behind it yet.
     var hasSound = false
+    /// Every match on the device, newest first.
+    var matches: [MatchSummary] = []
+    var onWatch: (MatchSummary) -> Void = { _ in }
+    var onOpen: (MatchSummary) -> Void = { _ in }
 
     @State private var showsRules = false
     @State private var showsSettings = false
+    @State private var showsHistory = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -297,6 +302,9 @@ struct MainMenuView: View {
             // twice on one screen is how a menu starts to look like a form.
             if !isNewcomer { tutorialButton }
             rulesButton
+            // Only once there is something to look at. A menu entry that opens
+            // an empty screen is a menu entry that does nothing (§36).
+            if !matches.isEmpty { historyButton }
             settingsButton
         }
     }
@@ -337,6 +345,28 @@ struct MainMenuView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("menu.tutorial")
+    }
+
+    private var historyButton: some View {
+        Button {
+            showsHistory = true
+        } label: {
+            Text("menu.history")
+                .font(.system(size: labelSize, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.72))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Keezly.Spacing.small)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("menu.history")
+        .sheet(isPresented: $showsHistory) {
+            MatchListView(
+                matches: matches,
+                statistics: Statistics(matches: matches),
+                onWatch: onWatch,
+                onResume: onOpen
+            )
+        }
     }
 
     private var settingsButton: some View {

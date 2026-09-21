@@ -12,6 +12,11 @@ struct BoardCentreView: View {
 
     let state: GameState
     let roles: [SeatRole]
+    /// Whether this board is being watched rather than played.
+    ///
+    /// A replay has nobody waiting on it: "thinking…" would be describing a
+    /// decision that was made and recorded some time ago.
+    var isReplay = false
     var width: CGFloat
     /// Laid out down the middle of the board, or across a tray beside it.
     ///
@@ -69,6 +74,7 @@ struct BoardCentreView: View {
                 return false
             }(),
             finished: state.result != nil,
+            isReplay: isReplay,
             width: width
         )
     }
@@ -148,7 +154,15 @@ private struct TurnIndicator: View {
     let identity: PlayerIdentity
     let isComputer: Bool
     let finished: Bool
+    var isReplay = false
     let width: CGFloat
+
+    /// Whose turn it is, in the tense that applies.
+    private var label: LocalizedStringKey {
+        if finished { return "turn.finished" }
+        if isReplay { return "turn.watching" }
+        return isComputer ? "turn.thinking" : "turn.yours"
+    }
 
     var body: some View {
         HStack(spacing: width * 0.04) {
@@ -156,7 +170,7 @@ private struct TurnIndicator: View {
                 .fill(identity.color)
                 .frame(width: width * 0.12, height: width * 0.12)
 
-            Text(finished ? "turn.finished" : (isComputer ? "turn.thinking" : "turn.yours"))
+            Text(label)
                 .font(.system(size: max(11, width * 0.07) * textScale, weight: .semibold, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
