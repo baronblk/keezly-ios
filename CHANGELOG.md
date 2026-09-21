@@ -55,6 +55,10 @@ Versioning.
   them can see another player's cards.
 - **Replay**: finished matches can be played back exactly, move by move,
   because the engine is deterministic.
+- **Pass & play**: up to six people sharing one device. Before each person's
+  turn the board is covered by a plain screen with their name and one button,
+  and the cards are drawn only for whoever has said they are holding the
+  device — so nobody sees anybody else's hand, even for an instant.
 - **A menu to set up the table**: two to six players, partners or everyone for
   themselves, and opponents at three strengths. The seats are shown as they
   will be dealt, so choosing a table shows what the table will look like rather

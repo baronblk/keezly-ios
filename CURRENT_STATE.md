@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-bc2e9b1  feat(menu): add a main menu with table configuration
+bfbac24  feat(pass-and-play): add the privacy handover flow
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -74,6 +74,19 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**Pass & play works, and keeps its one promise (M5, DEC-022).** Up to six
+people share the device. Before each person's turn the board is covered by a
+plain opaque screen with their name and one button — no hand, no counts,
+nothing that rewards holding on to the device.
+
+The promise is not made by the cover. The hand is *built* only for the seat
+that has said it is holding the device, checked where the hand is made as well
+as behind the cover, so the cards would not appear even if the cover failed to
+draw. A UI test counts the cards on screen while the cover is up and requires
+zero, on a table where every seat is a person so that every turn is a handover.
+
+A table with one person never sees any of it: no cover, no extra tap.
 
 **The app opens on a menu (M4.0).** Two to six players, partners or everyone
 for themselves, three opponent strengths, and the seats shown as they will be
@@ -208,7 +221,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 ## Not Implemented Yet
 
 
-- Pass & play, autosave, statistics, match history, replay playback UI.
+- Autosave, resume, statistics, match history, replay playback UI.
 - Bespoke dealing, Seven-leg and Jack-swap choreography (the generic move and
   swap animations exist).
 - Split View and Stage Manager verification.
@@ -272,7 +285,7 @@ Recorded per environment; never merged (§167, §175).
 | Environment | Status | Last run | Commit |
 |---|---|---|---|
 | Simulator — iPhone 17, iOS 27.0 | **PASSED** (34/34) | 2026-09-20 | `e4bae0f` |
-| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (97 passed, 0 failed, 3 skipped) | 2026-09-21 | `bc2e9b1` |
+| Simulator — iPad Pro 13" (M5), iOS 27.0 | **PASSED** (108 passed, 0 failed, 4 skipped) | 2026-09-21 | `bfbac24` |
 | Physical iPhone 17 Pro, iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
 | Physical iPhone — re-run on the polish | **BLOCKED** — device left the wired connection mid-run (ISS-014) | 2026-09-21 | — |
 | Physical iPad (A16), iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
@@ -353,8 +366,8 @@ left, in order:
 
 1. **Main menu and table configuration**, which is what lets a player choose
    2–6 seats, teams and opponents rather than getting the built-in four.
-1. **M5 — pass & play and autosave**, which is what lets the seats the menu
-   already offers be filled by people rather than only by the computer.
+1. **M5 — autosave and resume**, so a match survives the app being closed.
+   Pass & play itself is done.
 
 Blocked and not startable: anything behind the App Store Connect record
 (MAN-02), and Game Center multi-device (MAN-11/12).
