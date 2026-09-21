@@ -8,7 +8,7 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-820b7d5  feat(persistence): autosave and resume from seed plus accepted actions
+2f7bde9  feat(gamecenter): add a versioned turn envelope over a mockable transport
 ```
 
 Verified on **2026-09-20** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
@@ -74,6 +74,37 @@ effect at all. Both are fixed and captured.
 capture is drawn after the move that caused it. The presenter holds its own
 copy of the positions and cannot reach `GameState`; an interrupted animation
 always settles on the true position.
+
+**Game Center has a model, a boundary and tests — but no real run (M6,
+DEC-024).** There is no online engine: a match across devices is the same
+record as one on the sofa. Between the engine and Apple sits `MatchTransport`,
+five methods with no GameKit type in them, so every online rule is tested
+against a mock with no account, no network and no simulator.
+
+| Part | Status |
+|---|---|
+| Turn envelope, revisions, idempotency, validation | **MOCK VERIFIED** (29 tests) |
+| Two clients exchanging a match over many turns | **MOCK VERIFIED** (12 tests) |
+| Participant mapping, teams at 4 and 6 seats, several matches at once | **MOCK VERIFIED** |
+| Authentication state machine | **TESTED** as a pure function |
+| `GameCenterTransport`, the GameKit adapter | **IMPLEMENTED, NOT VERIFIED** |
+| A real match between two Apple Accounts | **BLOCKED** — MAN-02, MAN-05, MAN-11, MAN-12 |
+
+A turn carries its own `moveID`, the revision it was made against and the one
+it produces, which gives five distinct answers — accepted, duplicate, stale,
+out of order, rejected — each handled separately. A duplicate is recognised by
+identity *before* its revision would make it look stale.
+
+Arriving data is never taken as a position. It is decompressed, version- and
+checksum-checked, then **replayed through the real engine**, with the revision
+required to rise at every action and to land exactly where the sender claimed,
+and the resulting board's checksum compared with the one sent.
+
+**A size problem was found before it could ship.** A four-hundred-move
+six-player match came to **64,384 bytes** of JSON against Game Center's
+65,536-byte limit — a full six-player match would not have fitted. Compressing
+the canonical bytes brings the same match to **4,173 bytes**. A test holds the
+number.
 
 **A match survives the app being closed (M5, DEC-023).** It is stored as its
 configuration, its seed and the actions the engine accepted — nothing else, and
