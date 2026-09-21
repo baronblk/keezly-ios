@@ -23,6 +23,13 @@ struct GameScreen: View {
     /// Where the keyboard is. Shared by the hand and the board, so focus can
     /// cross between them (§46).
     @FocusState private var focus: PlayFocus?
+    /// The seat whose cards may be shown.
+    ///
+    /// Not simply "the seat on turn". On a pass-and-play table the device goes
+    /// round, and a hand must not appear until the person it belongs to has
+    /// said they are holding it — otherwise the cards are on screen at exactly
+    /// the moment the device is being passed (§34).
+    @State private var seatInHand: Seat?
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -97,10 +104,22 @@ struct GameScreen: View {
     /// Below this the cards in the middle stop being readable.
     static let minimumCentreScale: CGFloat = 0.19
 
+    /// Whether the device is waiting to be handed to somebody else.
+    ///
+    /// The whole of the privacy rule is this one condition: a person's turn
+    /// has come and the cards on screen are not theirs yet.
+    private var awaitingHandover: Bool {
+        guard session.isPassAndPlay, let seat = session.seatOnTurn else { return false }
+        return seatInHand != seat
+    }
+
+    /// The seat whose point of view the screen is taking.
+    private var viewpoint: Seat? { seatInHand ?? session.localSeat }
+
     /// The interaction state, rebuilt from the session every render so it can
     /// never disagree with the board.
     private var planner: PlayPlanner {
-        guard let seat = session.localSeat, session.isAwaitingHuman else {
+        guard let seat = session.seatOnTurn, session.isAwaitingHuman, !awaitingHandover else {
             return PlayPlanner(observation: PlayerObservation(of: session.state, for: session.state.currentSeat))
         }
         return PlayPlanner(
@@ -115,12 +134,12 @@ struct GameScreen: View {
     /// on every render exactly as the planner is — so focus can never point at
     /// something the engine would refuse.
     private var ring: FocusRing {
-        guard session.isAwaitingHuman else { return FocusRing(mustFold: false) }
+        guard session.isAwaitingHuman, !awaitingHandover else { return FocusRing(mustFold: false) }
         guard !session.mustFold else { return FocusRing(mustFold: true) }
         let planner = planner
         return FocusRing(
             mustFold: false,
-            hand: session.localSeat.map { session.state.hand(of: $0).cards } ?? [],
+            hand: session.seatOnTurn.map { session.state.hand(of: $0).cards } ?? [],
             playable: planner.playableCards,
             selectablePawns: planner.selectablePawns,
             targets: planner.highlightedTargets
@@ -152,7 +171,11 @@ struct GameScreen: View {
                         .zIndex(999)
                 }
 
-                if proxy.size.height < Self.shortHeightThreshold {
+                if awaitingHandover, let seat = session.seatOnTurn {
+                    HandoverView(seat: seat) { seatInHand = seat }
+                        .transition(.opacity)
+                        .zIndex(500)
+                } else if proxy.size.height < Self.shortHeightThreshold {
                     shortLayout(size: proxy.size)
                 } else if isCompact {
                     compactLayout(size: proxy.size)
@@ -170,7 +193,12 @@ struct GameScreen: View {
         .focusEffectDisabled()
         .keyboardFocus($focus, equals: .screen)
         .defaultFocus($focus, .screen)
-        .onAppear { session.begin() }
+        .onAppear {
+            // A table with one person at it never hands over, so their cards
+            // are theirs from the first deal.
+            if !session.isPassAndPlay { seatInHand = session.localSeat }
+            session.begin()
+        }
         // Not on appear: at that point the computers may still be opening, so
         // there is nothing a human could focus yet.
         .onChange(of: session.isAwaitingHuman) { _, awaiting in
@@ -300,13 +328,13 @@ struct GameScreen: View {
         let floor = min(size.width, size.height) * 0.62
         let boardSide = max(floor, min(available - minimumSide * 2, heightBudget))
         let sideWidth = max(minimumSide, (available - boardSide) / 2)
-        let opponents = session.state.configuration.seats.filter { $0 != session.localSeat }
+        let opponents = session.state.configuration.seats.filter { $0 != viewpoint }
         let split = (opponents.count + 1) / 2
 
         return HStack(alignment: .center, spacing: Keezly.Spacing.large) {
             SeatColumn(
                 seats: Array(opponents.prefix(split)),
-                state: session.state, roles: session.roles, localSeat: session.localSeat
+                state: session.state, roles: session.roles, localSeat: viewpoint
             )
             .frame(width: sideWidth)
 
@@ -327,7 +355,7 @@ struct GameScreen: View {
             ZStack {
                 SeatColumn(
                     seats: Array(opponents.suffix(from: split)),
-                    state: session.state, roles: session.roles, localSeat: session.localSeat
+                    state: session.state, roles: session.roles, localSeat: viewpoint
                 )
                 tableTray(axis: .vertical)
             }
@@ -341,14 +369,14 @@ struct GameScreen: View {
     /// board before.
     private var opponentStrip: some View {
         HStack(spacing: Keezly.Spacing.tight) {
-            ForEach(session.state.configuration.seats.filter { $0 != session.localSeat }, id: \.self) { seat in
+            ForEach(session.state.configuration.seats.filter { $0 != viewpoint }, id: \.self) { seat in
                 SeatChip(
                     seat: seat,
                     cardCount: session.state.hand(of: seat).count,
                     pawnsHome: session.state.pawns(of: seat).count(where: \.isHome),
                     isDealer: session.state.dealer == seat,
                     isOnTurn: session.state.currentSeat == seat,
-                    isPartner: session.localSeat.map {
+                    isPartner: viewpoint.map {
                         session.state.configuration.areAllied($0, seat) && $0 != seat
                     } ?? false
                 )
@@ -419,7 +447,10 @@ struct GameScreen: View {
                 .accessibilityHint("action.fold.hint")
             }
 
-            if let seat = session.localSeat {
+            // Drawn only for the person who has said they are holding the
+            // device. Checked here as well as behind the cover, so a hand
+            // cannot appear even if the cover failed to draw (§34).
+            if let seat = viewpoint, !awaitingHandover {
                 HandView(
                     cards: session.state.hand(of: seat).cards,
                     playable: planner.playableCards,

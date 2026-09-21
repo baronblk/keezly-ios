@@ -681,3 +681,41 @@ with them instead of leaving a stale exception behind.
 **Also settled here.** The middle's size on three to six seats is now
 proportioned to the board's own quiet field rather than to the size of the
 view, so a five- or six-player table gets a middle in proportion to its board.
+
+---
+
+## DEC-022 — The hand is drawn for one seat, not hidden from the others
+
+- **Date:** 2026-09-21
+- **Topic:** Pass & play
+- **Status:** ACCEPTED
+
+**Context.** Several people share one device. The obvious implementation shows
+the board as usual and puts something over it while the device is passed. That
+makes privacy a property of the covering — of z-order, of transition timing, of
+whether a blur is opaque enough — which is to say, of things that go wrong
+quietly.
+
+**Decision.** Privacy is a property of what is *built*, not of what is drawn on
+top. `GameScreen` holds the seat whose cards may be shown, and it is set only
+when a person says they are holding the device. The hand is built only for that
+seat. The cover is then an explanation, not a defence: if it failed to appear,
+no cards would be on screen anyway.
+
+The same seat drives the planner, the seat panels and the keyboard's reach, so
+there is one answer to "whose turn is this screen showing" rather than several
+that could disagree.
+
+**What follows from it.**
+
+- The cover is opaque rather than blurred, because a blurred hand is still a
+  hand at this card size.
+- `MatchSession.localSeat` — the first human seat — is right for a table with
+  one person and wrong for pass & play. It is kept, documented as such, and the
+  screen asks for `seatOnTurn` instead.
+- A table with one person never hands over: their cards are theirs from the
+  first deal, with no extra tap.
+
+**Verified by** a UI test that counts the cards on screen while the cover is up
+and requires zero, on a table where every seat is a person so that every turn
+is a handover.

@@ -111,3 +111,98 @@ struct TableConfigurationTests {
         #expect(session.state.pawns.count == seats * pawnsPerSeat)
     }
 }
+
+/// §34 — pass & play: several people sharing one device.
+@Suite("Pass and play")
+struct PassAndPlayTests {
+
+    private func table(seats: Int, people: Int, teams: Bool = true) -> TableConfiguration {
+        var table = TableConfiguration()
+        table.seatCount = seats
+        table.humanCount = people
+        table.prefersTeams = teams
+        return table
+    }
+
+    @Test("one person at the table is not pass and play")
+    func soloIsNotPassAndPlay() {
+        #expect(!table(seats: 4, people: 1).isPassAndPlay)
+        #expect(table(seats: 4, people: 2).isPassAndPlay)
+    }
+
+    @Test("people take the first seats and the computer takes the rest", arguments: 1...4)
+    func peopleFillFromTheFirstSeat(people: Int) {
+        let roles = table(seats: 4, people: people).roles
+        #expect(roles.prefix(people).allSatisfy { $0.isHuman })
+        #expect(roles.dropFirst(people).allSatisfy { !$0.isHuman })
+        #expect(roles.count == 4)
+    }
+
+    @Test("a table cannot seat more people than it has seats")
+    func peopleAreCappedBySeats() {
+        // The stored count is deliberately *not* clamped, so shrinking a table
+        // and growing it again does not forget how many people were playing.
+        var table = table(seats: 6, people: 6)
+        table.seatCount = 2
+        #expect(table.seatedHumans == 2)
+        #expect(table.roles.count == 2)
+        #expect(table.roles.allSatisfy { $0.isHuman })
+
+        table.seatCount = 6
+        #expect(table.seatedHumans == 6, "the table forgot how many people were playing")
+    }
+
+    @Test("two people at a four-seat partners table are opponents")
+    func twoPeopleAtFourSeatsAreRivals() {
+        // Seats 0 and 2 are allies at four seats, so the first two seats are
+        // on opposite sides.
+        #expect(!table(seats: 4, people: 2).seatsPeopleAsPartners)
+    }
+
+    @Test("two people at a six-seat partners table are partners")
+    func twoPeopleAtSixSeatsArePartners() {
+        // At six seats seat 0 is allied with seat 3 — but seats 0, 1 and 2 are
+        // one side each, so the first two people are on different sides.
+        let six = table(seats: 6, people: 2)
+        #expect(six.seatsPeopleAsPartners == six.gameConfiguration.areAllied(Seat(0), Seat(1)))
+    }
+
+    @Test("partners are never claimed where the table has none")
+    func noPartnersWithoutTeams() {
+        #expect(!table(seats: 4, people: 4, teams: false).seatsPeopleAsPartners)
+        #expect(!table(seats: 3, people: 3).seatsPeopleAsPartners)
+    }
+
+    @Test("a session knows every seat a person plays", arguments: 1...4)
+    @MainActor
+    func sessionReportsTheHumanSeats(people: Int) {
+        let table = table(seats: 4, people: people)
+        let session = MatchSession(
+            configuration: table.gameConfiguration,
+            seed: 2026,
+            roles: table.roles
+        )
+        #expect(session.humanSeats.map(\.index) == Array(0..<people))
+        #expect(session.isPassAndPlay == (people > 1))
+    }
+
+    @Test("the seat on turn is a person's only when it really is")
+    @MainActor
+    func seatOnTurnIsOnlyEverAPerson() {
+        let table = table(seats: 4, people: 2)
+        let session = MatchSession(
+            configuration: table.gameConfiguration,
+            seed: 2026,
+            roles: table.roles
+        )
+        // Whatever the deal produced, the rule holds: `seatOnTurn` is set if
+        // and only if the seat playing is one a person holds. That is what the
+        // privacy cover keys off, so it must never name a computer's seat.
+        let onTurn = session.state.currentSeat
+        let isPerson = session.roles[onTurn.index].isHuman
+        #expect((session.seatOnTurn != nil) == isPerson)
+        if let seat = session.seatOnTurn {
+            #expect(session.humanSeats.contains(seat))
+        }
+    }
+}

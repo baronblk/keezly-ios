@@ -14,6 +14,11 @@ struct TableConfiguration: Equatable {
     var prefersTeams: Bool = true
     /// How hard the computer opponents play.
     var difficulty: AIDifficulty = .medium
+    /// How many seats are taken by people sharing the device (§34).
+    ///
+    /// One is an ordinary game against the computer. More is pass & play: the
+    /// device goes round the table, and the seats fill from the first.
+    var humanCount: Int = 1
 
     static let seatCounts = Array(2...6)
 
@@ -40,12 +45,37 @@ struct TableConfiguration: Equatable {
         GameConfiguration(seatCount: seatCount, teamMode: teamMode)
     }
 
-    /// One human, the rest played by the computer.
+    /// How many people can share this table. At least one, at most every seat.
+    var humanRange: ClosedRange<Int> { 1...seatCount }
+
+    /// The number of people actually seated, whatever the stepper last held.
     ///
-    /// Pass & play — several people sharing one device — arrives in M5. Until
-    /// then the menu does not offer it, because a menu must not contain an
-    /// option that does nothing (§36).
+    /// Kept as a separate reading rather than clamping the stored value, so
+    /// reducing the table from six seats to two and back does not silently
+    /// forget that four people were playing.
+    var seatedHumans: Int { min(max(1, humanCount), seatCount) }
+
+    /// Who plays each seat: the people first, then the computer.
+    ///
+    /// People take consecutive seats rather than being spread around the
+    /// table. On a partners table that matters — seats *i* and *i + n/2* are
+    /// allies — and `partnerships` says what it comes to.
     var roles: [SeatRole] {
-        [.human] + Array(repeating: SeatRole.computer(difficulty), count: max(0, seatCount - 1))
+        let people = seatedHumans
+        return (0..<seatCount).map { $0 < people ? .human : .computer(difficulty) }
     }
+
+    /// Whether two people at this table are partners rather than opponents.
+    ///
+    /// Worth saying out loud in the menu: at four seats two people are
+    /// opponents, at six seats they are partners, and a player setting up the
+    /// table should not have to work that out from the seating.
+    var seatsPeopleAsPartners: Bool {
+        guard teamMode == .teamsOfTwo, seatedHumans >= 2 else { return false }
+        let configuration = gameConfiguration
+        return (1..<seatedHumans).contains { configuration.areAllied(Seat(0), Seat($0)) }
+    }
+
+    /// Whether the device has to change hands during a turn (§34).
+    var isPassAndPlay: Bool { seatedHumans > 1 }
 }

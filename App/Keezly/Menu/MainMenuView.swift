@@ -90,6 +90,29 @@ struct MainMenuView: View {
                 }
             }
 
+            field("table.people") {
+                Picker("table.people", selection: $table.humanCount) {
+                    ForEach(table.humanRange, id: \.self) { count in
+                        Text(verbatim: "\(count)").tag(count)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("table.people")
+
+                // What sharing the device actually means at this table. At
+                // four seats two people are opponents, at six they are
+                // partners, and nobody should have to work that out from the
+                // seating.
+                Text(
+                    table.isPassAndPlay
+                        ? (table.seatsPeopleAsPartners ? "table.people.partners" : "table.people.rivals")
+                        : "table.people.solo"
+                )
+                .font(.system(size: labelSize * 0.88, design: .rounded))
+                .foregroundStyle(Keezly.Palette.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+
             field("table.opponents") {
                 Picker("table.opponents", selection: $table.difficulty) {
                     Text("ai.easy").tag(AIDifficulty.easy)
@@ -97,6 +120,7 @@ struct MainMenuView: View {
                     Text("ai.hard").tag(AIDifficulty.hard)
                 }
                 .pickerStyle(.segmented)
+                .disabled(table.seatedHumans >= table.seatCount)
                 .accessibilityIdentifier("table.opponents")
             }
 
@@ -126,6 +150,7 @@ struct MainMenuView: View {
                 ForEach(0..<table.seatCount, id: \.self) { index in
                     let seat = Seat(index)
                     let identity = PlayerIdentity.identity(for: seat)
+                    let isPerson = index < table.seatedHumans
                     let isPartner = table.teamMode == .teamsOfTwo
                         && index != 0
                         && table.gameConfiguration.areAllied(Seat(0), seat)
@@ -140,12 +165,16 @@ struct MainMenuView: View {
                         }
                         .frame(width: 34, height: 34)
                         .overlay {
-                            if index == 0 {
+                            if isPerson {
                                 Circle().strokeBorder(identity.color, lineWidth: 2.5)
                             }
                         }
 
-                        Text(index == 0 ? "seat.you" : (isPartner ? "seat.partner" : "seat.computer"))
+                        Text(
+                            index == 0
+                                ? "seat.you"
+                                : seatLabel(isPerson: isPerson, isPartner: isPartner, index: index)
+                        )
                             .font(.system(size: labelSize * 0.74, weight: .medium, design: .rounded))
                             .foregroundStyle(Keezly.Palette.secondaryText)
                             .lineLimit(1)
@@ -157,6 +186,12 @@ struct MainMenuView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("table.seats")
+    }
+
+    /// What a seat is called in the menu: a person, a partner, or the computer.
+    private func seatLabel(isPerson: Bool, isPartner: Bool, index: Int) -> LocalizedStringKey {
+        if isPerson { return "seat.person \(index + 1)" }
+        return isPartner ? "seat.partner" : "seat.computer"
     }
 
     private var startButton: some View {

@@ -337,6 +337,36 @@ machine can supply one. The tests that need real keys skip rather than pass.
 
 ---
 
+## Pass & play, and the one promise it makes (DEC-022)
+
+Several people share one device, so the device changes hands mid-match. The
+only thing that really matters is what is on screen at that moment.
+
+**A hand appears for one person and one moment.** Before each person's turn the
+board is covered by a plain, opaque screen naming whose turn it is, with one
+button. Nothing about the position is on it — no hand, no card counts, nothing
+that rewards holding the device a second longer.
+
+Three things make the promise hold rather than merely intend it:
+
+- **The cover is opaque, not blurred.** A blurred hand is still a hand, and
+  these cards are large enough to read through one.
+- **The hand is drawn only for the person who has said they are holding the
+  device**, checked where the hand is built as well as behind the cover. If the
+  cover ever failed to draw, the cards still would not appear.
+- **A UI test asserts it**: at the moment the cover is up, the number of cards
+  on screen is zero. That test is the feature; the rest is arrangement.
+
+**Who the screen belongs to.** On a table with one person, "local" is one fixed
+seat. With several it is whoever is holding the device — so the board, the seat
+panels and the keyboard's reach all follow the seat on turn rather than seat
+zero.
+
+**A table with one person never sees any of this.** No cover, no button, no
+extra tap between the deal and the game.
+
+---
+
 ## Interaction
 
 The flow is card → pawn → square (§36). Illegal targets are never offered:

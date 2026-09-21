@@ -138,11 +138,23 @@ final class MatchSession {
 
     // MARK: - Queries the UI needs
 
-    /// The seat the local player controls, if any. The first human seat: on a
-    /// pass-and-play table the others take their turn in the same place (§34).
-    var localSeat: Seat? {
-        roles.firstIndex(where: \.isHuman).map(Seat.init)
+    /// Every seat played by a person at this device.
+    var humanSeats: [Seat] {
+        roles.indices.filter { roles[$0].isHuman }.map(Seat.init)
     }
+
+    /// Whether the device has to change hands during a match (§34).
+    var isPassAndPlay: Bool { humanSeats.count > 1 }
+
+    /// The first human seat.
+    ///
+    /// The right answer for a table with one person at it, and the wrong one
+    /// for pass & play — there "local" is whoever is holding the device, which
+    /// is why the screen asks for `seatOnTurn` instead.
+    var localSeat: Seat? { humanSeats.first }
+
+    /// The seat a person must play right now, if it is a person's turn at all.
+    var seatOnTurn: Seat? { currentRole.isHuman ? state.currentSeat : nil }
 
     var currentRole: SeatRole { roles[state.currentSeat.index] }
 

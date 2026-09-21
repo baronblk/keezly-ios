@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05E2F7C4D915B34F8A21C6FF /* PassAndPlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */; };
 		092103484C74A862ECF89DF8 /* SuitGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E264E59919E60235F368F7F /* SuitGlyph.swift */; };
 		11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ED8C1FD416E628043CC4D29 /* Assets.xcassets */; };
 		180EEED18A6C25123E43D24B /* CardFaceArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7A5D5762F62794C05527AF /* CardFaceArt.swift */; };
@@ -37,6 +38,7 @@
 		9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */; };
 		A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */; };
 		A3944BF892A031CFD85EDB6B /* MatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF95D494649C4F6D223A28C /* MatchSession.swift */; };
+		A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32529E7548CA1EFE9A4F729 /* HandoverView.swift */; };
 		B2801BC0A5360759083EB63B /* BoardSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */; };
 		B29A4F858EE41B8D796DB41C /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */; };
 		B586F635085CB018833325F3 /* KeyboardFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963EE8EC7128581D049817F2 /* KeyboardFocus.swift */; };
@@ -102,6 +104,7 @@
 		AC5CC86597A4A00C17A31B2D /* KeezlyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KeezlyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntegrationTests.swift; sourceTree = "<group>"; };
 		AF665365FA61E826D11B50E9 /* PlayerIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerIdentity.swift; sourceTree = "<group>"; };
+		B32529E7548CA1EFE9A4F729 /* HandoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoverView.swift; sourceTree = "<group>"; };
 		B899A9121779A5665E7D27E6 /* HandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandView.swift; sourceTree = "<group>"; };
 		C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchFixtureTests.swift; sourceTree = "<group>"; };
 		C482C27A4DE9D8BA7FA25193 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
@@ -112,6 +115,7 @@
 		EBF95D494649C4F6D223A28C /* MatchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSession.swift; sourceTree = "<group>"; };
 		F01639F69FA03230480F3F8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F1B93678F21644FD63C4658C /* PlayPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPlanner.swift; sourceTree = "<group>"; };
+		F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassAndPlayTests.swift; sourceTree = "<group>"; };
 		FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -151,6 +155,7 @@
 			children = (
 				26B0B7B51FE6EE314EF9AB1A /* BoardPresenter.swift */,
 				67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */,
+				B32529E7548CA1EFE9A4F729 /* HandoverView.swift */,
 				DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */,
 				F1B93678F21644FD63C4658C /* PlayPlanner.swift */,
 				390FE2938458CED13A70D210 /* SeatStatusView.swift */,
@@ -242,6 +247,7 @@
 				5983C639D9EC2271A596DDFB /* DesignReviewScreenshots.swift */,
 				6A5741C72A907AEF603B8937 /* LaunchTests.swift */,
 				27C1C6FA4C7ECD6AF5A32B37 /* MenuFlowTests.swift */,
+				F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */,
 				32C34A7B19CE230B87432042 /* PlayFlowTests.swift */,
 			);
 			path = KeezlyUITests;
@@ -441,6 +447,7 @@
 				58241CDF0095935276E260B2 /* CardView.swift in Sources */,
 				B29A4F858EE41B8D796DB41C /* GameScreen.swift in Sources */,
 				EA94C32B2E325833C8916390 /* HandView.swift in Sources */,
+				A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */,
 				24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */,
 				A1C559609D6FD0AD54146DEC /* KeezlyTheme.swift in Sources */,
 				B586F635085CB018833325F3 /* KeyboardFocus.swift in Sources */,
@@ -465,6 +472,7 @@
 				CA91E83F0BEFC4381F66886A /* DesignReviewScreenshots.swift in Sources */,
 				813DD1386E7D98D2C9006EAC /* LaunchTests.swift in Sources */,
 				1C051D284088FC2535DBECF0 /* MenuFlowTests.swift in Sources */,
+				05E2F7C4D915B34F8A21C6FF /* PassAndPlayTests.swift in Sources */,
 				30E7DB9168705F188C09987B /* PlayFlowTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
