@@ -13,6 +13,7 @@
 		10D756531C32278F94994858 /* LessonBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462E6E6659DFE1B4E4611356 /* LessonBanner.swift */; };
 		11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ED8C1FD416E628043CC4D29 /* Assets.xcassets */; };
 		180EEED18A6C25123E43D24B /* CardFaceArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7A5D5762F62794C05527AF /* CardFaceArt.swift */; };
+		1B98BDCC45E72A06255CABA3 /* AppIconArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4A19747D7F73A71DC7DBD2 /* AppIconArtwork.swift */; };
 		1C051D284088FC2535DBECF0 /* MenuFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C1C6FA4C7ECD6AF5A32B37 /* MenuFlowTests.swift */; };
 		24FAF2D5D85F704D09728360 /* KeezlyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */; };
 		264BC2D47B0EE11D6B0E80C5 /* Lesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9494E3CF894AD64E24FE743 /* Lesson.swift */; };
@@ -70,6 +71,7 @@
 		C7F64D09D8F2AB0A20F02ECE /* RulebookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6181BDD1F1E6EEE9241F2EF0 /* RulebookView.swift */; };
 		CA91E83F0BEFC4381F66886A /* DesignReviewScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5983C639D9EC2271A596DDFB /* DesignReviewScreenshots.swift */; };
 		CBA6DA54C8B5C81FC8363A8F /* ActionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040212E38AB305A286845007 /* ActionList.swift */; };
+		D8F593780828DF706C48E176 /* AppIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89977E9E9BC53E55811B932A /* AppIconTests.swift */; };
 		DE704BCD2D005E5E4345B4BD /* ActionListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC69C3AE4E8D6DCED88A698 /* ActionListTests.swift */; };
 		DF7BFA02380288CCD372B832 /* PlayFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */; };
 		E2304885CB459B1B1D626328 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC0E53379721916E392C04F /* RootView.swift */; };
@@ -108,6 +110,7 @@
 		26B0B7B51FE6EE314EF9AB1A /* BoardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardPresenter.swift; sourceTree = "<group>"; };
 		27C1C6FA4C7ECD6AF5A32B37 /* MenuFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuFlowTests.swift; sourceTree = "<group>"; };
 		2B7A5D5762F62794C05527AF /* CardFaceArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardFaceArt.swift; sourceTree = "<group>"; };
+		2C4A19747D7F73A71DC7DBD2 /* AppIconArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconArtwork.swift; sourceTree = "<group>"; };
 		2DC0E53379721916E392C04F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		2F5615D1F3AA72616536C39E /* ScreenshotMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMode.swift; sourceTree = "<group>"; };
 		317A24C86F2312B7C966802F /* MoveNarratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveNarratorTests.swift; sourceTree = "<group>"; };
@@ -139,6 +142,7 @@
 		8741059D62130818C55BF28A /* Rulebook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rulebook.swift; sourceTree = "<group>"; };
 		88398C0B7DDDF6AFF83579CA /* Keezly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Keezly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		897EA5B37322B0549DF70ED6 /* BoardTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardTheme.swift; sourceTree = "<group>"; };
+		89977E9E9BC53E55811B932A /* AppIconTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconTests.swift; sourceTree = "<group>"; };
 		8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFocusTests.swift; sourceTree = "<group>"; };
 		8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyApp.swift; sourceTree = "<group>"; };
 		8EB92D3C1A47B55D665EE1FA /* MatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStore.swift; sourceTree = "<group>"; };
@@ -206,6 +210,14 @@
 				0E264E59919E60235F368F7F /* SuitGlyph.swift */,
 			);
 			path = Cards;
+			sourceTree = "<group>";
+		};
+		27EEB2A60BF07015EB2880FF /* Brand */ = {
+			isa = PBXGroup;
+			children = (
+				2C4A19747D7F73A71DC7DBD2 /* AppIconArtwork.swift */,
+			);
+			path = Brand;
 			sourceTree = "<group>";
 		};
 		2892EB6A903073922444B3E1 /* Play */ = {
@@ -380,6 +392,7 @@
 			children = (
 				42EF2244E40D5D4EE42420EC /* Accessibility */,
 				32DC8061A42E668F5ABC3EE2 /* Board */,
+				27EEB2A60BF07015EB2880FF /* Brand */,
 				2249E629CB6BDD603AFA93CD /* Cards */,
 				C2CE7554DBA3AF25B7905141 /* DesignSystem */,
 				83BBE5FE9640A0E7AB2FB4F4 /* Menu */,
@@ -402,6 +415,7 @@
 			isa = PBXGroup;
 			children = (
 				FFC69C3AE4E8D6DCED88A698 /* ActionListTests.swift */,
+				89977E9E9BC53E55811B932A /* AppIconTests.swift */,
 				AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */,
 				50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */,
 				79A595475A4A4A8173245936 /* BoardOrnamentTests.swift */,
@@ -549,6 +563,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DE704BCD2D005E5E4345B4BD /* ActionListTests.swift in Sources */,
+				D8F593780828DF706C48E176 /* AppIconTests.swift in Sources */,
 				64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */,
 				579A0C223F29D69A70ABB93C /* BoardLayoutTests.swift in Sources */,
 				9FBA85C85F907C1A6EBF99DC /* BoardOrnamentTests.swift in Sources */,
@@ -576,6 +591,7 @@
 				CBA6DA54C8B5C81FC8363A8F /* ActionList.swift in Sources */,
 				385911464D67283C726D556D /* ActionListView.swift in Sources */,
 				299485F2EE880AC138E9FFE9 /* AdaptivePicker.swift in Sources */,
+				1B98BDCC45E72A06255CABA3 /* AppIconArtwork.swift in Sources */,
 				C38467AD832BA4A6AE1C4DAD /* BoardCentreView.swift in Sources */,
 				8309DF26E59769918673891D /* BoardLayout.swift in Sources */,
 				71D9948558D1AD1F37A7F8EE /* BoardOrnament.swift in Sources */,

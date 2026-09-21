@@ -926,3 +926,59 @@ Three levels, never conflated:
 
 Nothing in Keezly — the app, the store listing, the documentation — may claim
 more than A.
+
+---
+
+## DEC-026 — The app icon is code, and it is four pawns round a ring
+
+**Status:** ACCEPTED · 2026-09-22 · supersedes nothing
+
+### Context
+
+§79 asks for at least three of our own concepts, compared at the sizes an icon
+is really seen at, with the decision written down. No placeholder, no SF
+Symbol, no lettering — an icon 29 points across cannot carry a word, and a name
+that has to be read is a name that has not been recognised.
+
+### What was compared
+
+Three concepts, each built from the board's own vocabulary — the same maple,
+the same milled holes, the same pawn silhouette, the same Delft-blue engraving
+— so that whichever won, the icon and the game would look like one object.
+
+| Concept | The argument | How it fared |
+|---|---|---|
+| **corner** | A corner of the board: engraved rim, the track curving away, one pawn seated in its hole. Unmistakably a board game | The rim read as a grey line crossing the icon and the composition stayed unbalanced through two rounds. At 29 it was a red pawn beside some scribble |
+| **table** | Four pieces round a quiet middle — the table seen from above. Says "a game for several people" before it says anything else | **Chosen.** Four seat colours are still four pieces at 29, and the silhouettes carry the tinted mask on their own |
+| **medallion** | The Dutch engraving alone, with one piece at its heart. The most distinctive of the three | Handsome at 1024 and haze at 29: eight fine strokes that close together stop being a pattern. Reduced to six and it survived, but it says "ornament" where the others say "game" |
+
+The winner took the medallion's engraved ring for its middle — two fine Delft
+lines rather than a plain circle — so the Dutch note survives in the icon that
+shipped.
+
+### Decision
+
+1. **The icon is `IconConcept.table`.**
+2. **The icon is code.** `AppIconArtwork` draws it in SwiftUI; the three 1024
+   masters in the asset catalogue are renders of that code, produced by
+   `scripts/icon-install.sh`. There is no drawing-program original, so there is
+   nothing that can quietly drift away from the app.
+3. **Drift is checked, not trusted.** `scripts/icon-check.sh` re-renders and
+   compares against what is committed, and fails if they differ.
+4. **All three appearances ship**: default, dark (the wood's own dark variant),
+   and a grayscale mask for the tinted appearance.
+
+### What the tests hold it to
+
+`AppIconTests` renders every concept at 1024, 180, 120, 60, 40 and 29, and
+fails a concept that flattens towards one colour at 29, one that loses its
+shape as a tinted mask, or a set of three that turn out to be the same picture
+three ways.
+
+### What was rejected
+
+- **A wordmark.** Illegible at 29 and unnecessary above it.
+- **An SF Symbol or a stock game glyph.** Not ours, and it would have made
+  Keezly look like a template.
+- **A photograph of a board.** The app draws its board; an icon that did not
+  would be advertising a different product.
