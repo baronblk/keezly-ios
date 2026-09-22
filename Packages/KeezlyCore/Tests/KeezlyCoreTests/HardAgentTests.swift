@@ -225,21 +225,48 @@ struct HardAgentTests {
     }
 
     @Test("the search stops when its budget runs out", .timingSensitive)
-    func searchHonoursItsBudget() async {
+    func searchHonoursItsBudget() async throws {
         let observation = Self.heavyObservation()
         let clock = ContinuousClock()
 
-        for budget in [AIBudget.simulation, .interactive] {
+        // Only the budgets that are *about* time. `.simulation` consults no
+        // clock on purpose, so asking how long it took is asking the wrong
+        // question of it — its bound is its sample counts, and the test below
+        // checks the thing that bound is for.
+        for budget in [AIBudget.interactive, AIBudget(maximumDuration: .milliseconds(80))] {
+            let limit = try #require(budget.maximumDuration)
             let start = clock.now
             _ = await HardAgent(seed: 4, budget: budget).chooseAction(for: observation)
             let elapsed = clock.now - start
             // Allow the static pass on top of the budget, and no more.
-            #expect(elapsed < budget.maximumDuration + .milliseconds(150),
-                    "budget \(budget.maximumDuration) but the search took \(elapsed)")
+            #expect(elapsed < limit + .milliseconds(150),
+                    "budget \(limit) but the search took \(elapsed)")
         }
     }
 
     // MARK: - Determinization stays inside the boundary
+
+    /// **The simulation budget consults no clock, and this is how we know.**
+    ///
+    /// Hard used to stop sampling at a fifty-millisecond deadline even in the
+    /// headless harness, so how many worlds a decision explored depended on how
+    /// busy the machine was. The same seed therefore played a *different match*
+    /// on a loaded machine — which was discovered the honest way, by a soak run
+    /// failing and then passing on the next attempt with nothing changed.
+    ///
+    /// A seed that does not reproduce a match is not a seed. Twenty decisions
+    /// is enough to catch a budget that has quietly gone back to the clock:
+    /// under load the sample counts diverge within the first few.
+    @Test("the simulation budget plays the same move every time")
+    func simulationBudgetIsReproducible() async {
+        let observation = Self.heavyObservation()
+
+        let first = await HardAgent(seed: 99, budget: .simulation).chooseAction(for: observation)
+        for attempt in 1...20 {
+            let again = await HardAgent(seed: 99, budget: .simulation).chooseAction(for: observation)
+            #expect(again == first, "attempt \(attempt) chose \(again) where the first chose \(first)")
+        }
+    }
 
     @Test("a sampled world matches every public fact and invents only hidden ones")
     func determinizationIsConsistent() {

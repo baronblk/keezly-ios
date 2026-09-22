@@ -1,5 +1,5 @@
-@testable import Keezly
 import Foundation
+@testable import Keezly
 import Testing
 
 /// §36, §52 — the newcomer nudge appears once and then never again.

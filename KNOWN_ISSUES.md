@@ -15,7 +15,6 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 | ISS-016 | A seat colour does not reach 3:1 against the board | Accepted — colour proven redundant (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
 | ISS-014 | Neither physical device will start a UI test runner | Blocker (hardware gate) |
-| ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
 | ISS-010 | No hardware keyboard or pointer available to verify M4.7 end to end | Verification gap |
 | ISS-011 | Commit `1d46410` carries a message that does not match its content | Cosmetic (history) |
 
@@ -76,6 +75,86 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Board/BoardLayout.swift`, `App/Keezly/Play/GameScreen+Layout.swift`,
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
+
+### ISS-017 — Hard's play depends on how busy the machine is
+
+- **Status:** FIXED, VERIFIED
+- **Severity:** Major (reproducibility)
+- **Component:** KeezlyCore / AI
+- **Description:** `HardAgent` stopped sampling at a wall-clock deadline
+  (`ContinuousClock`, 50 ms under `AIBudget.simulation`), so how many worlds a
+  decision explored depended on how loaded the machine was. The same seed
+  therefore played a **different match** on a busy machine than on a quiet one.
+- **How it was found:** the honest way, and not the way anybody would want. A
+  new soak run crashed on an assertion in `GameReducer.advanceTurn` (ISS-018).
+  Re-running the identical filter, with only a diagnostic added, passed — and
+  the diagnostic never fired. A seeded engine does not do that.
+- **Why it matters beyond the annoyance:** every simulation result in this
+  repository is stated as "measured at N over M matches", and a failing seed is
+  supposed to be handed back as a bug report. Neither is true of a run that
+  cannot be repeated. It also contradicts DEC-003 in the one place the project
+  most relies on it.
+- **What it did *not* affect:** saved matches and replays, which are the seed
+  plus the **accepted actions**. A replay reproduces what happened because it
+  is told what happened; it never asks an agent to think again.
+- **Fix:** `AIBudget.maximumDuration` is now optional, and
+  `AIBudget.simulation` leaves it `nil` — the headless harness consults no
+  clock at all. The search is bounded by its own sample counts instead, which
+  are small and fixed: six candidates, eight sampled worlds each, eight plies.
+  Interactive play keeps its clock, because there a person really is waiting
+  and the accepted actions are what gets recorded either way.
+- **Related tests:** `HardAgentTests.simulationBudgetIsReproducible` — the same
+  seed and position, twenty times, must choose the same move. The timing tests
+  no longer ask `.simulation` how long it took, because that is now the wrong
+  question to ask of it.
+- **Related files:** `Packages/KeezlyCore/Sources/KeezlyCore/AI/AIAgent.swift`,
+  `Packages/KeezlyCore/Sources/KeezlyCore/AI/HardAgent.swift`
+
+### ISS-018 — A legal end position was reported as a broken rule engine
+
+- **Status:** FIXED, VERIFIED
+- **Severity:** Minor (a false assertion, not a wrong game)
+- **Component:** KeezlyCore / GameReducer
+- **Description:** `GameReducer.advanceTurn` walks the table looking for a seat
+  with a legal move, dealing the next round when it finds none, and ended a
+  whole 5/4/4 cycle of that with `assertionFailure("No seat could act across
+  three consecutive deal rounds")`. A soak run reached that position.
+- **Why the assertion was wrong:** a seat that has brought all four pawns home
+  can never move again, whatever it is dealt. In a team match one seat of each
+  team can be finished while the match runs on, so two of four seats can be
+  permanently moveless — and the two that are left are stuck for a round
+  whenever neither draws a card that starts a pawn, which on the five cards a
+  round opens with is likely rather than rare. This is the ordinary end of a
+  match, not a broken rule engine.
+- **What the shipping build always did:** the assertion is compiled out, the
+  function returns with the turn where it was, the caller force-folds that
+  seat, and folding comes back through the same path and deals again. Matches
+  complete. The release build was right and the debug build was calling a legal
+  position a bug — which is the wrong way round, because an assertion that
+  fires on legal positions is one people learn to comment out.
+- **Fix:** the assertion is gone and the reason giving up is safe is written
+  where the assertion was. **The bound itself is unchanged at one cycle.** That
+  is deliberate: the cards that unstick the table arrive at the same rate
+  whether the rounds are dealt inside one call or across several, so a larger
+  number changes only how many forced folds get recorded on the way — and it
+  keeps this a fix to the assertion rather than a change to the turn order. A
+  rule engine that really has stopped offering moves still does not hang: it
+  runs out of `MatchSimulator.maximumActions` and is reported as
+  `didNotFinish` with its seed, which is a fact somebody can act on rather than
+  a crash in a debug build only.
+- **Why the position exists at all, given that a finished player takes over
+  their partner's pawns (§8, and it is implemented):** taking over does not
+  help when the partner's remaining pawns are also unmovable — waiting for a
+  card that starts a pawn, or in the home lane needing an exact count. At the
+  end of a match that is an ordinary few rounds, not a broken table.
+- **Verified by:** the core suite, 176 tests, green in 145s with the assertion
+  removed — the same 148s it took with it, so nothing was being held up by the
+  crash.
+- **Related files:**
+  `Packages/KeezlyCore/Sources/KeezlyCore/Engine/GameReducer.swift`
+- **Related tests:** `SoakTests` — 630 matches across every strength, table
+  size, team mode and rule variant, which is what reached the position in the
+  first place
 
 ### ISS-016 — A seat colour does not reach 3:1 against the board
 
@@ -201,7 +280,7 @@ anyway: a shape helps somebody using the app in bright sunlight too.
 
 ### ISS-012 — Landscape captures carry a 25% black margin
 
-- **Status:** OPEN
+- **Status:** FIXED, VERIFIED
 - **Severity:** Minor (tooling; blocks App Store submission of captures)
 - **Component:** Screenshot harness
 - **Description:** `XCUIApplication.screenshot()` on a rotated app returns the
@@ -224,10 +303,23 @@ anyway: a shape helps somebody using the app in bright sunlight too.
 - **Explicitly not the answer:** cropping a fixed black margin, or any
   correction tuned to one device's proportions. The margin is an artefact of
   the wrong capture source, not something to trim off.
-- **Next step:** settle this in the screenshot milestone (M11), where the
-  captures move to `fastlane snapshot` and are written to disk, and where the
-  result can be checked as a file rather than as an attachment.
-- **Related files:** `App/KeezlyUITests/DesignReviewScreenshots.swift`
+- **Fix:** both halves. The capture already uses `XCUIScreen.main.screenshot()`
+  and asserts its own orientation. `scripts/screenshots.sh` now exports the
+  attachments out of the result bundle into a directory, named from the
+  manifest, and `scripts/screenshots-verify.py` checks them **as files**: right
+  way up by name, no black band on any edge, nothing below App Store Connect's
+  minimum. The `screenshots` and `screenshots_verify` lanes drive it and
+  `release_check` fails when the set is missing.
+- **The check deliberately refuses the easy fix.** Its failure message says the
+  capture source is wrong and not to crop it, because a crop constant tuned to
+  one device's proportions would make the symptom disappear and leave the
+  defect (§43).
+- **Verified by:** the verifier run against a capture set that *does* carry
+  black bands — the letterboxed pane captures from `board-review.sh` — where it
+  names them and gives the share of the frame. A check that has never fired is
+  not a check.
+- **Related files:** `App/KeezlyUITests/DesignReviewScreenshots.swift`,
+  `scripts/screenshots.sh`, `scripts/screenshots-verify.py`
 
 ### ISS-011 — A commit message that does not match its content
 

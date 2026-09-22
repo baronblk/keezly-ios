@@ -1,5 +1,5 @@
-@testable import Keezly
 import Foundation
+@testable import Keezly
 import KeezlyCore
 import Testing
 

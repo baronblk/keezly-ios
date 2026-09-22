@@ -18,7 +18,11 @@ set -euo pipefail
 
 DESTINATION="${1:-build/screenshots}"
 IPAD="${KEEZLY_IPAD:-iPad Pro 13-inch (M5)}"
-IPHONE="${KEEZLY_IPHONE:-iPhone 17 Pro}"
+# A Pro Max, not a Pro. App Store Connect wants the 6.9-inch set at 1290 points
+# across or better; an iPhone 17 Pro captures at 1206 and the upload is refused.
+# `screenshots-verify.py` caught exactly that, which is the whole reason it
+# measures the short edge rather than the long one.
+IPHONE="${KEEZLY_IPHONE:-iPhone 17 Pro Max}"
 SUITE="KeezlyUITests/DesignReviewScreenshots"
 
 # App Store Connect wants de-DE, nl-NL and en. The language and region are

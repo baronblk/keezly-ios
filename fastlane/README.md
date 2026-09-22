@@ -71,6 +71,22 @@ The physical iPad gate
 
 Both physical device gates
 
+### ios screenshots
+
+```sh
+[bundle exec] fastlane ios screenshots
+```
+
+The App Store screenshot set: every locale, both devices, written to disk
+
+### ios screenshots_verify
+
+```sh
+[bundle exec] fastlane ios screenshots_verify
+```
+
+Check an existing screenshot set without re-capturing it
+
 ### ios lint
 
 ```sh

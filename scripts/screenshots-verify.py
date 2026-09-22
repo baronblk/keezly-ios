@@ -14,9 +14,17 @@ What is checked, and why each one is here rather than trusted:
              for a band of *any* width — it must never be turned into a crop,
              because the band was the wrong capture source and not a margin.
   size       App Store Connect rejects anything under its minimums, and a
-             rejection three weeks later is an expensive way to learn it.
-  content    Nothing in the frame that a store listing must not carry: a debug
-             overlay, a test identifier, a raw localisation key.
+             rejection three weeks later is an expensive way to learn it. This
+             one has already earned its keep: the capture device was an
+             iPhone 17 Pro, whose screenshots are 1206 points across, and the
+             store wants 1290.
+
+What is **not** checked here, and is not pretended to be: whether the frame
+carries a debug overlay, a test identifier, a raw localisation key or anybody's
+name. Finding text in a PNG needs OCR this has no business carrying, and a
+check that cannot see something must not imply that it looked. That gate is a
+person with the set open, and it is written down as one in
+`RELEASE_CHECKLIST.md`.
 
 Reports every failure rather than stopping at the first, because a screenshot
 run is slow and finding out about one fault at a time is how a morning goes.
@@ -31,8 +39,13 @@ except ImportError:  # pragma: no cover - the message is the whole point
     print("Pillow is needed: python3 -m pip install pillow", file=sys.stderr)
     sys.exit(2)
 
-# App Store Connect's minimum for the 6.9" iPhone and the 13" iPad sets. Below
-# either, an upload is refused.
+# The **short** edge App Store Connect expects. A 6.9" iPhone capture is
+# 1290x2796 and a 13" iPad one is 2064x2752, so 1290 passes both and anything
+# scaled down fails — which is the case worth catching, because a downscaled
+# capture looks fine in a file browser and is refused at upload.
+#
+# Measured against the short edge rather than the long one on purpose: a long
+# thin image has a long edge too, and would sail through.
 MINIMUM_EDGE = 1290
 
 # Dark, but not black. The table the board sits on is a very dark green; a
@@ -81,8 +94,10 @@ def check(path):
     if "portrait" in name and height <= width:
         faults.append(f"portrait capture is {width}x{height} — it is not taller than it is wide")
 
-    if max(width, height) < MINIMUM_EDGE:
-        faults.append(f"{width}x{height} is below App Store Connect's {MINIMUM_EDGE}px minimum edge")
+    if min(width, height) < MINIMUM_EDGE:
+        faults.append(
+            f"{width}x{height} — the short edge is below App Store Connect's {MINIMUM_EDGE}px minimum"
+        )
 
     top, bottom, left, right = black_border(image)
     if max(top, bottom, left, right) > 2:

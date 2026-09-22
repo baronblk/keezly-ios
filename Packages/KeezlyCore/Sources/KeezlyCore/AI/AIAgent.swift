@@ -39,14 +39,35 @@ public extension AIAgent {
 /// Hard searches until the budget runs out. The UI adds its own small delay for
 /// feel — that is presentation, not thinking time (§24).
 public struct AIBudget: Hashable, Sendable {
-    public let maximumDuration: Duration
+    /// How long the agent may think, or `nil` when it must not look at a clock
+    /// at all.
+    ///
+    /// Somebody waiting for a move is a real constraint, so interactive play is
+    /// time-boxed. A simulated match has nobody waiting, and there a clock is
+    /// actively harmful: the number of worlds a decision gets to sample depends
+    /// on how loaded the machine happens to be, so the same seed plays a
+    /// different match on a busy afternoon than on a quiet one.
+    ///
+    /// That breaks the whole point of seeding (DEC-003) — a failing simulation
+    /// seed is only a bug report if somebody else can run it — and it is how a
+    /// soak failure came to vanish on the next run.
+    public let maximumDuration: Duration?
 
     public init(maximumDuration: Duration) {
         self.maximumDuration = maximumDuration
     }
 
+    private init() {
+        maximumDuration = nil
+    }
+
     public static let interactive = AIBudget(maximumDuration: .milliseconds(700))
-    /// Used by the headless simulation harness, where wall-clock time matters
-    /// more than move quality.
-    public static let simulation = AIBudget(maximumDuration: .milliseconds(50))
+    /// Used by the headless simulation harness, where reproducibility matters
+    /// more than latency.
+    ///
+    /// Bounded by the search's own sample counts rather than by time. Those
+    /// counts are small and fixed — six candidates, eight sampled worlds each,
+    /// eight plies — so a decision is cheap without a clock needing to cut it
+    /// short.
+    public static let simulation = AIBudget()
 }

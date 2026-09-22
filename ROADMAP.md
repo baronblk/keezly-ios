@@ -19,7 +19,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M8 | Brand / App Icon / Audio / Haptics | **IMPLEMENTATION COMPLETE EXCEPT AUDIO ASSETS** |
 | M9 | Statistics / Replay / Game Center Meta | DONE — achievement reporting BLOCKED (MAN-02) |
 | M10 | Localisation | DONE |
-| M11 | CI / QA / Hardening | NOT STARTED |
+| M11 | CI / QA / Hardening | IN PROGRESS |
 | M12 | Release Candidate 1.0.0 | NOT STARTED |
 
 ---
@@ -273,18 +273,18 @@ Tracked as a release blocker in `CURRENT_STATE.md` and decided in DEC-027.
 
 ---
 
-## M11 — CI / QA / Hardening — NOT STARTED
+## M11 — CI / QA / Hardening — IN PROGRESS
 
 | Task | Status |
 |---|---|
 | M11.1 Xcode Cloud "Keezly CI" workflow (PR: build + test) | NOT STARTED |
 | M11.2 Xcode Cloud "Keezly Main" workflow (build + test + analyze) | NOT STARTED |
 | M11.3 Xcode Cloud "Keezly Release" workflow (+ archive + TestFlight) | NOT STARTED |
-| M11.4 Screenshot harness, fixtures and deterministic screenshot mode | NOT STARTED |
-| M11.5 `fastlane screenshots` / `screenshots_verify` | NOT STARTED |
-| M11.6 `fastlane qa` and `fastlane release_check` | NOT STARTED |
-| M11.7 Large-scale AI simulation in CI | NOT STARTED |
-| M11.8 Simulator/orientation/localisation UI test matrix | NOT STARTED |
+| M11.4 Screenshot harness, fixtures and deterministic screenshot mode | **DONE** — `DesignReviewScreenshots` captures from `XCUIScreen.main`, asserts its own orientation, and the set is now exported to files and checked as files (ISS-012) |
+| M11.5 `fastlane screenshots` / `screenshots_verify` | **IMPLEMENTED, NOT YET RUN END TO END** — both lanes exist and delegate to `scripts/screenshots.sh` and `scripts/screenshots-verify.py`; the verifier has been run against a set that does carry black bands and named them |
+| M11.6 `fastlane qa` and `fastlane release_check` | **PARTIAL** — `lint` run and green; it found four files that had never passed `swiftformat`, because on the previously pinned Ruby no lane could run at all |
+| M11.7 Large-scale AI simulation in CI | **IMPLEMENTED** — `SoakTests`, 630 matches across every strength, table size, team mode and rule variant, gated behind `KEEZLY_EXTENDED_SIM=1`. It found ISS-017 and ISS-018 on its first run |
+| M11.8 Simulator/orientation/localisation UI test matrix | **IMPLEMENTED, NOT YET RUN** — `scripts/screenshots.sh` sweeps de-DE, nl-NL and en across an iPhone and an iPad with `-testLanguage`/`-testRegion` |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
 | M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
 | M11.11 Physical iPhone quality gate | PARTIAL — 58/58 on an iPhone 17 Pro (iOS 27.0); haptics, audio and Game Center items wait on those features |

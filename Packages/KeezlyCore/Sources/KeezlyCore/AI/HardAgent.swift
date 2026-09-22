@@ -14,6 +14,11 @@ import Foundation
 /// Time-boxed and cancellable: the search stops at the budget or when the task
 /// is cancelled, and returns the best candidate found so far. It never blocks
 /// the main actor, because it is only ever awaited from a detached task.
+///
+/// Under `AIBudget.simulation` it consults no clock, so the same seed and the
+/// same position always produce the same move. That is not a nicety: an agent
+/// whose play depends on machine load makes every simulated match
+/// irreproducible, and a soak failure nobody can reproduce is not a bug report.
 public struct HardAgent: AIAgent, Sendable {
     public let difficulty = AIDifficulty.hard
     public let seed: UInt64
@@ -62,7 +67,9 @@ public struct HardAgent: AIAgent, Sendable {
 
         var generator = SeededGenerator(seed: seed ^ observation.stableKey)
         let clock = ContinuousClock()
-        let deadline = clock.now + budget.maximumDuration
+        // Absent when the budget forbids a clock, which is what makes a
+        // simulated match reproducible from its seed.
+        let deadline = budget.maximumDuration.map { clock.now + $0 }
 
         // Static pass: score everything, keep the plausible candidates. The
         // risk term is O(pawns²) per move, so on a six-seat board with a Seven
@@ -96,7 +103,8 @@ public struct HardAgent: AIAgent, Sendable {
             var rolloutTotal = 0.0
             var samples = 0
             for _ in 0..<samplesPerCandidate {
-                if clock.now >= deadline || Task.isCancelled { break }
+                if let deadline, clock.now >= deadline { break }
+                if Task.isCancelled { break }
 
                 let world = Determinization.sample(from: observation, using: &generator)
                 // The candidate is legal in the real position, and a sampled

@@ -208,15 +208,44 @@ public enum GameReducer {
 
     // MARK: - Turn order
 
+    /// How many deal rounds this will work through before handing the problem
+    /// back to its caller.
+    ///
+    /// One 5/4/4 cycle, unchanged. Raising it buys nothing: the cards that
+    /// unstick the table arrive at the same rate either way, and whether the
+    /// rounds are dealt inside one call or across several changes only how
+    /// many forced folds are recorded on the way. Leaving it where it was also
+    /// keeps this a fix to the *assertion* and not to the turn order.
+    static let dealRoundsPerAttempt = 3
+
     /// Hands the turn to the next seat that can actually act.
     ///
     /// Seats holding cards but no legal move are folded on the way past (§13),
     /// so the state machine never parks on a seat that cannot move. When no
     /// seat is left, the next 5/4/4 deal round begins (§12).
+    ///
+    /// **Running out of rounds is an ordinary position, not a broken engine
+    /// (ISS-018).** This used to end in `assertionFailure`, on the reasoning
+    /// that nobody being able to act for a whole cycle could not happen. It
+    /// can, and a soak run found it: a seat that has brought all four pawns
+    /// home can never move again whatever it is dealt, in a team match one
+    /// seat of each team can be finished while the match runs on, and the two
+    /// that are left are stuck for a round whenever neither draws a card that
+    /// starts a pawn — which on five cards is likely rather than rare.
+    ///
+    /// So it gives up quietly, and that is safe: the turn stays where it is,
+    /// the caller force-folds that seat, and folding comes back through here
+    /// and deals again. The shipping build has always completed these matches;
+    /// it was only the debug build, with the assertion compiled in, that
+    /// stopped — which is the wrong way round, and an assertion that fires on
+    /// legal positions is one people learn to comment out.
+    ///
+    /// A rule engine that has genuinely stopped offering moves does not hang
+    /// here either. It runs out of `MatchSimulator.maximumActions`, which
+    /// reports `didNotFinish` with the seed that produced it — a fact somebody
+    /// can act on, rather than a crash in a debug build only.
     static func advanceTurn(in state: inout GameState, events: inout [GameEvent]) {
-        // Two deal rounds without anyone being able to act would mean the rule
-        // engine is broken; the bound stops that from becoming a hang (§62).
-        for _ in 0..<3 {
+        for _ in 0..<dealRoundsPerAttempt {
             let next = state.configuration.nextSeat(after: state.currentSeat)
             if seatTheTurnPassesTo(in: &state, events: &events, from: next) {
                 return
@@ -226,7 +255,6 @@ public enum GameReducer {
                 return
             }
         }
-        assertionFailure("No seat could act across three consecutive deal rounds")
     }
 
     /// Walks the table once from `start`, folding dead hands, and parks the

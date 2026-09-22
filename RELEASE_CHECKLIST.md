@@ -175,10 +175,22 @@ called complete until the gameplay items above are implemented and re-run.
 
 - [ ] Screenshots complete for de-DE, nl-NL, en — iPhone and iPad
 - [ ] iPad 13" landscape screenshots lead the iPad set
-- [ ] Screenshot quality gate passed (no debug overlay, no keyboard, no loading
-      spinner, no placeholder names, no personal data)
-- [ ] Metadata complete per locale: subtitle, promotional text, description,
-      keywords, what's new, support and privacy text
+- [ ] Screenshot **mechanical** gate: `fastlane screenshots_verify` green —
+      every capture the right way up, no dead band on any edge, short edge at
+      or above App Store Connect's 1290px
+- [ ] Screenshot **human** gate, which no script here performs and none
+      pretends to: somebody opens the set and confirms there is no debug
+      overlay, no keyboard, no loading spinner, no test identifier, no raw
+      localisation key, no placeholder name and nobody's personal data. Finding
+      text in a PNG needs OCR this project has no business carrying, so this
+      one is a person
+- [x] Metadata written and checked per locale — name, subtitle, promotional
+      text, description, keywords and release notes for de-DE, nl-NL and en-US,
+      all inside App Store Connect's character limits and free of any claim the
+      build cannot keep (`scripts/metadata-check.sh`)
+- [ ] Metadata completed by its owner: the copyright holder's name and the
+      support and privacy URLs (MAN-13). The check fails while any is missing,
+      so a half-finished set cannot be uploaded by accident
 - [ ] Privacy manifest present if required
 - [ ] App Store privacy answers prepared
 
@@ -187,7 +199,16 @@ called complete until the gameplay items above are implemented and re-run.
 - [ ] `bundle exec fastlane release_check` green
 - [ ] Xcode Cloud "Keezly Release" workflow green
 - [ ] TestFlight build installed and smoke-tested
-- [ ] No secrets anywhere in the repository (secret scan passed)
+- [x] No secrets anywhere in the repository — scanned at `e78ce56`, working tree
+      **and** every reachable commit. Nothing tracked with a `.p8`, `.p12`,
+      `.mobileprovision`, `.cer`, `.pem`, `.keystore` or `.jks` extension and no
+      `.env` outside the committed `.env.example`, which is a template by
+      design. No PEM private-key header, AWS key id, GitHub, Slack or OpenAI
+      token pattern, and no JWT, in any tracked file or in history. No
+      `DEVELOPMENT_TEAM` and no provisioning profile id in `project.pbxproj` —
+      signing identity stays in the git-ignored `Config/Local.xcconfig` (§107).
+      No credential value is recorded here or anywhere else in the
+      documentation, which is the point of scanning rather than listing
 
 ---
 

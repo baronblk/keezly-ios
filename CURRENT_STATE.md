@@ -422,8 +422,9 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 - Reporting achievements to Game Center (M9.4) — blocked on MAN-02.
 - Bespoke dealing, Seven-leg and Jack-swap choreography; the generic move and
   swap animations exist.
-- Split View and Stage Manager verification.
-- Screenshot harness and Xcode Cloud workflows (M11).
+- Xcode Cloud workflows (M11.1–M11.3) — blocked on MAN-02 and MAN-04.
+- The copyright holder and the support and privacy URLs for the store listing
+  (MAN-13). Everything else about the listing is written and checked.
 
 ---
 
