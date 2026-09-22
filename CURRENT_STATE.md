@@ -454,6 +454,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 | Two clients | 12 |
 | Online hidden information | 5 |
 | Soak (gated) | 4 |
+| Persistence soak (gated) | 4 |
 
 Many are parameterised over seat counts or card ranks, so executed cases exceed
 test-function count. The invariant suite alone plays 221 complete matches.
@@ -472,6 +473,23 @@ variants. It adds no new assertion: every match is checked by the same
 `GameStateInvariant` the engine applies after every action. What it adds is
 *occasions* for those checks, which is why the right number to quote about it
 is matches and not tests.
+
+**The persistence soak** (`KEEZLY_EXTENDED_SIM=1 swift test --filter
+PersistenceSoakTests`) — **4 tests, 20 parameterised cases, 24.5 s, clean.**
+The same idea applied to saves and replays. The properties were already
+established; what was missing was *position*. `steppingIsMonotonic` walks a
+record at `actionCount / 12` intervals — about twelve sample points in a match
+of two hundred actions — and the round-trip tests use a fresh deal. A save that
+is correct at the opening deal and wrong halfway through a Seven split passes
+all of that, because nothing saved halfway through a Seven split. This rebuilds
+the state at **every** point of a real match on every table size, encodes every
+intermediate state and checks it comes back byte for byte, and compares a
+replay to the live match state by state rather than at the end — a replay that
+reaches the right final position by a different route is showing somebody a
+game they did not play.
+
+It found nothing, which is the result worth having from a test written after
+two real defects rather than before them.
 
 It earned its place on the first run, by finding two defects that the existing
 suites could not reach: an assertion that called a legal end position a broken
