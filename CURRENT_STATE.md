@@ -430,8 +430,8 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Tests
 
-`cd Packages/KeezlyCore && swift test` — **171 tests in 15 suites, 0 failures**,
-94 s, re-run at the commit above.
+`cd Packages/KeezlyCore && swift test` — **176 tests in 16 suites, 0 failures**,
+145 s, re-run at the commit above.
 
 | Suite | Tests |
 |---|---|
@@ -450,6 +450,7 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 | Online match | 17 |
 | Two clients | 12 |
 | Online hidden information | 5 |
+| Soak (gated) | 4 |
 
 Many are parameterised over seat counts or card ranks, so executed cases exceed
 test-function count. The invariant suite alone plays 221 complete matches.
@@ -458,8 +459,23 @@ Two gated suites, excluded from the default run on purpose:
 
 | Gate | Command | Why |
 |---|---|---|
-| Extended simulation | `KEEZLY_EXTENDED_SIM=1 swift test` | Large AI samples and seat-fairness runs take minutes |
+| Extended simulation | `KEEZLY_EXTENDED_SIM=1 swift test` | Large AI samples, seat-fairness runs and the soak take minutes |
 | Timing | `KEEZLY_TIMING_TESTS=1 swift test` | Wall-clock bounds measure scheduler queueing under a parallel run (see ISS-005) |
+
+**The soak** (`KEEZLY_EXTENDED_SIM=1 swift test --filter Soak`) — **630
+complete matches in 213 s, clean.** Every strength against every table size
+from two seats to six, tables of mixed strengths, both team modes and six rule
+variants. It adds no new assertion: every match is checked by the same
+`GameStateInvariant` the engine applies after every action. What it adds is
+*occasions* for those checks, which is why the right number to quote about it
+is matches and not tests.
+
+It earned its place on the first run, by finding two defects that the existing
+suites could not reach: an assertion that called a legal end position a broken
+rule engine (ISS-018), and — behind it — `HardAgent` stopping its search on a
+wall clock even in the headless harness, so that **the same seed played a
+different match depending on how busy the machine was** (ISS-017). The second
+of those had been quietly false for every simulation figure in this document.
 
 App-level, on the iPad Pro 13" (M5) simulator, iOS 27.0:
 

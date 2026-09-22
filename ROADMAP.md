@@ -283,7 +283,7 @@ Tracked as a release blocker in `CURRENT_STATE.md` and decided in DEC-027.
 | M11.4 Screenshot harness, fixtures and deterministic screenshot mode | **DONE** — `DesignReviewScreenshots` captures from `XCUIScreen.main`, asserts its own orientation, and the set is now exported to files and checked as files (ISS-012) |
 | M11.5 `fastlane screenshots` / `screenshots_verify` | **IMPLEMENTED, NOT YET RUN END TO END** — both lanes exist and delegate to `scripts/screenshots.sh` and `scripts/screenshots-verify.py`; the verifier has been run against a set that does carry black bands and named them |
 | M11.6 `fastlane qa` and `fastlane release_check` | **PARTIAL** — `lint` run and green; it found four files that had never passed `swiftformat`, because on the previously pinned Ruby no lane could run at all |
-| M11.7 Large-scale AI simulation in CI | **IMPLEMENTED** — `SoakTests`, 630 matches across every strength, table size, team mode and rule variant, gated behind `KEEZLY_EXTENDED_SIM=1`. It found ISS-017 and ISS-018 on its first run |
+| M11.7 Large-scale AI simulation in CI | **DONE, VERIFIED** — `SoakTests`, **630 complete matches in 213 s, clean**, across every strength, table size, team mode and rule variant, gated behind `KEEZLY_EXTENDED_SIM=1`. It found ISS-017 and ISS-018 on its first run. Not wired into Xcode Cloud, which is blocked on MAN-02/MAN-04 |
 | M11.8 Simulator/orientation/localisation UI test matrix | **IMPLEMENTED, NOT YET RUN** — `scripts/screenshots.sh` sweeps de-DE, nl-NL and en across an iPhone and an iPad with `-testLanguage`/`-testRegion` |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
 | M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
