@@ -88,7 +88,15 @@ struct BoardCentreView: View {
     /// One answer, given in one place, because the playing screen and the
     /// replay screen both draw this and a hard-coded fraction in the second of
     /// them is how the two drift apart.
-    static func fitted(in layout: BoardLayout, boardSide: CGFloat) -> (content: Content, width: CGFloat) {
+    ///
+    /// `nonisolated` because it is arithmetic over a `BoardLayout` and touches
+    /// nothing else. It inherits the main actor from the view it is declared
+    /// on otherwise, which is untrue of it and makes a test that measures the
+    /// same numbers have to pretend to be a view.
+    nonisolated static func fitted(
+        in layout: BoardLayout,
+        boardSide: CGFloat
+    ) -> (content: Content, width: CGFloat) {
         func width(_ content: Content) -> CGFloat {
             let byField = layout.centreWidthFraction(aspect: content.aspect)
             return boardSide * min(classicScale, max(minimumScale, byField))
