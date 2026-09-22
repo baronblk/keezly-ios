@@ -178,4 +178,76 @@ struct BoardLayoutTests {
         // More seats means more squares on the same ring.
         #expect(Self.layout(seatCount).squareSize > Self.layout(seatCount + 1).squareSize)
     }
+
+    // MARK: - The board stands in its space
+
+    /// **The board is not pressed into its container.**
+    ///
+    /// `contentBounds` is what a view scales to fit. It used to be the bounds
+    /// of the *playing squares*, padded by one square — while the panel is
+    /// drawn `surfaceMargin` further out again, which is several squares. So
+    /// the thing being fitted was smaller than the thing being drawn, and the
+    /// board's rounded corners, its border ornament and its shadow were pushed
+    /// past the edge of the view.
+    ///
+    /// It was never technically clipped, which is why it survived several
+    /// reviews: it simply looked like a board that had been squeezed in.
+    @Test("the drawn board sits clear of the bounds a view fits it into", arguments: 2...6)
+    func boardHasRoomAroundIt(seatCount: Int) {
+        let layout = Self.layout(seatCount)
+        let panel = layout.panelBounds
+        let content = layout.contentBounds
+
+        // Every side, not just the ones a square board happens to make equal.
+        let margins = [
+            panel.minX - content.minX,
+            content.maxX - panel.maxX,
+            panel.minY - content.minY,
+            content.maxY - panel.maxY,
+        ]
+        for margin in margins {
+            #expect(
+                margin >= layout.squareSize * 3,
+                "the panel comes within \(margin / layout.squareSize) squares of the edge"
+            )
+        }
+
+        // And the air is a real share of the board rather than a rounding
+        // error: about a tenth of the whole, which is what makes it read as
+        // deliberate rather than tight.
+        let share = (content.width - panel.width) / content.width
+        #expect(share > 0.08, "only \(Int(share * 100))% of the width is margin")
+        #expect(share < 0.35, "\(Int(share * 100))% of the width is margin — the board has shrunk away")
+    }
+
+    /// The panel is bigger than the squares on it, which is the whole reason
+    /// the bounds had to change.
+    @Test("the panel extends well past the outermost square", arguments: 2...6)
+    func panelIsBiggerThanThePlayingArea(seatCount: Int) {
+        let layout = Self.layout(seatCount)
+        let furthest = layout.allPositions
+            .map { layout.point(for: $0) }
+            .map { max(abs($0.x), abs($0.y)) }
+            .max() ?? 0
+
+        #expect(
+            layout.panelBounds.width / 2 > furthest + layout.squareSize,
+            "the panel does not clear the waiting areas standing on it"
+        )
+    }
+
+    /// The quiet middle is a property of the playing area, so changing the air
+    /// around the board must not move it (ISS-008, DEC-021).
+    @Test("the quiet middle does not depend on the margin around the board")
+    func innerFieldIgnoresTheMargin() {
+        // Two seats have the least middle and four the reference amount; the
+        // ratio between them is what the centre cards are sized from.
+        let two = Self.layout(2).innerFieldFraction
+        let four = Self.layout(4).innerFieldFraction
+        let six = Self.layout(6).innerFieldFraction
+
+        #expect(two > 0 && four > 0 && six > 0)
+        #expect(two < four, "a two-seat board has less middle, not more")
+        #expect(four <= six, "more seats means a longer track and more middle")
+    }
 }

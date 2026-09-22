@@ -39,20 +39,24 @@ struct BoardSurface: View {
         closedPath(layout.outline(inflatedBy: layout.surfaceMargin))
     }
 
+    /// How thick the board is, as a fraction of a square.
+    ///
+    /// The single most important number on this screen for making the board
+    /// read as an object. Without a visible side face a board is a silhouette
+    /// filled with wood colour — which is what "badly cut out" means.
+    private static let thicknessInHoles: CGFloat = 0.46
+
     private func drawPanel(_ panel: Path, in context: inout GraphicsContext, hole: CGFloat) {
-        // Two shadows rather than one: a tight contact shadow that sits the
-        // board on the table, and a wide soft one that gives it weight. A
-        // single shadow reads either as a sticker or as a smudge.
-        var contact = context
-        contact.addFilter(.shadow(color: .black.opacity(0.55), radius: hole * 0.35, y: hole * 0.14))
-        contact.fill(panel, with: .color(theme.surfaceMid))
-
-        var shadowed = context
-        shadowed.addFilter(.shadow(color: .black.opacity(0.38), radius: hole * 1.6, y: hole * 0.7))
-        shadowed.fill(panel, with: .color(theme.surfaceMid))
-
-        // A gentle top-to-bottom sheen, as a flat panel catches light.
         let bounds = panel.boundingRect
+        let thickness = hole * Self.thicknessInHoles
+        // The same silhouette, dropped by the board's own depth. Everything
+        // between this and the top surface is the edge of the wood.
+        let side = panel.applying(CGAffineTransform(translationX: 0, y: thickness))
+
+        drawShadow(under: side, in: &context, hole: hole, thickness: thickness)
+        drawSideFace(side, top: panel, in: &context, bounds: bounds, hole: hole)
+
+        // The top surface, with a gentle sheen as a flat panel catches light.
         context.fill(
             panel,
             with: .linearGradient(
@@ -61,11 +65,109 @@ struct BoardSurface: View {
                 endPoint: CGPoint(x: bounds.midX, y: bounds.maxY)
             )
         )
-        // The milled edge, then a bevel just inside it: lit along the top,
-        // shaded along the bottom, which is what tells the eye the board has
-        // thickness rather than being a printed shape.
-        context.stroke(panel, with: .color(theme.edge.opacity(0.92)), lineWidth: max(1, hole * 0.11))
 
+        drawEdge(panel, in: &context, bounds: bounds, hole: hole)
+    }
+
+    /// What the board casts on the table.
+    ///
+    /// Two shadows, both thrown **downward** from the board's lower silhouette
+    /// rather than spread evenly around it. A soft shadow ringing a shape is
+    /// the drop shadow of a cut-out sticker; a real object pools darkness
+    /// under its near edge and throws a softer one behind (§43).
+    private func drawShadow(
+        under side: Path,
+        in context: inout GraphicsContext,
+        hole: CGFloat,
+        thickness: CGFloat
+    ) {
+        // The wider, softer one: weight, not outline.
+        var ambient = context
+        ambient.addFilter(.shadow(
+            color: .black.opacity(0.46),
+            radius: hole * 1.5,
+            y: thickness + hole * 0.75
+        ))
+        ambient.fill(side, with: .color(theme.edge))
+
+        // The tight one where the wood meets the table. Dark, small, and very
+        // close: this is the contact, and it is what stops the board floating.
+        var contact = context
+        contact.addFilter(.shadow(
+            color: .black.opacity(0.72),
+            radius: hole * 0.22,
+            y: hole * 0.10
+        ))
+        contact.fill(side, with: .color(theme.edge))
+    }
+
+    /// The edge of the wood: the band between the top surface and the table.
+    ///
+    /// Lit where it faces the light and dark underneath, exactly as a real
+    /// edge is, so the thickness reads without anybody having to notice it.
+    private func drawSideFace(
+        _ side: Path,
+        top: Path,
+        in context: inout GraphicsContext,
+        bounds: CGRect,
+        hole: CGFloat
+    ) {
+        // Materially darker than the face above it. An edge only a shade
+        // darker than the top reads as a second flat band — as a border drawn
+        // on, rather than as wood turning away from the light.
+        context.fill(
+            side,
+            with: .linearGradient(
+                Gradient(stops: [
+                    .init(color: theme.edge.darker(by: 0.18), location: 0),
+                    .init(color: theme.edge.darker(by: 0.38), location: 0.6),
+                    .init(color: theme.edge.darker(by: 0.52), location: 1),
+                ]),
+                startPoint: CGPoint(x: bounds.midX, y: bounds.minY),
+                endPoint: CGPoint(x: bounds.midX, y: bounds.maxY + hole * 0.5)
+            )
+        )
+
+        // Where the edge meets the table, darkest of all: the last sliver of
+        // wood before the shadow, which is what makes the two read as touching
+        // rather than as one shape laid over another.
+        context.stroke(
+            side,
+            with: .color(theme.edge.darker(by: 0.62).opacity(0.75)),
+            lineWidth: max(0.6, hole * 0.05)
+        )
+    }
+
+    /// Where the top surface meets its own edge.
+    ///
+    /// Not a uniform outline. A line of even weight and colour all the way
+    /// round a shape is the single strongest cue that it was cut out of
+    /// something: real edges catch light at the top and lose it underneath.
+    private func drawEdge(
+        _ panel: Path,
+        in context: inout GraphicsContext,
+        bounds: CGRect,
+        hole: CGFloat
+    ) {
+        // The arris: a fine lit line along the top, fading to nothing by the
+        // bottom, where the edge turns away from the light.
+        context.stroke(
+            panel,
+            with: .linearGradient(
+                Gradient(stops: [
+                    .init(color: .white.opacity(0.42), location: 0),
+                    .init(color: .white.opacity(0.10), location: 0.35),
+                    .init(color: .black.opacity(0.10), location: 0.72),
+                    .init(color: .black.opacity(0.26), location: 1),
+                ]),
+                startPoint: CGPoint(x: bounds.midX, y: bounds.minY),
+                endPoint: CGPoint(x: bounds.midX, y: bounds.maxY)
+            ),
+            lineWidth: max(0.8, hole * 0.09)
+        )
+
+        // And the chamfer just inside it, which is what makes the transition
+        // from face to edge look milled rather than drawn.
         let bevel = closedPath(BoardOrnament.offset(
             layout.outline(inflatedBy: layout.surfaceMargin),
             by: -layout.pitch * 0.10
@@ -74,14 +176,14 @@ struct BoardSurface: View {
             bevel,
             with: .linearGradient(
                 Gradient(colors: [
-                    .white.opacity(0.30),
-                    .white.opacity(0.06),
-                    .black.opacity(0.16),
+                    .white.opacity(0.24),
+                    .white.opacity(0.04),
+                    .black.opacity(0.14),
                 ]),
                 startPoint: CGPoint(x: bounds.midX, y: bounds.minY),
                 endPoint: CGPoint(x: bounds.midX, y: bounds.maxY)
             ),
-            lineWidth: max(1, hole * 0.14)
+            lineWidth: max(1, hole * 0.13)
         )
     }
 
@@ -470,12 +572,52 @@ struct BoardSurface: View {
     }
 
     /// A closed polyline in unit space, as a path in view space.
+    /// A closed outline, drawn as a smooth curve rather than a polygon.
+    ///
+    /// The board's silhouette used to be straight chords between sampled
+    /// points. At the corners — where the samples were sparsest and the
+    /// curvature highest — that read as visible facets, and a faceted edge on
+    /// a wooden object reads as something cut out of paper rather than milled.
+    ///
+    /// A Catmull-Rom spline through the points, converted to the cubic
+    /// segments a `Path` is made of. It passes through every sample, so the
+    /// shape is still exactly the curve the squares sit on; it just stops
+    /// pretending the curve is made of straight lines.
     private func closedPath(_ unitPoints: [CGPoint]) -> Path {
         var path = Path()
         let points = unitPoints.map(transform.point)
-        guard let first = points.first else { return path }
-        path.move(to: first)
-        for point in points.dropFirst() { path.addLine(to: point) }
+        guard points.count > 3 else {
+            guard let first = points.first else { return path }
+            path.move(to: first)
+            for point in points.dropFirst() { path.addLine(to: point) }
+            path.closeSubpath()
+            return path
+        }
+
+        let count = points.count
+        path.move(to: points[0])
+        for index in 0..<count {
+            let before = points[(index - 1 + count) % count]
+            let start = points[index]
+            let end = points[(index + 1) % count]
+            let after = points[(index + 2) % count]
+
+            // The Catmull-Rom tangent at each end, as Bézier controls. A sixth
+            // of the span is the standard uniform parameterisation and is what
+            // makes the curvature change evenly from the flats into the
+            // corners instead of stepping.
+            path.addCurve(
+                to: end,
+                control1: CGPoint(
+                    x: start.x + (end.x - before.x) / 6,
+                    y: start.y + (end.y - before.y) / 6
+                ),
+                control2: CGPoint(
+                    x: end.x - (after.x - start.x) / 6,
+                    y: end.y - (after.y - start.y) / 6
+                )
+            )
+        }
         path.closeSubpath()
         return path
     }

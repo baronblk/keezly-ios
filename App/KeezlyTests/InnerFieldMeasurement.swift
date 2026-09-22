@@ -19,8 +19,17 @@ struct InnerFieldTests {
     }
 
     /// The quiet middle, in square pitches, for every table size.
+    ///
+    /// Re-measured when the silhouette was softened from a superellipse of
+    /// exponent 8 to one of 5: a rounder ring encloses more area for the same
+    /// perimeter, so every table gained middle. The two-seat figure moved much
+    /// further, from 0.28 to 1.23, because its home lanes were set side by side
+    /// rather than head to head (DEC-021) — which was the point of doing it.
+    ///
+    /// Still asserted rather than printed. These numbers moving is allowed;
+    /// them moving *without anybody deciding to* is not.
     private static let measured: [Int: CGFloat] = [
-        2: 0.28, 3: 2.42, 4: 4.56, 5: 6.70, 6: 8.84,
+        2: 1.23, 3: 2.67, 4: 4.90, 5: 7.12, 6: 9.34,
     ]
 
     @Test("the board's proportions are what the design was decided on", arguments: 2...6)
@@ -35,7 +44,7 @@ struct InnerFieldTests {
     func innerFieldGrowsWithSeats(seats: Int) {
         // The lanes are four squares long whatever the table size, while the
         // track is sixteen squares per seat — so the middle grows with every
-        // seat added, and at two seats there is essentially none.
+        // seat added, and at two seats there is barely any.
         #expect(layout(seats: seats).innerFieldRadius < layout(seats: seats + 1).innerFieldRadius)
     }
 
@@ -50,10 +59,10 @@ struct InnerFieldTests {
         // Stated as a rule about space rather than a special case for two, so
         // that a future change to the lanes or the track moves the decision
         // with it instead of leaving a stale exception behind.
-        #expect(BoardLayout.centrePlacement(innerFieldRadius: 0.28, pitch: 1) == .beside)
+        #expect(BoardLayout.centrePlacement(innerFieldRadius: 1.23, pitch: 1) == .beside)
         #expect(BoardLayout.centrePlacement(innerFieldRadius: 1.49, pitch: 1) == .beside)
         #expect(BoardLayout.centrePlacement(innerFieldRadius: 1.5, pitch: 1) == .inside)
-        #expect(BoardLayout.centrePlacement(innerFieldRadius: 4.56, pitch: 1) == .inside)
+        #expect(BoardLayout.centrePlacement(innerFieldRadius: 4.90, pitch: 1) == .inside)
     }
 
     @Test("a degenerate layout is not asked to hold anything")

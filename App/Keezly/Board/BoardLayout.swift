@@ -29,12 +29,27 @@ struct BoardLayout: Sendable {
 
     /// Superellipse exponent.
     ///
-    /// A traditional Keezen board is a square with straight runs of holes and
-    /// rounded corners — that shape belongs to the game, not to any publisher,
-    /// and players expect it. 8 gives straight sides and a soft corner: close
-    /// to the familiar form, drawn from our own curve rather than copied from
-    /// anyone's artwork (§76).
-    static let ringExponent: Double = 8
+    /// A traditional Keezen board is a square with runs of holes and rounded
+    /// corners — that shape belongs to the game, not to any publisher, and
+    /// players expect it. It is drawn from our own curve rather than copied
+    /// from anyone's artwork (§76).
+    ///
+    /// **5, not 8.** Eight gives almost dead-straight sides and puts all the
+    /// curvature into a short corner, so the silhouette changes direction
+    /// abruptly: the eye reads the join between the flat and the corner as a
+    /// corner of its own, and the whole outline looks stamped out rather than
+    /// milled. Five spreads the same turn over a longer arc — the curvature
+    /// changes continuously, there is no point on the edge where the shape
+    /// visibly *starts* turning, and it still reads unmistakably as a rounded
+    /// square rather than an oval.
+    static let ringExponent: Double = 5
+    /// How many points the drawn outline is resampled to.
+    ///
+    /// Spaced by distance along the curve and joined with cubic segments, so
+    /// this is about smoothness of *shape*, not of rendering: 192 is well past
+    /// the point where another point changes anything visible, and far short of
+    /// handing the renderer a path it has to think about.
+    static let outlineResolution = 192
     /// How much of the distance between neighbouring squares a square occupies.
     /// Below 1 so the track reads as separate squares rather than a stripe.
     static let squareFill: Double = 0.66
@@ -96,10 +111,13 @@ struct BoardLayout: Sendable {
     /// — a medallion, the cards — has to be measured against this rather than
     /// against the size of the view (ISS-008).
     var innerFieldFraction: CGFloat {
-        let extent = max(contentBounds.width, contentBounds.height)
+        // Measured against the track, not the frame. The margin of air around
+        // the board is a layout decision and has nothing to do with how much
+        // quiet middle the *playing area* has.
+        let extent = trackPoints.map { max(abs($0.x), abs($0.y)) }.max() ?? 0
         guard extent > 0 else { return 0 }
         let inner = homePoints.compactMap { $0.last.map { hypot($0.x, $0.y) } }.min() ?? 0
-        return (inner * 2) / extent
+        return inner / extent
     }
 
     /// The classic four-player board's quiet middle, which everything else is
@@ -113,7 +131,14 @@ struct BoardLayout: Sendable {
     /// yet in play.
     let surfaceMargin: CGFloat
     /// The extent everything occupies, so a view can scale to fit exactly.
+    ///
+    /// Includes the panel, the shadow it casts and a deliberate margin of air
+    /// around it, so the board reads as an object on a table rather than a
+    /// surface pressed into its container.
     let contentBounds: CGRect
+    /// The drawn panel alone, without the shadow or the air. What a test
+    /// measures when it asks whether the board has room around it.
+    let panelBounds: CGRect
     /// The board's outline, as a closed polygon in unit space. Decimated from
     /// the sampling used to place the squares, so the drawn edge and the square
     /// positions come from the same curve.
@@ -162,10 +187,13 @@ struct BoardLayout: Sendable {
         for seat in board.seats {
             let entry = points[board.homeEntryIndex(for: seat)]
             let inward = Self.normalised(CGPoint(x: -entry.x, y: -entry.y))
+            // Two seats get their lanes set side by side rather than head to
+            // head; every other table runs them straight in. See `laneOffset`.
+            let sideways = Self.laneOffset(along: inward, seatCount: board.seatCount, pitch: pitch)
             homes.append((0..<pawnsPerSeat).map { slot in
                 CGPoint(
-                    x: entry.x + inward.x * pitch * Double(slot + 1),
-                    y: entry.y + inward.y * pitch * Double(slot + 1)
+                    x: entry.x + sideways.x + inward.x * pitch * Double(slot + 1),
+                    y: entry.y + sideways.y + inward.y * pitch * Double(slot + 1)
                 )
             })
 
@@ -191,16 +219,96 @@ struct BoardLayout: Sendable {
         self.homePoints = homes
         self.waitingPoints = waits
 
-        // Decimate the dense sampling for drawing: 240 points is smooth at any
-        // size Keezly is played at, and avoids handing a 4096-point path to
-        // the renderer on every frame.
-        let stride = max(1, (ring.count - 1) / 240)
-        self.outline = Swift.stride(from: 0, to: ring.count - 1, by: stride).map { ring[$0] }
+        // Resampled by **arc length**, not by index.
+        //
+        // The dense ring is sampled at equal *angles*, and on a superellipse
+        // equal angles are nowhere near equal distances: the samples crowd
+        // along the flats and thin out round the corners — exactly backwards,
+        // because the corners are where all the curvature is. Decimating that
+        // by index left the corners with a handful of points, and the corners
+        // were then drawn as short straight chords. That is what made the
+        // silhouette look faceted, and faceted is what "cut out" looks like.
+        //
+        // Walking the ring by distance puts the same number of points in every
+        // millimetre of edge, so the corners get their share.
+        self.outline = (0..<Self.outlineResolution).map { index in
+            Self.point(
+                onRing: ring,
+                lengths: lengths,
+                atFraction: Double(index) / Double(Self.outlineResolution)
+            )
+        }
 
-        self.contentBounds = Self.bounds(
-            of: points + homes.flatMap(\.self) + waits.flatMap(\.self),
-            padding: size
-        )
+        // The panel, which is what is actually drawn — not the squares on it.
+        //
+        // This used to measure the *playing positions* and pad them by one
+        // square. But the panel is inflated by `surfaceMargin`, several squares
+        // further out, so the thing being scaled to fit was smaller than the
+        // thing being drawn: the board's rounded corners, its border ornament
+        // and its shadow were all pushed past the edge of the view. It was not
+        // clipped — it was worse than clipped, because it looked deliberate.
+        let panel = Self.inflated(self.outline, by: self.surfaceMargin)
+        self.panelBounds = Self.bounds(of: panel, padding: 0)
+
+        // Room for the shadow the panel casts, and then air.
+        //
+        // The board is a physical object standing on a table. An object whose
+        // edge touches the frame is not standing on anything — and when space
+        // runs short the board is drawn a little smaller rather than a little
+        // closer to the edge (§43).
+        let shadowAllowance = size * 2.0
+        let breathingRoom = size * 1.4
+        self.contentBounds = Self.bounds(of: panel, padding: shadowAllowance + breathingRoom)
+    }
+
+    /// How far a seat's home lane is set to one side of its entry square.
+    ///
+    /// Zero for four seats and up, which is what a real board does: with four
+    /// or six lanes arriving from different sides they meet in the middle as
+    /// spokes, and the shape reads immediately.
+    ///
+    /// **Two seats are a different composition and are given one.** With only
+    /// two entries, and those opposite each other, lanes that run straight in
+    /// fall on the same line: the two meet nose to nose and form a single
+    /// column through the middle. Nothing about it is wrong — and it looks
+    /// like arithmetic rather than a board. There is no centre left, and
+    /// nothing tells you at a glance which half of that column is whose.
+    ///
+    /// So a two-seat table sets each lane a little to one side. The two then
+    /// run **parallel, side by side**, each still straight in from its own
+    /// player's entry, and the half-turn that maps one seat onto the other
+    /// maps one lane onto the other exactly. Between them the middle is
+    /// genuinely empty, which is what lets a two-player table keep the draw
+    /// pile where every other table has it (ISS-008, ISS-013, DEC-021).
+    ///
+    /// Presentation only. `BoardGraph` is untouched, the rules are untouched,
+    /// and a home square is the same home square wherever it is drawn.
+    private static func laneOffset(along inward: CGPoint, seatCount: Int, pitch: CGFloat) -> CGPoint {
+        guard seatCount == 2 else { return .zero }
+        // Perpendicular to the lane, and the same way round in world space for
+        // both seats — which is what makes the pair symmetric under a
+        // half-turn rather than mirrored.
+        let tangent = CGPoint(x: -inward.y, y: inward.x)
+        return CGPoint(x: tangent.x * pitch * twoSeatLaneOffset, y: tangent.y * pitch * twoSeatLaneOffset)
+    }
+
+    /// How far off its entry a two-seat home lane sits, in squares.
+    ///
+    /// Far enough that the two lanes clear each other with a square of board
+    /// between them, and no further: a lane that wandered away from its own
+    /// entry would stop looking like that player's lane.
+    static let twoSeatLaneOffset: CGFloat = 1.15
+
+    /// Pushes a closed outline out along its own radius.
+    private static func inflated(_ outline: [CGPoint], by margin: CGFloat) -> [CGPoint] {
+        outline.map { point in
+            let length = hypot(point.x, point.y)
+            guard length > 0 else { return point }
+            return CGPoint(
+                x: point.x * (length + margin) / length,
+                y: point.y * (length + margin) / length
+            )
+        }
     }
 
     // MARK: - Lookup
