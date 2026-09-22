@@ -76,6 +76,36 @@ struct InnerFieldTests {
         #expect(fraction < diameter, "seats \(seats): \(fraction) of \(diameter)")
     }
 
+    /// **A bigger board never carries less.**
+    ///
+    /// The middle drops its two text labels when the board is too small to
+    /// draw them at the size they were designed at, and they reappear above
+    /// that. Nothing else may happen in between — and in particular the
+    /// decision must be a function of one number, because the board and the
+    /// status line beneath it both ask it.
+    ///
+    /// They once asked it of two different numbers: the board measured its own
+    /// geometry and the line below used the layout's. At sizes where those
+    /// straddled the threshold the board decided it was too small and moved
+    /// the labels out, the line below decided it was large enough and drew
+    /// nothing, and whose turn it was disappeared from the screen.
+    @Test("what the middle carries only ever grows with the board", arguments: 3...6)
+    func centreContentIsMonotonic(seats: Int) {
+        let layout = layout(seats: seats)
+        var seenFull = false
+        for side in stride(from: CGFloat(240), through: 1_400, by: 4) {
+            let content = BoardCentreView.fitted(in: layout, boardSide: side).content
+            if content == .full {
+                seenFull = true
+            } else {
+                #expect(!seenFull, "seats \(seats): the middle gave up its labels again at \(Int(side))pt")
+            }
+        }
+        // A board the size of a thirteen-inch iPad must be able to carry them,
+        // or the rule is not a threshold, it is an off switch.
+        #expect(seenFull, "seats \(seats): the middle never carried its labels at any size")
+    }
+
     @Test("a degenerate layout is not asked to hold anything")
     func degenerateLayoutIsHandled() {
         #expect(BoardLayout.centrePlacement(innerFieldRadius: 0, pitch: 0) == .beside)

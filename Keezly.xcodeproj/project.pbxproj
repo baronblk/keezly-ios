@@ -50,6 +50,7 @@
 		64C3B3D1B1A0D298F70A273A /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60E312424F2068DAD864AE22 /* Statistics.swift */; };
 		64CF2DB28EC65A89F8304B83 /* AppIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4348693A6AFB35B996AD07 /* AppIntegrationTests.swift */; };
 		697C95CBF6282BDFC37ECD4E /* MatchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0229B62760A53B9B55B07723 /* MatchListView.swift */; };
+		6B1E4FDCFD16F35FD97EE428 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6E50404D8D3EA77B84451510 /* PrivacyInfo.xcprivacy */; };
 		6BC9E719FDA1B8015AECF13C /* TutorialRun.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C536DFF7D3FD204F337D584 /* TutorialRun.swift */; };
 		6D7078B7436E4C5E72AED247 /* GrayscaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E814C79BC8A969E82B7D48 /* GrayscaleTests.swift */; };
 		6F76881931D3BEC678981AD8 /* MatchEndView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0BF630CB2278771597A67A /* MatchEndView.swift */; };
@@ -164,6 +165,7 @@
 		67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreen.swift; sourceTree = "<group>"; };
 		6A5741C72A907AEF603B8937 /* LaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
 		6B9869B71A5F567920F36A1C /* home.caf */ = {isa = PBXFileReference; path = home.caf; sourceTree = "<group>"; };
+		6E50404D8D3EA77B84451510 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6ED8C1FD416E628043CC4D29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		715B39EEB871A7D480A659C4 /* WelcomeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeTests.swift; sourceTree = "<group>"; };
 		71AC79E7E5ACF55DEC8B2C58 /* capture.caf */ = {isa = PBXFileReference; path = capture.caf; sourceTree = "<group>"; };
@@ -496,6 +498,7 @@
 				F01639F69FA03230480F3F8B /* Info.plist */,
 				8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */,
 				A7AD9526A6D73BF8D94109D3 /* Localizable.xcstrings */,
+				6E50404D8D3EA77B84451510 /* PrivacyInfo.xcprivacy */,
 				2DC0E53379721916E392C04F /* RootView.swift */,
 			);
 			path = Keezly;
@@ -647,6 +650,7 @@
 			files = (
 				11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */,
 				E3CFA18060839ED0805FA3FB /* Localizable.xcstrings in Resources */,
+				6B1E4FDCFD16F35FD97EE428 /* PrivacyInfo.xcprivacy in Resources */,
 				A8F0BBF17EF0051B92A6F024 /* capture.caf in Resources */,
 				A69D0995449BC4529D343D80 /* fold.caf in Resources */,
 				62212C2AF2BDA2BAD9F43C23 /* home.caf in Resources */,

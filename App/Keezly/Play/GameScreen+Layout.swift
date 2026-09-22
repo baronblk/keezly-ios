@@ -59,7 +59,7 @@ extension GameScreen {
             // as a second, smaller board sitting above the real one.
             Spacer(minLength: 0)
             tableTray(axis: .horizontal)
-            board
+            board(side: layout.boardSide)
                 .frame(maxWidth: layout.boardSide, maxHeight: layout.boardSide)
             boardStatus(boardSide: layout.boardSide)
             sevenProgress
@@ -82,7 +82,7 @@ extension GameScreen {
         let sideWidth = max(160, size.width - boardSide - Keezly.Spacing.medium * 2)
 
         return HStack(spacing: Keezly.Spacing.medium) {
-            board
+            board(side: boardSide)
                 .frame(width: boardSide, height: boardSide)
 
             VStack(spacing: Keezly.Spacing.small) {
@@ -124,7 +124,7 @@ extension GameScreen {
             .frame(width: sideWidth)
 
             VStack(spacing: Keezly.Spacing.medium) {
-                board.frame(maxHeight: .infinity)
+                board(side: boardSide).frame(maxHeight: .infinity)
                 boardStatus(boardSide: boardSide)
                 sevenProgress
                 hintLine
@@ -346,7 +346,16 @@ extension GameScreen {
 
     // MARK: - Pieces
 
-    var board: some View {
+    /// The board, and whatever its middle can carry at the size it is given.
+    ///
+    /// `side` is passed in rather than measured here, and that is the point:
+    /// the status line beneath the board asks the same question of the same
+    /// number. When the board measured its own geometry instead, the two could
+    /// disagree across the legibility threshold — the board decided it was too
+    /// small for the labels and moved them out, the line below decided it was
+    /// large enough and drew nothing, and whose turn it was vanished from the
+    /// screen entirely. One number, asked once.
+    func board(side: CGFloat) -> some View {
         ZStack {
             BoardView(
                 layout: layout,
@@ -367,9 +376,8 @@ extension GameScreen {
             )
 
             if layout.centrePlacement == .inside {
+                let fit = BoardCentreView.fitted(in: layout, boardSide: side)
                 GeometryReader { proxy in
-                    let side = min(proxy.size.width, proxy.size.height)
-                    let fit = BoardCentreView.fitted(in: layout, boardSide: side)
                     BoardCentreView(
                         state: session.state,
                         roles: session.roles,
