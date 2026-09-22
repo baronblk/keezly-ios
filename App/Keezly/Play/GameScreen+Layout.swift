@@ -15,8 +15,6 @@ extension GameScreen {
     /// the board worth looking at. A phone in landscape is the case.
     static let shortHeightThreshold: CGFloat = 520
 
-
-
     /// How much height the fanned hand takes below the board.
     var handHeight: CGFloat { handCardWidth * 1.45 + handCardWidth * 0.3 }
 
