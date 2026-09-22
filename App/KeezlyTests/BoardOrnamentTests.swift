@@ -192,3 +192,39 @@ struct BoardOrnamentTests {
         }
     }
 }
+
+/// ISS-020 — which layer wins a tap where a square and a piece overlap.
+///
+/// Both are given at least `Keezly.Target.minimum` to be tapped, and on a phone
+/// the squares are smaller than that, so the two inflated areas overlap for
+/// real. Whichever is drawn last takes the tap, and getting that order wrong
+/// meant a highlighted destination beside a piece could not be tapped at all:
+/// the piece swallowed it, the move was never made, and the turn never passed.
+///
+/// It failed only on iPhone. On iPad the squares are larger than 44pt, nothing
+/// is inflated and nothing overlaps — which is why it looked like a test
+/// harness fault for as long as it did.
+@Suite("Board tap precedence")
+@MainActor
+struct BoardTapPrecedenceTests {
+
+    private func board(selecting pawn: PawnID?) -> BoardView {
+        BoardView(
+            layout: BoardLayout(board: BoardGraph(seatCount: 4)),
+            pawns: [],
+            legalTargets: [],
+            selectablePawns: [],
+            selectedPawn: pawn
+        )
+    }
+
+    @Test("while no piece is chosen, the piece wins the tap")
+    func pieceWinsWhileChoosing() {
+        #expect(board(selecting: nil).targetsTakePrecedence == false)
+    }
+
+    @Test("once a piece is chosen, the square wins the tap")
+    func squareWinsAfterChoosing() {
+        #expect(board(selecting: PawnID(seat: Seat(0), slot: 0)).targetsTakePrecedence)
+    }
+}

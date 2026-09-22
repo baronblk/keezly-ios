@@ -12,7 +12,6 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
-| ISS-020 | `ui_tests` is red: one test fails with two simulator destinations | Blocker (test harness) |
 | ISS-019 | The physical device gate stops at a password prompt | Blocker (hardware gate, needs a person) |
 | ISS-016 | A seat colour does not reach 3:1 against the board | Accepted — colour proven redundant (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
@@ -78,98 +77,74 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
 
-### ISS-020 — A UI test fails only when the whole suite runs, and nobody knows why yet
+### ISS-020 — A tap on a highlighted square was swallowed by a piece — FIXED
 
-- **Status:** OPEN — reproducible only at full-suite scope; **cause not
-  identified**
-- **Severity:** Blocker for the `ui_tests` lane, which is currently **red**
-- **Component:** UI test harness, or the app — that is exactly what is not yet
-  known
-- **Description:** `PassAndPlayTests.testTheCoverReturnsForTheNextPlayer` fails
-  in a full `fastlane ui_tests` run with *"the device was not covered before the
-  next player"* — the handover cover did not appear after a card was played.
-  The assertion before it passed, so a move really was made; the turn did not
-  pass on.
+- **Status:** CLOSED, 2026-09-22. Cause proven, fixed, and pinned by a test
+- **Severity:** was a blocker for `ui_tests`; was also **a real defect for
+  players on iPhone**, which is the part that matters
+- **Component:** `App/Keezly/Board/BoardView.swift` — tap precedence, not the
+  test harness
 
-#### What has been measured
+#### What it actually was
 
-| Run | Result |
-|---|---|
-| Full suite, loaded machine | 2 failures — this and `testSevenMidSplit` |
-| Both tests in isolation at `fffd60c`, before today's work | pass |
-| Both tests in isolation at `a8d0359`, after every layout change today | pass |
-| Full suite, idle machine | 1 failure — `testSevenMidSplit` passed, so that one was load-sensitive |
-| This test alone, iPhone 17, at HEAD | pass |
-| The whole `PassAndPlayTests` class, iPhone 17, at HEAD | pass, 4 tests |
-| A landscape screenshot test then this test, iPhone 17, clean boot | pass |
+A board square and a piece are each given at least `Keezly.Target.minimum`
+(44pt) to be tapped, because the drawn piece is smaller than a finger. On a
+phone the board's squares are **smaller than 44pt**, so both areas are inflated
+and genuinely overlap. Pieces were drawn last in the `ZStack`, so a piece took
+every contested tap — and a highlighted destination next to a piece could not be
+tapped at all.
 
-#### What that rules out
+For a player: tap a card, tap your piece, tap where you want to go, and the
+piece beside it gets selected instead. Nothing moves.
 
-- **Not a regression from today's work.** It passes at this morning's commit
-  *and* after every layout change made since.
-- **Not interference inside its own class.** The class passes whole.
-- **Not leftover device orientation.** `DesignReviewScreenshots` does leave the
-  device rotated, which is its own untidiness, but running a landscape capture
-  immediately before this test does not reproduce the failure.
-- **Not leftover saved matches.** `RootView` builds no `MatchStore` at all when
-  `-KEEZLY_UI_TESTING` is set, so a match left by an earlier test cannot be
-  resumed into this one. An earlier version of this entry gave that as the
-  mechanism; it was wrong.
-- **Not purely machine load.** An idle machine removed one of the two failures
-  and not this one.
-
-#### 2026-09-22 — it is not about suite scope
-
-The title of this entry is now wrong and is left standing so the record is not
-quietly rewritten. Measured today, all at HEAD:
-
-| Run | Result |
-|---|---|
-| `fastlane scan`, 2 destinations, whole UI suite | FAIL, 4 times out of 4 |
-| scan's exact `xcodebuild` line replayed by hand, 2 destinations | **FAIL**, exit 65 |
-| the same line with `-only-testing:KeezlyUITests/PassAndPlayTests` alone | **FAIL** in 5 minutes |
-| plain `xcodebuild`, 1 destination | pass |
-| plain `xcodebuild`, 2 destinations, four UI classes | pass |
-
-Two things follow. The cause is in the **command line**, not in scan's simulator
-preparation — replaying the line by hand reproduces it. And it does **not** need
-the rest of the suite: `PassAndPlayTests` on its own is enough, which turns a
-40-minute experiment into a 5-minute one.
-
-It fails on `iPhone 17` and passes on `iPad Pro 13-inch (M5)` in the same run,
-every time.
-
-The failure, read out of the result bundle rather than inferred from the log:
+Measured from the app, not inferred:
 
 ```
-XCTAssertTrue failed - the device was not covered before the next player
-PassAndPlayTests/testTheCoverReturnsForTheNextPlayer()
+chosen target.track.16 frame=(88.33, 252.0, 44.0, 44.0)   ← exactly the 44pt floor
+tap point (110.33, 274.0)
+  target rects containing it: ["target.track.16"]
+  pawn rects containing it:   ["pawn.1.0", "pawn.1.1"]   both hittable
+after the tap: hand = 5 cards, King still in it, no targets, no cover
 ```
 
-Three differences between the passing and failing invocations remain, and are
-being bisected one at a time: `-derivedDataPath`, `env NSUnbufferedIO=YES`, and
-`build test` versus `test`. A second destination is also still a candidate in
-its own right, because the passing plain runs and the failing scan-like run
-differ in more than one way at once.
+On iPad the squares are larger than 44pt, nothing is inflated, nothing overlaps,
+and the same test passed every time. That difference is the whole reason this
+looked like a harness fault for as long as it did.
 
-**No cause is claimed until one variant flips it reproducibly.** A note in
-`ScreenshotMode.swift` previously recorded the cause as a test tapping a
-Seven's partial-leg target; that fix is in and the test still fails, so that
-was at best only one of the faults and the note has been corrected.
+#### The fix
 
-#### What is still open
+`BoardView.targetsTakePrecedence` — while no piece is chosen the piece wins the
+tap, because the question on screen is *which piece*; once one is chosen the
+square wins, because the question is *where to*. Named rather than left inline
+so `BoardTapPrecedenceTests` can pin both states without a rendered board, and
+a future `ZStack` reordering cannot undo it silently.
 
-Which of those four differences it is.
+The original ordering comment — "target squares first, so a pawn standing on one
+stays tappable as a pawn" — was right for the first case and wrong for the
+second.
 
-**It must not be closed by re-running until it is green.** The failing
-assertion guards the pass-and-play privacy rule (§34): the device must be
-covered before the next player takes it. A test that sometimes says that did
-not happen is either a bad test or a real fault, and the two are worth
-distinguishing.
+#### What was claimed along the way and was not true
 
-- **Related files:** `App/KeezlyUITests/PassAndPlayTests.swift`,
-  `App/KeezlyUITests/DesignReviewScreenshots.swift`, `App/Keezly/RootView.swift`
-- **Related tests:** `KeezlyUITests`
+Kept, because the wrong turns cost more than the fix did.
+
+| Claimed | Disproved by |
+|---|---|
+| Fails only in a full suite run | `PassAndPlayTests` alone reproduces it |
+| Needs two simulator destinations | One destination reproduces it |
+| Machine load | An idle machine reproduces it |
+| `fastlane scan` differs from `xcodebuild` | The plainest `xcodebuild` reproduces it |
+| `-derivedDataPath` / `NSUnbufferedIO` / `build test` | The control run without any of them reproduces it |
+| Leftover state or orientation between tests | `RootView` builds no `MatchStore` under `-KEEZLY_UI_TESTING` |
+| A test tapping a Seven's partial-leg target | That fix shipped and the test still failed |
+| **"A move really was made; the turn did not pass on"** | **The hand still held all five cards, King included. No move was made at all** |
+
+That last one was in this file and was wrong. It was inferred from the `played`
+flag rather than from the hand, and `played` only recorded that a target had
+been tapped — not that anything had happened.
+
+- **Related files:** `App/Keezly/Board/BoardView.swift`,
+  `App/Keezly/Board/PawnView.swift`, `App/KeezlyUITests/PassAndPlayTests.swift`
+- **Related tests:** `BoardTapPrecedenceTests`, `KeezlyUITests/PassAndPlayTests`
 
 ### ISS-019 — The physical device gate stops at a password prompt
 
