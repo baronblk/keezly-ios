@@ -170,10 +170,14 @@ called complete until the gameplay items above are implemented and re-run.
       after a clean install
 - [ ] Icon **device verified**: installed on the physical iPad; its home screen
       has not been looked at from here. The physical iPhone was not connected
-- [x] All artwork, sounds and rule texts are original: the icon is drawn by
-      `AppIconArtwork.swift`, the seven cues are synthesised by
-      `Tools/soundforge.py`, and the rulebook is written for this app. Nothing
-      is sampled, downloaded or licensed
+- [x] All artwork, sounds and rule texts are original, **and it is checked
+      rather than asserted**: the icon is drawn by `AppIconArtwork.swift` and
+      `scripts/icon-check.sh` fails if the committed PNGs stop matching it; the
+      seven cues are synthesised by `Tools/soundforge.py` and
+      `scripts/sounds-check.sh` regenerates them and compares — bit-for-bit
+      identical, and both gates run inside `fastlane release_check`. The
+      rulebook is written for this app. Nothing is sampled, downloaded or
+      licensed
 - [ ] **Sound listened to on real hardware, through a speaker and through
       headphones, at the volume somebody would actually play at.**
       `Tools/soundcheck.py` establishes that no cue clips, none carries a DC
