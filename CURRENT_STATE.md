@@ -582,6 +582,31 @@ one passed a review that was looking at the wrong thing:
 
 ---
 
+## Release Gates — `fastlane release_check`
+
+Run at `be1287c` on 2026-09-22. Every gate the lane can decide is green; the
+ones it cannot are reported as what they are rather than folded in.
+
+| Gate | Result |
+|---|---|
+| Version is 1.0.0 | PASS |
+| Git tree clean | PASS |
+| No secrets tracked | PASS |
+| App icon present | PASS |
+| Screenshots verified | PASS — 84 captures, 0 faults |
+| Static checks | PASS — SwiftLint `--strict` and SwiftFormat |
+| Simulator gate | PASS |
+| Physical iPhone gate | **BLOCKED** — no device fills the role |
+| Physical iPad gate | AVAILABLE — `fastlane device_gate` not yet re-run today |
+| Game Center gate | **BLOCKED** — `docs/GAME_CENTER_DEVICE_TESTS.md` |
+
+The lane ends by saying so itself: *"Mandatory real-device gates are still
+BLOCKED — not releasable (§178)."* That sentence is the difference between RC
+PREPARED and RELEASE READY, and it is printed by the gate rather than written
+in a document.
+
+---
+
 ## Manual Actions Required
 
 | # | Action | Status |
