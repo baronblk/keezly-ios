@@ -109,12 +109,17 @@ platform :ios do
 
   desc "XCUITests on an iPhone and an iPad simulator"
   lane :ui_tests do
-    # `DesignReviewScreenshots` is deliberately excluded. It is a *capture*
-    # suite, not a correctness suite: it drives fourteen launches per device,
-    # rotates for most of them, sleeps a second and a half each time and does
-    # heavy image work — and measured, running it ahead of the others makes a
-    # later test fail that passes every other way it has been run (ISS-020).
-    # Without it these four classes are green; with it they are not.
+    # `DesignReviewScreenshots` is deliberately excluded, for time rather than
+    # for safety. It is a *capture* suite, not a correctness suite: fourteen
+    # launches per device, a rotation for most of them, a second and a half of
+    # settling each time and heavy image work — roughly twenty minutes on two
+    # devices to assert things that are checked better elsewhere.
+    #
+    # An earlier version of this comment also blamed it for ISS-020, claiming
+    # that running it first made a later test fail. That was wrong. ISS-020 was
+    # a tap-precedence bug on iPhone and had nothing to do with ordering or
+    # with this suite; once it was fixed, all five classes ran together and all
+    # 34 tests passed. The exclusion stands on its own cost and on nothing else.
     #
     # Nothing is lost by moving it. What it asserts about a capture —
     # orientation and size — is checked far more strictly on the files
