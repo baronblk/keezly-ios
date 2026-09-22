@@ -59,6 +59,14 @@ boot() {
   xcrun simctl shutdown "$udid" >/dev/null 2>&1 || true
   xcrun simctl boot "$udid" >/dev/null 2>&1 || true
   xcrun simctl bootstatus "$udid" -b >/dev/null 2>&1 || true
+  # The status bar every App Store screenshot has worn since 2007: full signal,
+  # full battery, 9:41. Without it the captures carry whatever the machine's
+  # clock and battery happened to be, which dates the set and makes two
+  # screenshots in the same listing disagree with each other.
+  xcrun simctl status_bar "$udid" override \
+    --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 \
+    --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 \
+    >/dev/null 2>&1 || true
 }
 
 run_capture() {
