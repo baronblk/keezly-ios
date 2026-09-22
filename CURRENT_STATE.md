@@ -27,7 +27,7 @@ Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 | M5 — Local Multiplayer / Pass & Play | **DONE** |
 | M6 — Game Center | **IMPLEMENTED, NOT VERIFIED** (MAN-02) |
 | M7 — Tutorial / Rulebook / Accessibility | **DONE** |
-| M8 — Brand / App Icon / Audio / Haptics | **IMPLEMENTATION COMPLETE EXCEPT AUDIO ASSETS** — audio is a **release blocker** |
+| M8 — Brand / App Icon / Audio / Haptics | **IMPLEMENTATION COMPLETE** — audio present and measured, **not listening-verified**; icon not **DEVICE VERIFIED** |
 | M9 — Statistics / Replay / Game Center Meta | **DONE** — reporting **BLOCKED** (MAN-02) |
 | M10 — Localisation | **DONE** |
 | **M11 — CI / QA / Hardening** | **NOT STARTED** |
@@ -190,15 +190,25 @@ capture and none on any portrait one. It is a capture artefact, not something
 wrong with the interface, and it is settled in M11 where the captures move to
 files.
 
-**The two-player board is solved (ISS-013, DEC-021).** The quiet middle is not
-a constant: measured in square pitches it is 0.28 at two seats, 2.42 at three
-and 4.56 at four. At two seats the home lanes very nearly meet and there is no
-middle at all. Shrinking the cards to fit was tried and made them unreadable,
-which is worse than crowding — so a two-player table shows the table's own
-cards **beside** the board, in a wooden tray opposite the other player. The
-rules and `BoardGraph` are identical for every table size; only the
-presentation adapts, and the decision is written as a rule about available
-space rather than a special case for two.
+**The board's middle is solved on every table and every screen (ISS-013,
+DEC-021).** The quiet middle is not a constant: measured in square pitches it
+is 1.2 at two seats, 2.7 at three and 4.9 at four. At two seats the home lanes
+very nearly meet, so they are set side by side rather than nose to nose — which
+is what gives that board a middle at all — and even then there is not room for
+a pile and a played card, so a two-player table shows the table's own cards
+**beside** the board, in a wooden tray opposite the other player. Shrinking
+them to fit was tried and made them unreadable, which is worse than crowding.
+
+What is drawn in the middle is now sized against the **middle**, measured, and
+not against the view: the two stopped being the same thing when the board's
+bounds grew to hold the panel, its shadow and the air around it. And a board
+too small to draw its two text labels at their designed size keeps the piles
+and moves the labels to a line beneath it — a phone's board is about a hundred
+points across the middle, where an eleven-point floor makes the turn pill half
+again the size it was drawn to be. The rules and `BoardGraph` are identical for
+every table size; only the presentation adapts, and every decision is written
+as a rule about available space rather than a special case for a seat count or
+a device.
 
 **A polish pass across the board (DEC-021).** Deeper holes so the track reads,
 stronger but still restrained player colours, a modelled edge with a contact
@@ -362,11 +372,21 @@ Measured results and sample sizes: `AI.md`.
 - Seven haptic cues derived from `GameEvent`, so a computer opponent's capture
   lands like the player's and a refused tap produces nothing. Runs collapse: a
   Seven split over seven squares is one knock.
-- Sound is **NOT DONE, and is a release blocker.** The architecture, the cues
-  and the switch exist and are tested; there are no recordings, so the thing
-  the milestone asked for does not exist. Audio is in 1.0.0's defined scope, so
-  this is a blocker rather than a deferral (DEC-027). The settings screen says
-  so plainly rather than offering a switch that governs nothing (§77).
+- Sound is **ASSET PRESENT, NOT LISTENING-VERIFIED.** Seven cues ship, and
+  they are *generated*, not sourced: `Tools/soundforge.py` synthesises them by
+  modal synthesis — decaying sinusoids at the inharmonic ratios a small struck
+  wooden body rings at, over a contact transient — so the provenance of the
+  audio is the source code that made it and there is no third-party licence to
+  resolve (§77, DEC-027).
+  `Tools/soundcheck.py` measures what a machine can: no cue clips, none carries
+  a DC offset, all seven decay like something struck, and each is short enough
+  to hear two hundred times. It caught the capture cue coming out *brighter*
+  than the gentle swap — the sound of a slap rather than a knock — now 980 Hz
+  against 1887 Hz.
+  What no test here establishes is whether they **sound good**, which needs
+  ears in a quiet room on real hardware. Until that has happened M8 is not
+  VERIFIED, and the release checklist says so in those words rather than
+  counting the files and calling it done.
 
 ### History, replay and achievements (M9)
 - Every saved match is listed, newest first, each already replayed and verified
@@ -399,7 +419,6 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 
 ## Not Implemented Yet
 
-- Sound recordings (M8.5) — the architecture ships, the audio does not.
 - Reporting achievements to Game Center (M9.4) — blocked on MAN-02.
 - Bespoke dealing, Seven-leg and Jack-swap choreography; the generic move and
   swap animations exist.
@@ -602,5 +621,5 @@ Two things will stay honestly incomplete until somebody unblocks them:
 
 | | Why |
 |---|---|
-| Sound | **ASSET PENDING.** Keezly will only ship audio it owns outright (§77) |
+| Sound | **ASSET PRESENT, NOT LISTENING-VERIFIED.** Synthesised from source in this repository (§77) |
 | Game Center, end to end | **BLOCKED** on MAN-02. Implemented and tested against a mock two-client harness; never run against a real match |

@@ -23,40 +23,58 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ## Open — in detail
 
-### ISS-013 — A two-player board has no room for the cards in the middle
+### ISS-013 — A small board has no room for what is drawn in its middle
 
 - **Status:** FIXED, VERIFIED
 - **Severity:** Minor (visual)
 - **Component:** App / Board
-- **Description:** The home lanes are four squares long whatever the table
-  size, so on a two-seat board — half the track of a four-seat one — they run
-  almost to the centre. The draw pile, the played card and the turn indicator
-  are drawn across them.
-- **Reproduction:** `-KEEZLY_SEATS 2` on an iPad, or the
-  `testTwoPlayerLandscape` capture.
-- **Expected:** The middle of the board reads as clearly as it does at four
-  seats.
-- **Actual:** At the original size the cards sit across both home lanes. Scaled
-  honestly to the space available they become too small to read, so the scale
-  is now floored (`GameScreen.minimumCentreScale`) and a little crowding
-  remains.
-- **Fix:** two things, in order. First the middle was proportioned to the
-  board's own quiet field rather than to the size of the view, which settles
-  three to six seats. That was not enough for two, where the field is 0.28 of a
-  square: shrinking the cards to fit made them unreadable, which is a worse
-  fault than crowding. So a two-player table now shows the table's own cards
-  **beside** the board — a wooden tray opposite the other player, holding the
-  deck, the played card, the turn and the round (DEC-021).
+- **Description:** Three separate faults, all of them the same mistake — the
+  middle being sized against something other than the middle.
+  1. The home lanes are four squares long whatever the table size, so on a
+     two-seat board — half the track of a four-seat one — they run almost to
+     the centre, and the draw pile, the played card and the turn indicator are
+     drawn across them.
+  2. The middle was a fixed fraction **of the view**. That was the same thing
+     as a fraction of the board only while the view was the playing squares.
+     When the board's bounds grew to hold the panel, its shadow and the air
+     around it, the board shrank inside its frame and the middle did not.
+  3. Both labels in the middle are text, and text has a legibility floor.
+     Below about eleven points they stop shrinking while everything around
+     them carries on, so on a phone the turn pill ends up half again the size
+     it was drawn to be, lying across the pieces.
+- **Reproduction:** `-KEEZLY_SEATS 2` on an iPad for (1);
+  `./scripts/board-review.sh` for (2) and (3) — the phone captures show it
+  plainly.
+- **Expected:** Whatever is in the middle sits in the middle, at a size that
+  can be read, on every board Keezly draws.
+- **Fix:** three, in order.
+  - Two seats show the table's own cards **beside** the board — a wooden tray
+    opposite the other player, holding the deck, the played card, the turn and
+    the round (DEC-021). Shrinking them to fit a field of a single square pitch
+    made them unreadable, which is the worse fault. The lanes themselves were
+    also set side by side rather than nose to nose, which is what gives that
+    board a middle at all.
+  - `BoardLayout.centreWidthFraction(aspect:)` measures the quiet field against
+    `contentBounds` — the thing a view actually scales to fit — and sizes the
+    middle from that. One answer, in `BoardCentreView.fitted(in:boardSide:)`,
+    so the playing screen and the replay screen cannot drift apart; the replay
+    had a hard-coded `0.26`.
+  - A board too small to draw the labels at their designed size keeps the piles
+    and moves the labels to a line **beneath** it, where they are legible
+    without covering anything. The rule is about legibility, not about device
+    class: the same phone in landscape, or an iPad in a narrow Stage Manager
+    window, gets the same answer for the same reason.
 - **What did not change:** `BoardGraph`, the rules, and the board itself. Only
-  the presentation adapts, and the decision is written as a rule about
-  available space rather than as a special case for two seats.
-- **Related tests:** `InnerFieldTests` — including that the board's measured
-  proportions are the ones the design was decided on, so a change to the lanes
-  or the track cannot silently invalidate it.
-- **Verified by:** captures of a two-seat table in both orientations, and the
-  app suite at commit `656bc88`.
-- **Related files:** `App/Keezly/Play/GameScreen.swift`,
-  `App/Keezly/Board/BoardLayout.swift`
+  the presentation adapts, and every decision is written as a rule about
+  available space rather than as a special case for a seat count or a device.
+- **Verified by:** `InnerFieldTests`, including that the board's measured
+  proportions are the ones the design was decided on — so a change to the lanes
+  or the track cannot silently invalidate any of this — and the full capture
+  set from `scripts/board-review.sh` at 2, 4 and 6 seats on phone, portrait
+  tablet and a landscape-shaped pane.
+- **Related files:** `App/Keezly/Board/BoardCentreView.swift`,
+  `App/Keezly/Board/BoardLayout.swift`, `App/Keezly/Play/GameScreen+Layout.swift`,
+  `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
 
 ### ISS-016 — A seat colour does not reach 3:1 against the board
