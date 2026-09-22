@@ -27,7 +27,7 @@ Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
 | M5 — Local Multiplayer / Pass & Play | **DONE** |
 | M6 — Game Center | **IMPLEMENTED, NOT VERIFIED** (MAN-02) |
 | M7 — Tutorial / Rulebook / Accessibility | **DONE** |
-| M8 — Brand / App Icon / Audio / Haptics | **DONE** — audio **ASSET PENDING** |
+| M8 — Brand / App Icon / Audio / Haptics | **IMPLEMENTATION COMPLETE EXCEPT AUDIO ASSETS** — audio is a **release blocker** |
 | M9 — Statistics / Replay / Game Center Meta | **DONE** — reporting **BLOCKED** (MAN-02) |
 | M10 — Localisation | **DONE** |
 | **M11 — CI / QA / Hardening** | **NOT STARTED** |
@@ -349,12 +349,19 @@ Measured results and sample sizes: `AI.md`.
 - The app icon is **code**: `AppIconArtwork` draws it, three concepts were
   compared at every size an icon is drawn at, and `table` was chosen (DEC-026).
   `scripts/icon-check.sh` fails if the committed PNGs stop matching the source.
+  **GENERATED**, **INTEGRATED & VERIFIED** — `assetutil` reports all three
+  appearances in the built `Assets.car`, and the icon is on the iPad and iPhone
+  simulator home screens after a clean install — but **not DEVICE VERIFIED**:
+  it is installed on the physical iPad and that home screen has not been looked
+  at from here. Three separate questions, kept separate (`APP_ICON.md`).
 - Seven haptic cues derived from `GameEvent`, so a computer opponent's capture
   lands like the player's and a refused tap produces nothing. Runs collapse: a
   Seven split over seven squares is one knock.
-- Sound is **ASSET PENDING**. The architecture, the cues and the switch exist;
-  there are no recordings, and the settings screen says so rather than offering
-  a switch that governs nothing (§77).
+- Sound is **NOT DONE, and is a release blocker.** The architecture, the cues
+  and the switch exist and are tested; there are no recordings, so the thing
+  the milestone asked for does not exist. Audio is in 1.0.0's defined scope, so
+  this is a blocker rather than a deferral (DEC-027). The settings screen says
+  so plainly rather than offering a switch that governs nothing (§77).
 
 ### History, replay and achievements (M9)
 - Every saved match is listed, newest first, each already replayed and verified

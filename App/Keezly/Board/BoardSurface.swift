@@ -151,7 +151,49 @@ struct BoardSurface: View {
             let tray = Path(roundedRect: rect, cornerRadius: min(rect.width, rect.height) * 0.28)
             context.fill(tray, with: .color(colour.opacity(0.26)))
             context.stroke(tray, with: .color(colour.opacity(0.62)), lineWidth: max(0.9, hole * 0.06))
+
+            // The seat's own mark, engraved into its two areas.
+            //
+            // Colour alone told you whose corner and whose lane these were,
+            // and amber measures 1.23:1 against this wood (ISS-016): in
+            // greyscale, or to somebody who cannot separate the two, the
+            // areas simply vanished. The mark is the same one the seat's
+            // pieces carry, so identity is shape as well as hue everywhere it
+            // matters (§42, §53).
+            drawSeatMark(for: seat, centredOn: CGPoint(x: rect.midX, y: rect.midY), hole: hole, in: &context)
+            drawSeatMark(for: seat, centredOn: homeMarkAnchor(for: seat), hole: hole, in: &context)
         }
+    }
+
+    /// Where a home lane's mark sits: just beyond its deepest square, on the
+    /// lane's own line, where the ornament's chevron already points.
+    private func homeMarkAnchor(for seat: Seat) -> CGPoint {
+        let lane = layout.homePoints[seat.index]
+        guard let deepest = lane.last, let entry = lane.first else { return .zero }
+        let direction = CGPoint(x: deepest.x - entry.x, y: deepest.y - entry.y)
+        let length = hypot(direction.x, direction.y)
+        guard length > 0 else { return transform.point(deepest) }
+        return transform.point(CGPoint(
+            x: deepest.x + direction.x / length * layout.pitch * 0.85,
+            y: deepest.y + direction.y / length * layout.pitch * 0.85
+        ))
+    }
+
+    /// One seat's mark, engraved rather than printed, so it belongs to the
+    /// board the way the ornament does.
+    private func drawSeatMark(
+        for seat: Seat,
+        centredOn centre: CGPoint,
+        hole: CGFloat,
+        in context: inout GraphicsContext
+    ) {
+        // Below this a mark is a smudge, and a smudge helps nobody.
+        guard hole >= 9 else { return }
+        let size = hole * 0.52
+        let shape = PlayerIdentity.identity(for: seat).mark.path(in: CGRect(
+            x: centre.x - size / 2, y: centre.y - size / 2, width: size, height: size
+        ))
+        engrave(shape, in: &context, width: max(0.5, hole * 0.05), tint: theme.edge, strength: 0.34)
     }
 
     // MARK: - Holes
@@ -233,10 +275,19 @@ struct BoardSurface: View {
             }
 
             if legalTargets.contains(position) {
+                // Dashed, not solid. A protected start square is already a
+                // solid ring, and two rings in two colours are the same ring
+                // to anybody reading the board in greyscale — which is the
+                // one distinction a player cannot afford to lose, because it
+                // separates "you may move here" from "nobody may pass" (§53).
                 context.stroke(
                     Path(ellipseIn: rect.insetBy(dx: -hole * 0.16, dy: -hole * 0.16)),
                     with: .color(Keezly.Palette.legalTarget),
-                    lineWidth: max(1.5, hole * 0.14)
+                    style: StrokeStyle(
+                        lineWidth: max(1.5, hole * 0.14),
+                        lineCap: .round,
+                        dash: [hole * 0.34, hole * 0.26]
+                    )
                 )
             }
         }

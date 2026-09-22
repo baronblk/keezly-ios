@@ -147,9 +147,18 @@ called complete until the gameplay items above are implemented and re-run.
 
 ### Brand and assets
 
-- [ ] App icon final; 1024px master, dark and tinted variants
-- [ ] Icon legible at 29, 40, 60, 120, 180 px
-- [ ] Editable icon sources committed under `Brand/`
+- [x] App icon final; 1024px master, dark and tinted variants — `assetutil`
+      confirms all three appearances in the built `Assets.car` (`APP_ICON.md`)
+- [x] Icon legible at 29, 40, 60, 120, 180 px — `AppIconTests` fails a concept
+      that flattens at 29 or loses its shape as a mask
+- [x] Editable icon sources committed — the icon *is* code:
+      `App/Keezly/Brand/AppIconArtwork.swift`, with `scripts/icon-check.sh`
+      failing if the committed PNGs stop matching it
+- [x] Icon **integrated**: `ASSETCATALOG_COMPILER_APPICON_NAME` set in both
+      configurations, and seen on the iPad and iPhone simulator home screens
+      after a clean install
+- [ ] Icon **device verified**: installed on the physical iPad; its home screen
+      has not been looked at from here. The physical iPhone was not connected
 - [ ] All artwork, sounds and rule texts are original
 
 ### Store

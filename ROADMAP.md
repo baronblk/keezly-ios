@@ -12,12 +12,12 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M1 | GameCore / Rules | **DONE** |
 | M2 | Complete Move Engine | **DONE** |
 | M3 | AI (Easy / Medium / Hard) | **DONE** |
-| M4 | Gameplay UI — iPad / iPhone | IN PROGRESS |
-| M5 | Local Multiplayer / Pass & Play | NOT STARTED |
-| M6 | Game Center Multiplayer | NOT STARTED |
-| M7 | Tutorial / Rulebook / Accessibility | DONE |
-| M8 | Brand / App Icon / Audio / Haptics | DONE — except the sound recordings, ASSET PENDING |
-| M9 | Statistics / Replay / Game Center Meta | DONE — reporting to Game Center blocked on MAN-02 |
+| M4 | Gameplay UI — iPad / iPhone | DONE except Split View / Stage Manager (M4.3) |
+| M5 | Local Multiplayer / Pass & Play | **DONE** |
+| M6 | Game Center Multiplayer | IMPLEMENTED, NOT VERIFIED (MAN-02) |
+| M7 | Tutorial / Rulebook / Accessibility | DONE — physical keyboard NOT VERIFIED (ISS-010) |
+| M8 | Brand / App Icon / Audio / Haptics | **IMPLEMENTATION COMPLETE EXCEPT AUDIO ASSETS** |
+| M9 | Statistics / Replay / Game Center Meta | DONE — achievement reporting BLOCKED (MAN-02) |
 | M10 | Localisation | DONE |
 | M11 | CI / QA / Hardening | NOT STARTED |
 | M12 | Release Candidate 1.0.0 | NOT STARTED |
@@ -160,7 +160,7 @@ leak and watching them fail. See `AI.md`.
 | M5.2 Autosave and resume (DEC-023) | DONE — seed plus accepted actions, written atomically before the animation starts; restore revalidates every action and refuses rather than repairs. Verified across 2–6 seats, partners and free-for-all, completed and abandoned matches, corruption, a newer schema and an unknown opponent, and by terminating and relaunching the app |
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
-| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | DONE — the layout is chosen by the space actually available rather than by size class, and `PlayLayoutTests` adds the three columns up on every display Keezly runs on. Four clipping defects fixed, the last of them the far seat panel on a portrait iPad. A two-player table has its own presentation (DEC-021). Split View and Stage Manager still untested |
+| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | **PARTIAL** — landscape and portrait are done and tested: the layout is chosen by the space actually available rather than by size class, `PlayLayoutTests` adds the three columns up on every display Keezly runs on, four clipping defects are fixed, and a two-player table has its own presentation (DEC-021). **Split View and Stage Manager are named in this task and have never been run**, so it is not DONE |
 | M4.4 iPhone layout — portrait and both landscape orientations | DONE — phones get their own compact and short-landscape layouts; reviewed on the smallest, standard and largest iPhones, in both orientations, at 4 and 6 seats |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
 | M4.6 Event-driven animation pipeline with input locking | DONE — `BoardPresenter` plays events one at a time, reorders a capture behind the move that caused it, honours Reduce Motion, and settles on the true position on any interruption |
@@ -221,21 +221,29 @@ and mocked tests can proceed without them (§142).
 | M7.3 In-app rulebook with the active rule set highlighted | DONE — ~26 sections in Keezly's own words, both readings shown where tables disagree, the table's own rules marked. `RuleFacet` is checked against `RuleSet` by reflection |
 | M7.4 In-game card help | DONE — a long press on a card opens the rulebook's own words about it, playable or not, because "why can I not play this one?" is the same question |
 | M7.5 Hint system using AI evaluation, disabled in competitive online play | DONE — the hint is a computer opponent handed the player's own `PlayerObservation`, so it cannot see a card the player cannot see. `MatchSession.allowsHints` is where a competitive online match would turn it off (DEC-025) |
-| M7.6 VoiceOver, Dynamic Type, Reduce Motion, contrast, keyboard access | DONE — narration from a `PlayerObservation`, announced turns, Reduce Motion honoured, the keyboard model complete. Reviewed at the largest accessibility text size on a real simulator, which turned up three defects (segmented pickers that cap their growth, a seat preview that piles up, a hand pushed off the bottom of the screen), all fixed. Contrast is now measured by `ContrastTests` rather than judged: the secondary ink went from 2.88:1 to over 4.5:1, and the one shortfall that cannot be fixed without darkening the board is recorded as ISS-016 |
+| M7.6 VoiceOver, Dynamic Type, Reduce Motion, contrast, keyboard access | **DONE except physical keyboard** — narration from a `PlayerObservation`, announced turns, Reduce Motion honoured, the keyboard model complete. Reviewed at the largest accessibility text size on a real simulator, which turned up three defects (segmented pickers that cap their growth, a seat preview that piles up, a hand pushed off the bottom of the screen), all fixed. Contrast is now measured by `ContrastTests` rather than judged: the secondary ink went from 2.88:1 to over 4.5:1, and the one shortfall that cannot be fixed without darkening the board is recorded as ISS-016. Keyboard access is implemented and unit-tested; **key delivery from a physical keyboard is NOT VERIFIED — hardware not available** (ISS-010) |
 | M7.7 Alternative list-of-legal-actions input | DONE — the same `MoveGenerator` as the board, with a test asserting the two move sets are *equal* rather than overlapping |
 
 ---
 
-## M8 — Brand / App Icon / Audio / Haptics — DONE (audio ASSET PENDING)
+## M8 — Brand / App Icon / Audio / Haptics — IMPLEMENTATION COMPLETE EXCEPT AUDIO ASSETS
 
 | Task | Status |
 |---|---|
 | M8.1 Three icon concepts, comparison sheet, decision | DONE — corner, table and medallion, each built from the board's own vocabulary, compared through two rounds of refinement. `table` chosen; the reasoning and what the other two failed at are DEC-026 |
-| M8.2 Final 1024px master, dark/tinted variants, editable sources | DONE — the icon *is* the source: `AppIconArtwork` draws it in SwiftUI and `scripts/icon-install.sh` renders the three 1024 files. `scripts/icon-check.sh` fails if they stop matching |
+| M8.2 Final 1024px master, dark/tinted variants, editable sources | DONE — the icon *is* the source: `AppIconArtwork` draws it in SwiftUI and `scripts/icon-install.sh` renders the three 1024 files. `scripts/icon-check.sh` fails if they stop matching. **Integrated and verified**: `assetutil` reports all three appearances in the built `Assets.car`, and the icon is on the iPad and iPhone simulator home screens after a clean install. **Not yet device-verified by eye** — see `APP_ICON.md` |
 | M8.3 Icon preview page at 1024/180/120/60/40/29 px | DONE — `scripts/icon-sheet.sh` writes every concept at every size plus the tinted masks; `AppIconTests` fails a concept that flattens at 29 or loses its shape as a mask |
 | M8.4 Original board, pawn and card artwork | DONE in M4 — board, holes, pawn silhouette, ornament and cards are all Keezly's own geometry (DEC-017, DEC-018, DEC-019) |
-| M8.5 Original sound set, fully disableable | **ASSET PENDING** — the architecture, the cues and the switch are built and tested; there are no recordings. Keezly will only ship audio it owns outright (§77), and stand-in noises heard on every move would set the tone of the whole game. The settings screen says so plainly rather than offering a switch that governs nothing |
+| M8.5 Original sound set, fully disableable | **NOT DONE — RELEASE BLOCKER.** The architecture, the cues and the switch are built and tested; there are no recordings, so the feature the task names does not exist. Audio is in 1.0.0's defined scope, so this is a blocker rather than a deferral (see DEC-027) |
 | M8.6 Haptics, fully disableable | DONE — seven cues derived from `GameEvent`, so a computer opponent's capture lands like the player's and a refused tap produces nothing. Runs collapse, so a Seven split over seven squares is one knock rather than seven. `FeedbackTests` proves the switch silences the channel |
+
+**Acceptance criteria — five of six met.** The icon, the artwork and the
+haptics are done and verified. **Audio is not**, and M8 is therefore not DONE:
+five sixths of a milestone is not a milestone. Calling it done because the
+*architecture* is finished would be grading the scaffolding instead of the
+building — the task says "original sound set", and there is no sound set.
+
+Tracked as a release blocker in `CURRENT_STATE.md` and decided in DEC-027.
 
 ---
 
