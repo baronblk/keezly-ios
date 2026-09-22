@@ -484,7 +484,7 @@ App-level, on the iPad Pro 13" (M5) simulator, iOS 27.0:
 
 | Target | Result |
 |---|---|
-| `KeezlyTests` | **199 passed in 25 suites, 0 failed** |
+| `KeezlyTests` | **214 passed in 26 suites, 0 failed**, 10 s |
 | `KeezlyUITests` | **37 passed, 0 failed, 3 skipped** |
 
 The three skips are the keyboard tests, which report honestly that no hardware
