@@ -98,6 +98,18 @@ result-bundle analysis · performance measurement.
 reach, whether an animation reads as elegant, and whether the board looks right
 on a real iPad at normal viewing distance (§173).
 
+**A person's hands required, which is not the same thing (ISS-019).**
+`fastlane device_ipad` runs the app suite on the real iPad — 27 suites green on
+2026-09-22 — and then stops at a `Password:` prompt and waits on standard
+input. Nothing here will answer it. A credential is the device owner's to type:
+it is not recorded in this repository, it does not go into an environment
+variable, and no lane will be changed to accept one, because automating past a
+credential prompt is the wrong fix even on the runs where it works (§107).
+
+Somebody at the machine running the lane once, interactively, and writing down
+*which* credential the prompt belongs to is what unblocks it. Until then the
+gate is reported as ATTEMPTED, INCOMPLETE — never as a pass.
+
 ---
 
 ## Device safety rules
