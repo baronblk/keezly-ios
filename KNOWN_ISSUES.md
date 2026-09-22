@@ -298,8 +298,29 @@ anyway: a shape helps somebody using the app in bright sunlight too.
   flight.
 - **Settled cause, for the pipeline to build on:** measured on a rotated iPad,
   `app.screenshot()` returns 2064×2752 with a quarter of it black, while
-  `XCUIScreen.main.screenshot()` returns the full 2752×2064. The screenshot
-  pipeline is to be built on the **screen** capture.
+  `XCUIScreen.main.screenshot()` returned the full 2752×2064. The screenshot
+  pipeline is built on the **screen** capture.
+- **That second measurement no longer holds, and the pipeline found out.**
+  On the current toolchain `XCUIScreen.main.screenshot()` also comes back
+  2064×2752 on a rotated iPad: the whole landscape screen, complete and not
+  black anywhere, but stored in the unrotated framebuffer and so lying on its
+  side. The app really is in landscape in it — the board is centred with the
+  seat panels flanking it — and only the frame is the wrong way round. The
+  quarter-turn in `attach` was kept as a guard rather than deleted when it
+  stopped firing, which is the only reason this was a correction rather than a
+  rediscovery.
+- **And a second defect underneath it: the in-test assertion was proving
+  nothing.** `attach` asserts that a landscape capture is wider than it is
+  tall, and those assertions passed — on the `UIImage` in memory. The
+  attachment did not carry it. A whole exported set of fourteen captures came
+  out 2064×2752, every one of them, including the ones just asserted to be
+  landscape. `XCTAttachment(image:)` is now `XCTAttachment(data:)` with the
+  corrected image's own PNG bytes.
+
+  The general lesson is worth keeping: **an assertion about a capture proves
+  nothing about the capture that ships.** It is precisely why the set is
+  exported to files and checked as files, and the file check caught this within
+  a minute of first being pointed at a real set.
 - **Explicitly not the answer:** cropping a fixed black margin, or any
   correction tuned to one device's proportions. The margin is an artefact of
   the wrong capture source, not something to trim off.

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Keezly's privacy manifest.
+
+	  Short, because the app does very little: it collects nothing, tracks
+	  nothing, and has nothing to send anywhere. The two false entries below are
+	  therefore facts rather than a posture, and the collected-data array is
+	  empty because it is empty.
+
+	  The one declaration that is needed is UserDefaults, which is on Apple's
+	  required-reason list. Keezly uses it for two switches — sound and haptics
+	  — and for whether the welcome screen has been seen. That is CA92.1:
+	  information accessed by this app, stored by this app, and never read from
+	  or written to anything else.
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

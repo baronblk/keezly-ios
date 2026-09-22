@@ -53,6 +53,15 @@ final class DesignReviewScreenshots: XCTestCase {
     /// | `app.screenshot()` | 2064×2752 — portrait, and a quarter of it black |
     /// | `XCUIScreen.main.screenshot()` | 2752×2064 — landscape, complete |
     ///
+    /// **That second row no longer holds on this toolchain.** Measured again
+    /// on a rotated iPad Pro 13-inch: the screen capture now comes back
+    /// 2064×2752 as well — the whole landscape screen, complete, but stored in
+    /// the unrotated framebuffer and so lying on its side. The app really is
+    /// laid out in landscape in it; only the frame is the wrong way round.
+    ///
+    /// Which is exactly what the turn below is for, and why it was kept as a
+    /// guard rather than deleted when it stopped firing.
+    ///
     /// The application element's capture is the region of the *unrotated*
     /// framebuffer that the element claims, so on a rotated device it comes
     /// back on its side with the remainder filled in black. The screen's
@@ -87,7 +96,25 @@ final class DesignReviewScreenshots: XCTestCase {
             )
         }
 
-        let attachment = XCTAttachment(image: image)
+        // **The turned image's own PNG bytes, not the `UIImage`.**
+        //
+        // `XCTAttachment(image:)` does not carry what was handed to it here:
+        // every capture in a whole exported set came out 2064x2752 — the raw
+        // portrait framebuffer — including the ones this function had just
+        // asserted were landscape. The assertions passed, because they measure
+        // the image in memory, and the file that a reviewer or App Store
+        // Connect would actually see was the uncorrected one.
+        //
+        // That is worth stating plainly: an in-test assertion about a capture
+        // proves nothing about the capture that ships. It is the whole reason
+        // the set is now exported to files and checked as files
+        // (`scripts/screenshots-verify.py`), and the reason this line encodes
+        // the bytes itself.
+        guard let png = image.pngData() else {
+            XCTFail("\(name): the capture could not be encoded as PNG")
+            return
+        }
+        let attachment = XCTAttachment(data: png, uniformTypeIdentifier: "public.png")
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)

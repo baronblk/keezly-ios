@@ -16,8 +16,16 @@ from pathlib import Path
 
 
 def slug(name):
-    """A file name that survives a shell, a zip and App Store Connect."""
-    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
+    """The capture's own name, without what the exporter added to it.
+
+    `suggestedHumanReadableName` is the attachment's name with an index and a
+    UUID appended and `.png` on the end — "menu_0_E8FC6A10-….png". All three
+    come off: the index and the id say nothing a reader wants, and leaving the
+    extension on gave every file a name ending `.png.png`.
+    """
+    stem = re.sub(r"\.png$", "", name, flags=re.IGNORECASE)
+    stem = re.sub(r"_\d+_[0-9A-Fa-f-]{36}$", "", stem)
+    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", stem).strip("-")
     return cleaned or "capture"
 
 
