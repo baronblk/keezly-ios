@@ -299,7 +299,12 @@ Measured results and sample sizes: `AI.md`.
 - Three layouts, chosen by the space actually available rather than by size
   class: a phone stack, a short-landscape row, and a board flanked by seat
   panels where the width can hold one. The arithmetic is in `PlayLayout` and
-  is tested against every display Keezly runs on.
+  `StackedLayout`, swept by test across **every width from 320 to 1400** in
+  both orientations — Split View panes and Stage Manager windows included —
+  and it is continuous, so a resize drag never makes the board jump.
+  `scripts/pane-review.sh` renders the real views at those sizes.
+  **iPadOS's own multitasking mechanism is not exercised**: only the app's
+  response to the sizes it produces.
 - A two-seat table puts the draw pile beside the board rather than shrinking it
   past reading (DEC-021).
 - `BoardPresenter` plays events one at a time, reorders a capture behind the

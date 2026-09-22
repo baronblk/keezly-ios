@@ -57,3 +57,66 @@ struct PlayLayout {
         max(0, size.height - handHeight - Keezly.Spacing.section)
     }
 }
+
+/// How the stacked layout divides a display: the board above, the hand below.
+///
+/// The layout a phone always gets, a portrait iPad gets, and an iPad in Split
+/// View or a resized Stage Manager window gets. It has to hold at *every*
+/// width between a third of an iPad and the whole of one, not only at the
+/// handful of sizes a device list happens to name — which is what
+/// `PlayLayoutTests` sweeps.
+struct StackedLayout {
+    /// Below this a board stops being a board, whatever else is competing for
+    /// the space.
+    static let minimumBoardSide: CGFloat = 240
+    /// The range a hand card's width moves through, narrow display to wide.
+    static let compactCardWidth: CGFloat = 110
+    static let regularCardWidth: CGFloat = 150
+    /// The range its starting size moves through, before spare height is
+    /// given to it.
+    static let compactBaseCard: CGFloat = 92
+    static let regularBaseCard: CGFloat = 112
+
+    let margin: CGFloat
+    let boardSide: CGFloat
+    let cardWidth: CGFloat
+    /// What the hand's frame is given, which is narrower than the screen: a
+    /// fanned card is rotated about its foot and reaches further sideways than
+    /// the frame it sits in.
+    let handWidth: CGFloat
+
+    /// Everything here scales with the width rather than stepping at the
+    /// size-class boundary.
+    ///
+    /// It used to step, and `PlayLayoutTests` caught what that cost: at 600
+    /// points the margin jumped from 8 to 24 and the card base from 92 to 112,
+    /// so the **board shrank by 28 points as the window grew by 4**. On a
+    /// phone that boundary is never crossed and nobody would see it; under
+    /// Stage Manager a resize drags straight through it, and the board would
+    /// visibly jolt backwards mid-drag.
+    ///
+    /// Size class says which kind of device this probably is. It does not say
+    /// how much room there is, and how much room there is, is the question
+    /// (§4, §5).
+    init(size: CGSize, chromeHeight: CGFloat) {
+        // A phone wants its board near the edges; a thirteen-inch panel
+        // touching the glass looks like a mistake. Between them, in between.
+        margin = min(Keezly.Spacing.large, max(Keezly.Spacing.small, size.width * 0.022))
+        let baseCardWidth = min(Self.regularBaseCard, max(Self.compactBaseCard, size.width * 0.11))
+
+        // The board would happily take the whole width, but the chrome above
+        // and below it grows with the reader's text size. Whatever else
+        // happens, the cards stay reachable (§53).
+        boardSide = max(
+            Self.minimumBoardSide,
+            min(size.width - margin * 2, size.height - chromeHeight - baseCardWidth * 1.2)
+        )
+        let spare = max(0, size.height - boardSide - chromeHeight)
+        let cap = min(Self.regularCardWidth, max(Self.compactCardWidth, size.width * 0.145))
+        cardWidth = min(cap, max(baseCardWidth, spare / 1.95))
+        handWidth = max(0, size.width - Keezly.Spacing.section)
+    }
+
+    /// Everything the row of content occupies across, padding included.
+    var totalWidth: CGFloat { boardSide + margin * 2 }
+}

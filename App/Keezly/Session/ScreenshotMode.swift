@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import KeezlyCore
 
@@ -57,6 +58,25 @@ enum ScreenshotMode {
     /// fixture machinery and hands the record to the replay, so the screen can
     /// be looked at and captured deterministically (§87).
     static var showsReplay: Bool { arguments.contains("-KEEZLY_REPLAY") }
+
+    /// `-KEEZLY_PANE 507x1376` — draw the app into a pane of that size rather
+    /// than the whole screen.
+    ///
+    /// An iPad is not always full screen (§4). Split View hands an app a
+    /// third, a half or two thirds of the width; Stage Manager hands it
+    /// whatever the window has been dragged to. Those sizes cannot be reached
+    /// from `simctl`, and driving the dock by gesture is not reliable enough
+    /// to base a check on.
+    ///
+    /// This renders the **real views at the real pane size**, which is where
+    /// the risk is. It does not exercise iPadOS's own multitasking machinery,
+    /// and nothing here claims it does.
+    static var pane: CGSize? {
+        guard let value = value(for: "-KEEZLY_PANE") else { return nil }
+        let parts = value.split(separator: "x").compactMap { Double($0) }
+        guard parts.count == 2, parts[0] > 0, parts[1] > 0 else { return nil }
+        return CGSize(width: parts[0], height: parts[1])
+    }
 
     /// Puts the keyboard somewhere at launch.
     ///

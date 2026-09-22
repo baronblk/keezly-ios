@@ -100,6 +100,10 @@ struct RootView: View {
             }
         }
         .environment(\.boardTheme, theme)
+        // Only ever set by a deterministic run. A pane is how the app is drawn
+        // in Split View and in a resized Stage Manager window, and those sizes
+        // are otherwise unreachable from a test.
+        .modifier(PaneConstraint(size: ScreenshotMode.pane))
     }
 
     private func refreshResumable() {
@@ -174,6 +178,25 @@ struct RootView: View {
     private func leaveTutorial() {
         tutorial = nil
         refreshResumable()
+    }
+}
+
+/// Draws the app into a pane of a fixed size, centred on a dark surround, so a
+/// capture shows exactly what a Split View pane would.
+private struct PaneConstraint: ViewModifier {
+    let size: CGSize?
+
+    func body(content: Content) -> some View {
+        if let size {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                content
+                    .frame(width: size.width, height: size.height)
+                    .clipped()
+            }
+        } else {
+            content
+        }
     }
 }
 

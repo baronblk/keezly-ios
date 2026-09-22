@@ -12,7 +12,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M1 | GameCore / Rules | **DONE** |
 | M2 | Complete Move Engine | **DONE** |
 | M3 | AI (Easy / Medium / Hard) | **DONE** |
-| M4 | Gameplay UI — iPad / iPhone | DONE except Split View / Stage Manager (M4.3) |
+| M4 | Gameplay UI — iPad / iPhone | **DONE** — multitasking *mechanism* untested (M4.3) |
 | M5 | Local Multiplayer / Pass & Play | **DONE** |
 | M6 | Game Center Multiplayer | IMPLEMENTED, NOT VERIFIED (MAN-02) |
 | M7 | Tutorial / Rulebook / Accessibility | DONE — physical keyboard NOT VERIFIED (ISS-010) |
@@ -160,7 +160,7 @@ leak and watching them fail. See `AI.md`.
 | M5.2 Autosave and resume (DEC-023) | DONE — seed plus accepted actions, written atomically before the animation starts; restore revalidates every action and refuses rather than repairs. Verified across 2–6 seats, partners and free-for-all, completed and abandoned matches, corruption, a newer schema and an unknown opponent, and by terminating and relaunching the app |
 | M4.1 Design system — spacing, type, materials, motion, player identity | DONE |
 | M4.2 Board rendering from `BoardGraph` topology | DONE |
-| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | **PARTIAL** — landscape and portrait are done and tested: the layout is chosen by the space actually available rather than by size class, `PlayLayoutTests` adds the three columns up on every display Keezly runs on, four clipping defects are fixed, and a two-player table has its own presentation (DEC-021). **Split View and Stage Manager are named in this task and have never been run**, so it is not DONE |
+| M4.3 Adaptive layout — iPad landscape/portrait, Split View, Stage Manager | **DONE, except iPadOS's own multitasking mechanism** — the layout is chosen by the space available rather than by size class, and is now *continuous*: it used to step at the size-class boundary, where the board shrank 28pt as the window grew 4pt, which nobody would ever have seen on a phone and everybody would have seen mid-drag under Stage Manager. `PlayLayoutTests` sweeps **every width from 320 to 1400** in both orientations, plus every Split View pane, and asserts the row fits, the hand stays on screen and nothing steps. `scripts/pane-review.sh` renders the real views at every pane size — a third, a half, two thirds, and Stage Manager windows down to 620×520 — and all of them hold. **What has not been exercised is iPadOS's own multitasking machinery**: entering Split View, dragging a window. That is Apple's code, not Keezly's, and driving it from a script is not reliable enough to base a claim on |
 | M4.4 iPhone layout — portrait and both landscape orientations | DONE — phones get their own compact and short-landscape layouts; reviewed on the smallest, standard and largest iPhones, in both orientations, at 4 and 6 seats |
 | M4.5 Card interaction flow, Jack targeting, seven sequence builder | DONE — the planner derives every option from complete legal moves, so a Seven cannot strand the player |
 | M4.6 Event-driven animation pipeline with input locking | DONE — `BoardPresenter` plays events one at a time, reorders a capture behind the move that caused it, honours Reduce Motion, and settles on the true position on any interruption |

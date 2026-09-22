@@ -15,8 +15,7 @@ extension GameScreen {
     /// the board worth looking at. A phone in landscape is the case.
     static let shortHeightThreshold: CGFloat = 520
 
-    /// Below this a board stops being a board, whatever the text size.
-    static let minimumBoardSide: CGFloat = 240
+
 
     /// How much height the fanned hand takes below the board.
     var handHeight: CGFloat { handCardWidth * 1.45 + handCardWidth * 0.3 }
@@ -41,22 +40,11 @@ extension GameScreen {
         // gap (§45).
         // A portrait iPad reaches this layout too, and an eight-point margin
         // that suits a phone leaves a thirteen-inch board touching the glass.
-        let margin = isCompact ? Keezly.Spacing.small : Keezly.Spacing.large
-        // The board would happily take the whole width, but the chrome above
-        // and below it grows with the reader's text size — at the accessibility
-        // sizes a full-width board pushed the hand off the bottom of the
-        // screen. Whatever else happens, the cards stay reachable (§53).
-        let boardSide = max(
-            Self.minimumBoardSide,
-            min(size.width - margin * 2, size.height - chromeHeight - handCardWidth * 1.2)
-        )
-        let spare = max(0, size.height - boardSide - chromeHeight)
-        // Capped: the fan tilts its outer cards, so its drawn width is a
-        // little more than the frame it is given. Letting the cards grow to
-        // fill the height exactly pushed the outermost two off the screen.
-        // The cap is the card's own readable maximum, which is larger on the
-        // bigger screen for the same reason the board is.
-        let cardWidth = min(isCompact ? 110 : 150, max(handCardWidth, spare / 1.95))
+        // The arithmetic lives in `StackedLayout`, where a test can sweep it
+        // across every width between a third of an iPad and the whole of one
+        // rather than the handful a device list happens to name.
+        let layout = StackedLayout(size: size, chromeHeight: chromeHeight)
+        let margin = layout.margin
 
         return VStack(spacing: Keezly.Spacing.small) {
             opponentStrip
@@ -65,11 +53,7 @@ extension GameScreen {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             sevenProgress
             hintLine
-            // Narrower than the screen by more than the padding: a fanned
-            // card is rotated about its foot, so it reaches further sideways
-            // than the frame the fan is given. Two of them did so far enough
-            // to be cut off at the edges.
-            hand(availableWidth: size.width - Keezly.Spacing.section, cardWidth: cardWidth)
+            hand(availableWidth: layout.handWidth, cardWidth: layout.cardWidth)
         }
         .padding(margin)
         // Nothing inside may push the layout wider than the screen: that is
