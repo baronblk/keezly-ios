@@ -266,6 +266,41 @@ device and locale selected — Apple allows ten, the pipeline produces fourteen.
 
 ---
 
+## Xcode Cloud — CANNOT BE CREATED BY API
+
+Not a guess and not a fastlane limitation. Apple's own refusals, read today:
+
+```
+GET  /v1/ciWorkflows   403  The resource 'ciWorkflows' does not allow
+                            'GET_COLLECTION'. Allowed: CREATE, DELETE,
+                            GET_INSTANCE, UPDATE
+POST /v1/ciProducts    403  The resource 'ciProducts' does not allow 'CREATE'.
+                            Allowed: DELETE, GET_COLLECTION, GET_INSTANCE
+```
+
+So a workflow *can* be created over the API — but only against a `ciProduct`,
+and a `ciProduct` cannot be created over the API at all. The account currently
+has:
+
+| | |
+|---|---|
+| `ciProducts` | **0** |
+| `scmRepositories` | **0** |
+| `scmProviders` | 1 — GitHub Cloud, `github.com`, already authorised |
+| Repositories under that provider | **0** |
+
+The GitHub connection exists; no repository has been attached to it. Onboarding
+the product is done once, from Xcode's *Product → Xcode Cloud → Create
+Workflow*, and it grants Apple access to the repository — an authorisation in
+the owner's name, which is his to give.
+
+Once one `ciProduct` exists, the three workflows are `POST /v1/ciWorkflows` and
+can be scripted from here. Available `ciMacOsVersions` and `ciXcodeVersions`
+were read back and include *Latest Release* for both, which is what a workflow
+should pin to.
+
+---
+
 ## Outstanding
 
 | | Waiting on |
@@ -277,3 +312,4 @@ device and locale selected — Apple allows ten, the pipeline produces fourteen.
 | DSA trader status | Owner — a legal self-declaration |
 | Screenshots | Fresh matrix, then upload |
 | TestFlight | A green build |
+| Xcode Cloud | Owner — one onboarding in Xcode; the API cannot create a `ciProduct` |
