@@ -32,7 +32,10 @@ final class LaunchTests: XCTestCase {
     @MainActor
     private func launched() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026"]
+        app.launchArguments = [
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026",
+        ]
         app.launch()
         return app
     }

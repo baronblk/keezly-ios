@@ -60,6 +60,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: de.gcng.keezly
         PRODUCT_NAME: Keezly
+        # Game Center, matching the GAME_CENTER capability on the App ID.
+        CODE_SIGN_ENTITLEMENTS: App/Keezly/Keezly.entitlements
         INFOPLIST_KEY_CFBundleDisplayName: Keezly
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

@@ -13,7 +13,7 @@ final class MenuFlowTests: XCTestCase {
     @MainActor
     private func launched() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = []
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
         app.launch()
         XCTAssertTrue(
             app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),

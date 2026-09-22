@@ -14,6 +14,56 @@ enum ScreenshotMode {
     /// True when the app was launched by a test or screenshot harness.
     static var isActive: Bool { arguments.contains("-KEEZLY_UI_TESTING") }
 
+    /// `-KEEZLY_UI_TEST_RESET_STATE YES` — forget everything this device has
+    /// remembered, before the first view is built.
+    ///
+    /// **Hygiene, not a fix.** A UI test that inherits what the last one left
+    /// behind is a test whose result depends on the order it ran in, and
+    /// several of Keezly's launch with no arguments at all — taking the real
+    /// menu and the real preferences. That is a hazard whether or not it has
+    /// bitten yet.
+    ///
+    /// It has not, so far: ISS-020 looked like state leakage and was not.
+    /// `RootView` builds no `MatchStore` under `-KEEZLY_UI_TESTING`, so a
+    /// saved match cannot cross from one test to the next, and the real cause
+    /// was a test tapping a Seven's leg target and waiting for a turn that had
+    /// deliberately not ended. This flag must not be recorded as having solved
+    /// that.
+    ///
+    /// Deliberately **not** gated on `isActive` as well. The tests that most
+    /// need isolating are the ones that launch with no arguments at all, to
+    /// drive the real menu and the real preferences — and `-KEEZLY_UI_TESTING`
+    /// sends the app straight to a board instead, which is the opposite of
+    /// what those tests are for. Requiring both would have left exactly the
+    /// tests that inherit state unable to ask not to.
+    ///
+    /// One argument is enough to be safe. A launch argument can only be set by
+    /// whatever starts the process — Xcode, a test runner, `simctl launch` —
+    /// and never by somebody tapping the icon. The value must be `YES` rather
+    /// than merely present, so a stray flag does nothing.
+    static var resetsState: Bool {
+        value(for: "-KEEZLY_UI_TEST_RESET_STATE") == "YES"
+    }
+
+    /// Clears what the app remembers between launches.
+    ///
+    /// Called before the root view is built, so nothing has read a stale value
+    /// yet. Does nothing at all unless `resetsState` is true, which needs a
+    /// launch argument no shipping build is ever given.
+    static func resetStateIfRequested() {
+        guard resetsState else { return }
+
+        // The two switches and the newcomer flag. Removed rather than set to a
+        // default, so `object(forKey:)` sees nothing and the app's own
+        // first-run defaults apply — which is what a fresh device looks like.
+        for key in ["keezly.sound", "keezly.haptics", "keezly.hasPlayed"] {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+
+        // Saved matches. A test that wants one creates it itself.
+        try? FileManager.default.removeItem(at: MatchStore.defaultDirectory)
+    }
+
     /// Seat count to open with. Defaults to four.
     static var seatCount: Int {
         value(for: "-KEEZLY_SEATS").flatMap(Int.init).map { max(2, min(6, $0)) } ?? 4

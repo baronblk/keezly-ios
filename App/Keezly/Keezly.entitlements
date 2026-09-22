@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Game Center, and nothing else.
+
+	  Keezly's online mode is `GKTurnBasedMatch` (see
+	  `App/Keezly/Online/GameCenterTransport.swift`), so this entitlement is
+	  used rather than aspirational. The App ID `de.gcng.keezly` carries the
+	  matching GAME_CENTER capability; the two have to agree or the build will
+	  not sign.
+
+	  Apple enables IN_APP_PURCHASE on every new App ID by default. It is left
+	  alone rather than declared here: Keezly sells nothing, no entitlement is
+	  needed for it, and removing it from the App ID would be a decision about
+	  pricing that has not been made.
+	-->
+	<key>com.apple.developer.game-center</key>
+	<true/>
+</dict>
+</plist>

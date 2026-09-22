@@ -205,6 +205,7 @@
 		C9494E3CF894AD64E24FE743 /* Lesson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lesson.swift; sourceTree = "<group>"; };
 		D25DE09C56A41F2B65DA5AD9 /* BoardOrnament.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardOrnament.swift; sourceTree = "<group>"; };
 		D3CE07784ADA861E27350246 /* FeedbackCue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackCue.swift; sourceTree = "<group>"; };
+		D5291C91F0A156E6B060032D /* Keezly.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keezly.entitlements; sourceTree = "<group>"; };
 		DE90F226F2E9B13AD7C2CB6F /* PlayFocus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFocus.swift; sourceTree = "<group>"; };
 		DF356FE7E26FFF8D6ADC49CD /* PawnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnView.swift; sourceTree = "<group>"; };
 		E336B27DD79B71BBB763188D /* GameCenterAuthenticationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterAuthenticationTests.swift; sourceTree = "<group>"; };
@@ -496,6 +497,7 @@
 				BF3D513E665BBBEB054AFC07 /* Tutorial */,
 				6ED8C1FD416E628043CC4D29 /* Assets.xcassets */,
 				F01639F69FA03230480F3F8B /* Info.plist */,
+				D5291C91F0A156E6B060032D /* Keezly.entitlements */,
 				8E72B2E4642A6BD4C11A860F /* KeezlyApp.swift */,
 				A7AD9526A6D73BF8D94109D3 /* Localizable.xcstrings */,
 				6E50404D8D3EA77B84451510 /* PrivacyInfo.xcprivacy */,
@@ -790,6 +792,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/Keezly/Keezly.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Keezly/Info.plist;
@@ -929,6 +932,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/Keezly/Keezly.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Keezly/Info.plist;

@@ -33,6 +33,11 @@ struct RootView: View {
     private let store: MatchStore?
 
     init() {
+        // Before anything reads a preference or lists a match. Does nothing
+        // unless the app was launched with `-KEEZLY_UI_TEST_RESET_STATE YES`,
+        // which no shipping build ever is.
+        ScreenshotMode.resetStateIfRequested()
+
         // A deterministic run keeps its matches out of the real store: a test
         // must not overwrite a player's saved game, and its own matches must
         // not turn up in the list.

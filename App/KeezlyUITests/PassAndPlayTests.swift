@@ -25,6 +25,7 @@ final class PassAndPlayTests: XCTestCase {
     private func launchedPassAndPlay(seats: Int = 3, seed: Int = 2026) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
             "-KEEZLY_UI_TESTING",
             "-KEEZLY_SEATS", String(seats),
             "-KEEZLY_HUMANS", String(seats),
@@ -82,8 +83,22 @@ final class PassAndPlayTests: XCTestCase {
         var played = false
         for card in cards(in: app) {
             card.tap()
+            // **Not `target.leg.`.** `BoardView` labels a Seven's partial
+            // legs `target.leg.<id>` and everything else `target.<id>`, so a
+            // plain BEGINSWITH match catches both — and tapping a leg commits
+            // one step of a split and deliberately leaves the turn open. This
+            // test then waited twenty seconds for a handover that was never
+            // coming.
+            //
+            // It failed only sometimes because it plays the first card that
+            // offers anything, and whether that card is the Seven depends on
+            // the position. The evidence was in the failure's own UI dump: a
+            // full five-card hand still holding `hand.card.7.39`, every pawn
+            // still where it started, and no cover (ISS-020).
             let targets = app.descendants(matching: .any)
-                .matching(NSPredicate(format: "identifier BEGINSWITH 'target.'"))
+                .matching(NSPredicate(
+                    format: "identifier BEGINSWITH 'target.' AND NOT identifier BEGINSWITH 'target.leg.'"
+                ))
             if let target = targets.allElementsBoundByIndex.first {
                 target.tap()
                 played = true
@@ -112,7 +127,10 @@ final class PassAndPlayTests: XCTestCase {
     @MainActor
     func testASoloTableNeverCoversTheBoard() {
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026"]
+        app.launchArguments = [
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026",
+        ]
         app.launch()
 
         let hand = app.descendants(matching: .any)
@@ -149,7 +167,7 @@ final class PassAndPlayResumeTests: XCTestCase {
     @MainActor
     private func startAndAbandon() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = []
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
         app.launch()
         XCTAssertTrue(
             app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),
@@ -178,6 +196,11 @@ final class PassAndPlayResumeTests: XCTestCase {
         let app = startAndAbandon()
         app.terminate()
 
+        // **No reset on this launch.** The first one cleared the device, this
+        // test then created a match on purpose, and the whole question is
+        // whether that match comes back covered. Resetting here would delete
+        // the thing under test and the assertion below would be measuring an
+        // empty menu.
         app.launchArguments = []
         app.launch()
 
@@ -198,6 +221,11 @@ final class PassAndPlayResumeTests: XCTestCase {
         let app = startAndAbandon()
         app.terminate()
 
+        // **No reset on this launch.** The first one cleared the device, this
+        // test then created a match on purpose, and the whole question is
+        // whether that match comes back covered. Resetting here would delete
+        // the thing under test and the assertion below would be measuring an
+        // empty menu.
         app.launchArguments = []
         app.launch()
         let resume = app.descendants(matching: .any)["menu.continue"]

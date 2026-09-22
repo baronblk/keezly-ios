@@ -18,6 +18,24 @@ final class DesignReviewScreenshots: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// Puts the device back the way it was found.
+    ///
+    /// `XCUIDevice.shared.orientation` is **global to the test run**, not to
+    /// the test that set it, and this suite rotates for most of its captures.
+    /// Leaving it rotated hands whatever runs next a device on its side — and
+    /// on a small phone that is not a cosmetic difference, it is a different
+    /// layout with the hand beside the board rather than beneath it.
+    ///
+    /// This is not known to cause ISS-020; running a landscape capture
+    /// immediately before the test that fails does not reproduce it. It is
+    /// here because a suite that leaves global state behind is wrong whether
+    /// or not it is today's culprit, and because ruling it out cost a run that
+    /// this would have made unnecessary.
+    override func tearDown() {
+        XCUIDevice.shared.orientation = .portrait
+        super.tearDown()
+    }
+
     // MARK: - Harness
 
     @MainActor
@@ -29,6 +47,7 @@ final class DesignReviewScreenshots: XCTestCase {
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
             "-KEEZLY_UI_TESTING",
             "-KEEZLY_SEATS", String(seats),
             "-KEEZLY_SEED", String(seed),
@@ -315,7 +334,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testMenu() {
         let name = "menu"
         let app = XCUIApplication()
-        app.launchArguments = []
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
         XCUIDevice.shared.orientation = .landscapeLeft
         app.launch()
         XCTAssertTrue(
