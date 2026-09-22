@@ -20,7 +20,7 @@
 # not be uploadable by accident. See fastlane/metadata/BLOCKED.md.
 set -uo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 ROOT="fastlane/metadata"
 LOCALES=(de-DE nl-NL en-US)
 failures=0
@@ -74,9 +74,7 @@ for locale in "${LOCALES[@]}"; do
 done
 
 echo "Fields that are somebody else's to supply:"
-for file in "$ROOT/copyright.txt"; do
-  [ -f "$file" ] || fail "$(basename "$file") is missing — see $ROOT/BLOCKED.md (MAN-13)"
-done
+[ -f "$ROOT/copyright.txt" ] || fail "copyright.txt is missing — see $ROOT/BLOCKED.md (MAN-13)"
 for locale in "${LOCALES[@]}"; do
   for name in support_url privacy_url; do
     [ -f "$ROOT/$locale/$name.txt" ] || fail "$locale/$name.txt is missing — see $ROOT/BLOCKED.md (MAN-13)"
