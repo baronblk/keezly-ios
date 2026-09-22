@@ -183,6 +183,30 @@ platform :ios do
     device_ipad
   end
 
+  desc "The App Store screenshot set: every locale, both devices, written to disk"
+  lane :screenshots do
+    # Delegated to the script rather than reimplemented here, because the
+    # capture set is also run on its own during design work and two copies of
+    # the locale matrix would drift.
+    Dir.chdir(REPO_ROOT) do
+      sh("./scripts/screenshots.sh #{File.join(ARTIFACTS, "screenshots")}")
+    end
+    UI.success("screenshots written to artifacts/screenshots and verified")
+  end
+
+  desc "Check an existing screenshot set without re-capturing it"
+  lane :screenshots_verify do
+    directory = File.join(ARTIFACTS, "screenshots")
+    UI.user_error!("No screenshot set at #{directory} — run the screenshots lane first") \
+      unless Dir.exist?(directory)
+
+    Dir.chdir(REPO_ROOT) do
+      sh("python3 scripts/screenshots-verify.py #{directory}")
+    end
+    UI.success("screenshot set passed the mechanical gate")
+    UI.important("Whether they sell the app is a judgement no lane makes.")
+  end
+
   desc "Static checks: SwiftLint and SwiftFormat"
   lane :lint do
     Dir.chdir(REPO_ROOT) do
@@ -238,6 +262,17 @@ platform :ios do
     # App icon must be a real icon, not an empty slot.
     icon_dir = File.join(REPO_ROOT, "App/Keezly/Assets.xcassets/AppIcon.appiconset")
     results["App icon present"] = !Dir.glob(File.join(icon_dir, "*.png")).empty?
+
+    # Screenshots. Reported as its own gate rather than folded into the others,
+    # and absent is absent — a release check that passed with no screenshots at
+    # all would be telling a useful lie.
+    shots = File.join(ARTIFACTS, "screenshots")
+    if Dir.exist?(shots) && !Dir.glob(File.join(shots, "**", "*.png")).empty?
+      results["Screenshots verified"] = system("cd #{REPO_ROOT} && python3 scripts/screenshots-verify.py #{shots}")
+    else
+      results["Screenshots verified"] = false
+      UI.error("No screenshot set at #{shots} — run the screenshots lane")
+    end
 
     # Static checks. --strict turns SwiftLint warnings into failures, which is
     # the right bar for a release candidate even though it is not for a work
