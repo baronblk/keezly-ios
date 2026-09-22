@@ -11,6 +11,21 @@
 #   2. Lanes do not duplicate Xcode Cloud. There is no archive lane and no
 #      TestFlight upload lane (§85, DEC-008).
 
+# fastlane reads and re-encodes its own output, and it cannot do that when the
+# shell has no UTF-8 locale: `ui_tests` crashed with
+#
+#   scan/error_handler.rb: 'Regexp#===': invalid byte sequence in US-ASCII
+#   shell.rb: 'String#encode': "\xE2\x9A" on UTF-16
+#
+# which reads like a test failure and is not — it is fastlane failing to print.
+# A build machine with an empty LANG is normal, so the lanes set one rather
+# than depending on whoever starts them. It affects fastlane's own output only;
+# nothing in the app or the tests reads it.
+ENV["LANG"] ||= "en_US.UTF-8"
+ENV["LC_ALL"] ||= "en_US.UTF-8"
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = nil
+
 default_platform(:ios)
 
 REPO_ROOT   = File.expand_path("..", __dir__)
