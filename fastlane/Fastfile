@@ -219,7 +219,9 @@ platform :ios do
   desc "The whole local quality gate"
   lane :qa do
     lint
-    run_core_tests
+    # No `run_core_tests` here: the `tests` lane below starts with it, and
+    # running it twice cost this lane 150 seconds every time — measured, both
+    # runs in the same log, 147.9 s and 149.2 s.
     build_app(
       project: PROJECT, scheme: SCHEME,
       destination: "generic/platform=iOS Simulator",
