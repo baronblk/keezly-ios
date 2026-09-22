@@ -1,0 +1,3 @@
+Die erste Version.
+
+Zwei bis sechs Spieler, im Team oder jeder für sich, auf einem Gerät oder gegen drei Computerstärken. Jede Hausregel ist ein Schalter. Tutorial, Regelbuch, Wiedergabe und Statistik. Deutsch, Niederländisch und Englisch, und durchgehend vollständige VoiceOver-Unterstützung.
