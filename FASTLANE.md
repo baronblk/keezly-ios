@@ -1,14 +1,22 @@
 # Keezly — fastlane
 
-**Status: SET UP.** fastlane 2.240.1 runs through Bundler. The test, QA and
-device lanes work; the screenshot lanes arrive with M11.4/M11.5.
+**Status: RUN.** fastlane 2.240.1 runs through Bundler, and the lanes below
+are recorded with what happened when they were actually executed rather than
+with what they are expected to do.
 
 ## Toolchain
 
-Ruby is pinned to **4.0.5** in `.tool-versions` and `.ruby-version`, which
-`mise`, `asdf` and `rbenv` all read. A version manager is *not* required:
-Homebrew's `ruby` provides exactly that version. fastlane's own version is
-fixed by the committed `Gemfile.lock` (DEC-012).
+Ruby is pinned to **3.4.10** in `.tool-versions` and `.ruby-version`, which
+`mise`, `asdf` and `rbenv` all read. fastlane's own version is fixed by the
+committed `Gemfile.lock` (DEC-012).
+
+It was pinned to 4.0.5, and on 4.0.5 **not one lane runs**: fastlane 2.240
+raises a `NameError` inside its own CLI dispatcher before it reaches a
+lane. The pin had been chosen because Homebrew's `ruby` happened to provide
+that version, and the documentation said the lanes worked — which nobody had
+checked, because checking it would have produced that error immediately.
+Raise the pin when fastlane supports the next Ruby, not when a package
+manager does.
 
 First time on a machine:
 

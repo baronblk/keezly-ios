@@ -578,6 +578,7 @@ one passed a review that was looking at the wrong thing:
 | MAN-10 | Pair a physical iPad | **DONE & VERIFIED** — iPad (A16), iOS 27.0, gate green 2026-09-20 |
 | MAN-11 | Second Apple Account in Game Center | OPEN |
 | MAN-12 | Second physical device for Game Center tests | OPEN |
+| MAN-13 | Copyright holder's name, support URL and privacy URL for the store listing | OPEN — the text metadata is written and checked; these three are facts about a person and a domain, and `fastlane/metadata/BLOCKED.md` says why guessing one is worse than leaving it blank |
 
 MAN-02 blocks TestFlight, Game Center configuration and Xcode Cloud. It blocks
 none of the work queued next.

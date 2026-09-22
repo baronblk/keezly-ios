@@ -75,11 +75,11 @@ done
 
 echo "Fields that are somebody else's to supply:"
 for file in "$ROOT/copyright.txt"; do
-  [ -f "$file" ] || fail "$(basename "$file") is missing — see $ROOT/BLOCKED.md (MAN-04)"
+  [ -f "$file" ] || fail "$(basename "$file") is missing — see $ROOT/BLOCKED.md (MAN-13)"
 done
 for locale in "${LOCALES[@]}"; do
   for name in support_url privacy_url; do
-    [ -f "$ROOT/$locale/$name.txt" ] || fail "$locale/$name.txt is missing — see $ROOT/BLOCKED.md (MAN-04)"
+    [ -f "$ROOT/$locale/$name.txt" ] || fail "$locale/$name.txt is missing — see $ROOT/BLOCKED.md (MAN-13)"
   done
 done
 

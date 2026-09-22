@@ -28,7 +28,7 @@ Three claims are therefore forbidden, and each has a reason:
 They are real addresses that must exist and be reachable, and guessing one is
 worse than leaving it blank — a dead support link is a rejection and a wrong
 privacy link is a legal problem. They are tracked as an external blocker
-(MAN-04 in ROADMAP.md) and must be filled in by the person who owns the domain.
+(MAN-13 in CURRENT_STATE.md) and must be filled in by the person who owns the domain.
 
 ## Limits App Store Connect enforces
 

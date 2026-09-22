@@ -2,7 +2,7 @@
 
 Each of these is a real-world fact about a person or a domain, not a decision
 about the app, and guessing one is worse than leaving it empty. They are
-external blockers (MAN-04), and `scripts/metadata-check.sh` fails while any of
+external blockers (MAN-13), and `scripts/metadata-check.sh` fails while any of
 them is missing — so the set cannot be uploaded half-finished by accident.
 
 | File | Why it is not here |

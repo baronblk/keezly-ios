@@ -1,6 +1,11 @@
 # Ruby version for the fastlane toolchain. Read by mise, asdf and rbenv.
 #
-# Homebrew's `ruby` formula currently provides exactly this version, so no
-# version manager is strictly required on a developer machine — see FASTLANE.md.
-# What matters is that everyone and every CI image agrees on one version.
-ruby 4.0.5
+# 3.4 because fastlane 2.240 does not run on Ruby 4: it raises a NameError
+# inside its own CLI dispatcher before any lane is reached, so a machine
+# following the previous pin could not run a single lane. Verified here rather
+# than assumed — `bundle exec fastlane lint` runs on this version and does not
+# on 4.0.5.
+#
+# What matters beyond that is only that everyone and every CI image agrees on
+# one version. Raise it when fastlane supports the next one, not before.
+ruby 3.4.10
