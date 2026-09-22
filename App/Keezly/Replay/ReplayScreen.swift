@@ -48,11 +48,13 @@ struct ReplayScreen: View {
                             if layout.centrePlacement == .inside {
                                 GeometryReader { board in
                                     let side = min(board.size.width, board.size.height)
+                                    let fit = BoardCentreView.fitted(in: layout, boardSide: side)
                                     BoardCentreView(
                                         state: replay.state,
                                         roles: replay.roles,
                                         isReplay: true,
-                                        width: side * 0.26
+                                        width: fit.width,
+                                        content: fit.content
                                     )
                                     .position(x: board.size.width / 2, y: board.size.height / 2)
                                 }

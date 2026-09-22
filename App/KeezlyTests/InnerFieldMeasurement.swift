@@ -65,6 +65,17 @@ struct InnerFieldTests {
         #expect(BoardLayout.centrePlacement(innerFieldRadius: 4.90, pitch: 1) == .inside)
     }
 
+    @Test("what sits in the middle is measured against the middle", arguments: 2...6)
+    func centreWidthIsMeasuredAgainstTheField(seats: Int) {
+        let layout = layout(seats: seats)
+        let fraction = layout.centreWidthFraction(aspect: 1.95)
+        let diameter = layout.innerFieldRadius * 2 / layout.contentBounds.width
+        #expect(fraction > 0)
+        // The block is nearly twice as tall as it is wide, so its diagonal is
+        // what has to fit: it may never be as wide as the field it sits in.
+        #expect(fraction < diameter, "seats \(seats): \(fraction) of \(diameter)")
+    }
+
     @Test("a degenerate layout is not asked to hold anything")
     func degenerateLayoutIsHandled() {
         #expect(BoardLayout.centrePlacement(innerFieldRadius: 0, pitch: 0) == .beside)

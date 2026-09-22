@@ -82,8 +82,8 @@ struct BoardLayout: Sendable {
     /// The home lanes are four squares long whatever the table size, but the
     /// track is sixteen squares *per seat*. On a two-seat board the lanes
     /// therefore reach almost to the middle — measured, the quiet field is
-    /// **0.28 of a square pitch**, against 2.4 at three seats and 4.6 at four.
-    /// There is no middle to put anything in.
+    /// **1.2 square pitches**, against 2.7 at three seats and 4.9 at four.
+    /// There is not enough middle to put a draw pile in.
     ///
     /// So a two-player table is presented differently: the cards sit beside
     /// the board, the way a deck sits on the table next to a small board,
@@ -101,6 +101,34 @@ struct BoardLayout: Sendable {
         // across the home lanes.
         return innerFieldRadius / pitch >= 1.5 ? .inside : .beside
     }
+
+    /// How wide something laid out in the quiet middle may be, as a fraction
+    /// of the extent a view scales to fit.
+    ///
+    /// `aspect` is the content's height over its width. What has to fit inside
+    /// a round field is the content's **diagonal**, not its width, which is
+    /// why a block twice as tall as it is wide gets less than half the
+    /// diameter.
+    ///
+    /// Measured against `contentBounds` because that is what a view fits —
+    /// and that is the whole point of having this. The middle content used to
+    /// be sized as a fixed fraction of the view, which was the same thing
+    /// while `contentBounds` was the playing squares. It stopped being the
+    /// same thing the moment the bounds grew to include the panel, its shadow
+    /// and the air around it: the board got smaller inside its frame and the
+    /// draw pile did not, so the pile ended up about a fifth too large and
+    /// the round label sat out on the home lanes.
+    func centreWidthFraction(aspect: CGFloat) -> CGFloat {
+        guard contentBounds.width > 0, aspect > 0 else { return 0 }
+        let diameter = innerFieldRadius * 2 / contentBounds.width
+        return diameter * Self.centreClearance / hypot(1, aspect)
+    }
+
+    /// How close the middle content may come to the first home square.
+    ///
+    /// Not touching it. A draw pile whose corner meets a home square reads as
+    /// a collision even when it is geometrically clear.
+    static let centreClearance: CGFloat = 0.94
 
     /// How much of the board is quiet middle, as a fraction of its whole
     /// extent.

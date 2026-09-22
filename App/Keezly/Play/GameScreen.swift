@@ -87,28 +87,11 @@ struct GameScreen: View {
     var shortHandCardWidth: CGFloat { 74 }
     var layout: BoardLayout { BoardLayout(board: session.state.board) }
 
-    /// How big the cards in the middle may be, as a fraction of the board.
-    ///
-    /// Proportioned to the board's quiet middle rather than to the view. A
-    /// fixed fraction suits the classic four-player board and is far too much
-    /// for two seats, where the home lanes run almost to the centre and the
-    /// draw pile ends up sitting across them (ISS-008). Never larger than the
-    /// four-player value, so the board it was designed on is unchanged.
-    var centreScale: CGFloat {
-        let reference = BoardLayout.classicInnerFieldFraction
-        guard reference > 0 else { return Self.classicCentreScale }
-        let scaled = Self.classicCentreScale * layout.innerFieldFraction / reference
-        // Floored as well as capped. Two seats leave so little middle that the
-        // honest proportion would shrink the draw pile past reading, and an
-        // illegible count is worse than a crowded one (ISS-013).
-        return min(Self.classicCentreScale, max(Self.minimumCentreScale, scaled))
-    }
-
     /// The table's own cards, when the board has no middle to hold them.
     ///
     /// Only a two-seat board reaches this: there the home lanes run almost to
-    /// the centre, leaving a quiet field of about a quarter of one square
-    /// (ISS-013). The same information is shown as a tray beside the board —
+    /// the centre, leaving a quiet field of a little over one square pitch —
+    /// not the three a pile and a played card need (ISS-013). The same information is shown as a tray beside the board —
     /// a deck on the table next to a small board — rather than shrunk past
     /// reading. The board and the rules are identical either way.
     @ViewBuilder
@@ -135,11 +118,6 @@ struct GameScreen: View {
             .accessibilityIdentifier("table.tray")
         }
     }
-
-    /// The share of the board the middle takes on a four-player table.
-    static let classicCentreScale: CGFloat = 0.26
-    /// Below this the cards in the middle stop being readable.
-    static let minimumCentreScale: CGFloat = 0.19
 
     /// Whether the device is waiting to be handed to somebody else.
     ///

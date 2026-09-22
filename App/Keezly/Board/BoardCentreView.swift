@@ -24,12 +24,97 @@ struct BoardCentreView: View {
     /// information is shown as a tray next to the board — the way a deck sits
     /// on the table beside a small board rather than on it.
     var axis: Axis = .vertical
+    /// Which of the three things this instance is drawing.
+    var content: Content = .full
+
+    /// What the middle is carrying.
+    ///
+    /// Two of the three things here are text, and text has a floor: below
+    /// about eleven points nobody can read it, so it stops shrinking with the
+    /// board. On a phone the board's middle is around a hundred points across
+    /// and the designed sizes — seven hundredths and five hundredths of that —
+    /// come out at seven and five. Both hit the floor, and the turn pill ends
+    /// up half again as large as it was drawn to be, sitting across a board
+    /// that has no room for it (ISS-013).
+    ///
+    /// The cards have no such floor: they are shapes, and a thirty-point card
+    /// back still reads as a stack of cards. So on a small board the middle
+    /// keeps the piles and the two labels move out to a line beneath it, where
+    /// they can be legible without being on top of anything.
+    enum Content {
+        /// The piles, the turn and the round: a board with room for all three.
+        case full
+        /// The piles alone, for a board whose middle cannot carry text.
+        case piles
+        /// The turn and the round, for the line beneath such a board.
+        case labels
+
+        /// How tall this block is against its own width, near enough to size
+        /// it against the board's quiet middle.
+        ///
+        /// Measured off the layout rather than guessed: the piles are `0.3`
+        /// wide and `1.45` tall each, the spacings are `0.11`, and the two
+        /// text lines come to about `0.22` between them.
+        var aspect: CGFloat {
+            switch self {
+            case .full: 0.88
+            case .piles: 0.60
+            case .labels: 0.16
+            }
+        }
+    }
+
+    // MARK: - Fitting
+
+    /// The share of the board a four-player middle takes. The reference the
+    /// rest is measured against, and never exceeded.
+    static let classicScale: CGFloat = 0.26
+    /// Below this the draw pile's count stops being readable, and an illegible
+    /// count is worse than a crowded middle (ISS-013).
+    static let minimumScale: CGFloat = 0.19
+    /// `TurnIndicator`'s designed size, as a fraction of the middle's width.
+    static let turnTextFraction: CGFloat = 0.07
+    /// The size below which it stops shrinking, because nobody could read it.
+    static let legibleText: CGFloat = 11
+    /// The width the labels are drawn at once they have left the board.
+    ///
+    /// Chosen so the turn label lands exactly on its floor: off the board
+    /// there is no reason to make it smaller, and none to make it larger than
+    /// the middle would have.
+    static let detachedWidth: CGFloat = legibleText / turnTextFraction
+
+    /// What a board of this size can carry in its middle, and how wide.
+    ///
+    /// One answer, given in one place, because the playing screen and the
+    /// replay screen both draw this and a hard-coded fraction in the second of
+    /// them is how the two drift apart.
+    static func fitted(in layout: BoardLayout, boardSide: CGFloat) -> (content: Content, width: CGFloat) {
+        func width(_ content: Content) -> CGFloat {
+            let byField = layout.centreWidthFraction(aspect: content.aspect)
+            return boardSide * min(classicScale, max(minimumScale, byField))
+        }
+        // Decided on what the full block would be given, so the answer does
+        // not depend on itself.
+        let content: Content = width(.full) * turnTextFraction >= legibleText ? .full : .piles
+        return (content, width(content))
+    }
 
     private var identity: PlayerIdentity { PlayerIdentity.identity(for: state.currentSeat) }
 
     var body: some View {
         Group {
-            if axis == .vertical {
+            if content == .piles {
+                piles
+            } else if content == .labels {
+                // Beneath the board rather than on it, so the two can be read
+                // at a readable size without covering the playing surface —
+                // and side by side rather than stacked, because height is
+                // exactly what is short on the boards that need this.
+                HStack(spacing: width * 0.12) {
+                    turn
+                    round
+                }
+            } else if axis == .vertical {
                 // Enough air that the cards, the turn and the round read as
                 // three things rather than one block — but not so much that
                 // they stop reading as one *group*. The first attempt at this
@@ -75,7 +160,8 @@ struct BoardCentreView: View {
             }(),
             finished: state.result != nil,
             isReplay: isReplay,
-            width: width
+            width: width,
+            onBoard: content != .labels
         )
     }
 
@@ -84,12 +170,18 @@ struct BoardCentreView: View {
             // The quietest thing in the middle. It answers a question nobody
             // asks mid-turn, so it recedes until looked for.
             .font(.system(size: max(9, width * 0.05) * captionScale, weight: .medium, design: .rounded))
-            .opacity(0.72)
+            .opacity(content == .labels ? 1 : 0.72)
             // Wraps rather than truncates at large text sizes. Half a sentence
             // tells the reader nothing (§53).
-            .multilineTextAlignment(axis == .vertical ? .center : .leading)
+            .multilineTextAlignment(axis == .vertical && content != .labels ? .center : .leading)
             .fixedSize(horizontal: false, vertical: true)
-            .foregroundStyle(Keezly.Palette.secondaryText)
+            // Off the board the wood is not behind it. The ink chosen to be
+            // quiet on a light surface is all but invisible on the dark table,
+            // which is how the round label came to be shipped unreadable for
+            // exactly as long as nobody zoomed in on a capture.
+            .foregroundStyle(content == .labels
+                ? AnyShapeStyle(Color.white.opacity(0.7))
+                : AnyShapeStyle(Keezly.Palette.secondaryText))
     }
 }
 
@@ -156,6 +248,8 @@ private struct TurnIndicator: View {
     let finished: Bool
     var isReplay = false
     let width: CGFloat
+    /// Whether the board's own wood is behind this, or the dark table is.
+    var onBoard = true
 
     /// Whose turn it is, in the tense that applies.
     private var label: LocalizedStringKey {
@@ -175,12 +269,16 @@ private struct TurnIndicator: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .fixedSize(horizontal: true, vertical: false)
-                .foregroundStyle(Keezly.Palette.primaryText)
+                .foregroundStyle(onBoard
+                    ? AnyShapeStyle(Keezly.Palette.primaryText)
+                    : AnyShapeStyle(Color.white))
         }
         .padding(.horizontal, width * 0.08)
         .padding(.vertical, width * 0.04)
+        // A sixth of the seat's colour is enough to read as that player on the
+        // board's light wood, and nowhere near enough on the dark table.
         .background(
-            Capsule().fill(identity.color.opacity(0.16))
+            Capsule().fill(identity.color.opacity(onBoard ? 0.16 : 0.34))
         )
         .accessibilityElement(children: .combine)
     }

@@ -46,13 +46,27 @@ extension GameScreen {
 
         return VStack(spacing: Keezly.Spacing.small) {
             opponentStrip
+            // The slack goes here, in one piece, rather than being split above
+            // and below the board by a greedy frame. A phone screen is taller
+            // than a square board and a hand need, and the spare height is
+            // better spent lifting the board away from the opponents than
+            // opening gaps inside the group the board belongs to — the hand
+            // stays where a thumb is (§5, §53).
+            //
+            // Above the tray rather than below it: on a two-seat table the
+            // tray *is* the board's middle, moved outside because there is no
+            // room for it inside (ISS-013). A gap between the two would read
+            // as a second, smaller board sitting above the real one.
+            Spacer(minLength: 0)
             tableTray(axis: .horizontal)
             board
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: layout.boardSide, maxHeight: layout.boardSide)
+            boardStatus(boardSide: layout.boardSide)
             sevenProgress
             hintLine
             hand(availableWidth: layout.handWidth, cardWidth: layout.cardWidth)
         }
+        .frame(maxHeight: .infinity)
         .padding(margin)
         // Nothing inside may push the layout wider than the screen: that is
         // what clipped the board on a six-player phone table.
@@ -75,6 +89,7 @@ extension GameScreen {
                 opponentStrip
                 tableTray(axis: .horizontal)
                 Spacer(minLength: 0)
+                boardStatus(boardSide: boardSide)
                 sevenProgress
                 hand(availableWidth: sideWidth)
                 Spacer(minLength: 0)
@@ -110,6 +125,7 @@ extension GameScreen {
 
             VStack(spacing: Keezly.Spacing.medium) {
                 board.frame(maxHeight: .infinity)
+                boardStatus(boardSide: boardSide)
                 sevenProgress
                 hintLine
                 hand(availableWidth: boardSide)
@@ -155,6 +171,27 @@ extension GameScreen {
         }
         .frame(maxWidth: .infinity)
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// Whose turn it is and which round, for a board too small to say so
+    /// itself.
+    ///
+    /// Empty whenever the middle is carrying them, which is every board from
+    /// about a tablet upwards. It sits directly under the board rather than in
+    /// a bar of its own: it is the same information in the same reading order,
+    /// moved down by however much it takes to stop covering the pieces.
+    @ViewBuilder
+    func boardStatus(boardSide: CGFloat) -> some View {
+        let fit = BoardCentreView.fitted(in: layout, boardSide: boardSide)
+        if layout.centrePlacement == .inside, fit.content == .piles {
+            BoardCentreView(
+                state: session.state,
+                roles: session.roles,
+                width: BoardCentreView.detachedWidth,
+                content: .labels
+            )
+            .accessibilityIdentifier("board.status")
+        }
     }
 
     @ViewBuilder
@@ -332,10 +369,12 @@ extension GameScreen {
             if layout.centrePlacement == .inside {
                 GeometryReader { proxy in
                     let side = min(proxy.size.width, proxy.size.height)
+                    let fit = BoardCentreView.fitted(in: layout, boardSide: side)
                     BoardCentreView(
                         state: session.state,
                         roles: session.roles,
-                        width: side * centreScale
+                        width: fit.width,
+                        content: fit.content
                     )
                     .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                 }
