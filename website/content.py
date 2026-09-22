@@ -4,9 +4,11 @@
 Kept apart from the templating so that a claim can be checked by reading it
 rather than by reading HTML. Two rules govern what may go in here:
 
-1. **Only what the app does.** Keezly 1.0.0 is a local game with an optional
-   Game Center turn-based mode. There is no account, no advertising, no
-   tracking and no server of ours. Nothing here may say otherwise.
+1. **Only what the app does.** Keezly 1.0.0 is a local game with optional
+   Game Center achievements. There is no online play in 1.0.0 — the turn-based
+   transport is written and tested but is not reachable from the interface, so
+   nothing here may promise it. There is no account, no advertising, no
+   tracking and no server of ours.
 2. **Nothing about anti-cheat, leaderboards or server-authorised play.** There
    is no server that could make any of it true (DEC-025), and a fairness claim
    the software cannot keep is worse than no claim at all.
@@ -98,8 +100,8 @@ T["de"] = {
              "Jede beendete Partie wird gespeichert und lässt sich Zug für Zug "
              "wiedergeben. Die Statistik wird aus diesen Partien berechnet."),
             ("Game Center",
-             "Optional und freundschaftlich: eine rundenbasierte Partie über Apples "
-             "Game Center, wenn Sie mögen. Ohne Anmeldung spielt Keezly genauso."),
+             "Zehn Erfolge, an Apples Game Center gemeldet, wenn Sie mögen. Ohne "
+             "Anmeldung spielt Keezly genauso — nur ohne Vermerk."),
             ("Barrierefrei bedienbar",
              "Vollständige VoiceOver-Unterstützung, dynamische Schrift, eine Liste "
              "aller erlaubten Züge und eine Bedienung, die nicht von Farbe abhängt."),
@@ -122,9 +124,9 @@ T["de"] = {
         "faq_h": "Häufige Fragen",
         "faq": [
             ("Brauche ich eine Internetverbindung?",
-             "Nein. Alle lokalen Modi — gegen den Computer und das Weiterreichen am "
-             "Tisch — funktionieren vollständig offline. Nur eine Game-Center-Partie "
-             "braucht eine Verbindung."),
+             "Nein. Keezly spielt vollständig offline — gegen den Computer und beim "
+             "Weiterreichen am Tisch. Eine Verbindung wird nur gebraucht, um einen "
+             "Erfolg an Game Center zu melden."),
             ("Brauche ich ein Konto?",
              "Nein. Keezly hat keine eigene Anmeldung. Game Center ist optional und "
              "wird von Apple bereitgestellt."),
@@ -219,8 +221,8 @@ T["nl"] = {
              "Elke afgelopen partij wordt bewaard en kun je zet voor zet terugkijken. "
              "De statistieken worden uit die partijen berekend."),
             ("Game Center",
-             "Optioneel en vriendschappelijk: een spel om de beurt via Apple Game "
-             "Center, als je dat wilt. Zonder aan te melden speelt Keezly net zo goed."),
+             "Tien prestaties, gemeld aan Apple Game Center als je dat wilt. Zonder "
+             "aan te melden speelt Keezly net zo goed — alleen zonder aantekening."),
             ("Toegankelijk te bedienen",
              "Volledige VoiceOver-ondersteuning, Dynamic Type, een lijst met alle "
              "toegestane zetten en bediening die niet van kleur afhangt."),
@@ -244,8 +246,9 @@ T["nl"] = {
         "faq_h": "Veelgestelde vragen",
         "faq": [
             ("Heb ik internet nodig?",
-             "Nee. Alle lokale modi — tegen de computer en doorgeven aan tafel — werken "
-             "volledig offline. Alleen een Game Center-partij heeft verbinding nodig."),
+             "Nee. Keezly speelt volledig offline — tegen de computer en doorgeven aan "
+             "tafel. Verbinding is alleen nodig om een prestatie aan Game Center te "
+             "melden."),
             ("Heb ik een account nodig?",
              "Nee. Keezly heeft geen eigen aanmelding. Game Center is optioneel en komt "
              "van Apple."),
@@ -339,8 +342,8 @@ T["en"] = {
              "Every finished match is saved and can be replayed move by move. Your "
              "statistics are worked out from those matches."),
             ("Game Center",
-             "Optional and friendly: a turn-based match through Apple's Game Center if "
-             "you want one. Keezly plays exactly the same without signing in."),
+             "Ten achievements, reported to Apple's Game Center if you want them. "
+             "Keezly plays exactly the same without signing in — just unrecorded."),
             ("Built to be used",
              "Full VoiceOver support, Dynamic Type, a complete list of legal moves, and "
              "an interface that never depends on colour alone."),
@@ -363,9 +366,9 @@ T["en"] = {
         "faq_h": "Common questions",
         "faq": [
             ("Do I need an internet connection?",
-             "No. Every local mode — against the computer and passing the device around "
-             "a table — works entirely offline. Only a Game Center match needs a "
-             "connection."),
+             "No. Keezly plays entirely offline — against the computer and passing the "
+             "device around a table. A connection is only needed to report an "
+             "achievement to Game Center."),
             ("Do I need an account?",
              "No. Keezly has no sign-in of its own. Game Center is optional and is "
              "provided by Apple."),
