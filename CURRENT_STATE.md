@@ -597,7 +597,7 @@ ones it cannot are reported as what they are rather than folded in.
 | Static checks | PASS — SwiftLint `--strict` and SwiftFormat |
 | Simulator gate | PASS |
 | Physical iPhone gate | **BLOCKED** — no device fills the role |
-| Physical iPad gate | AVAILABLE — `fastlane device_gate` not yet re-run today |
+| Physical iPad gate | **ATTEMPTED, INCOMPLETE** — the app suite ran on the device and **27 suites passed**; the lane then stopped at a `Password:` prompt and waited on input (ISS-019). Not a pass |
 | Game Center gate | **BLOCKED** — `docs/GAME_CENTER_DEVICE_TESTS.md` |
 
 The lane ends by saying so itself: *"Mandatory real-device gates are still

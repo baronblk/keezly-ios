@@ -326,6 +326,7 @@ None of these is code, and none of them can be closed from here:
 
 | Gate | Waiting on |
 |---|---|
+| The physical iPad gate completing | ISS-019 — the lane runs the suite on the device, 27 suites green, then stops at a password prompt. Somebody at the machine has to find out which credential it wants |
 | An App Store Connect record for `de.gcng.keezly` | MAN-02 — blocks TestFlight, Game Center and Xcode Cloud |
 | Xcode Cloud authorised and its three workflows run for real | MAN-04, after MAN-02. Not simulated, not described as done |
 | The app icon seen on a physical device | The icon is integrated and verified in the built `Assets.car` and on both simulators; nobody has looked at a physical home screen |

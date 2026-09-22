@@ -12,6 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
+| ISS-019 | The physical device gate stops at a password prompt | Blocker (hardware gate, needs a person) |
 | ISS-016 | A seat colour does not reach 3:1 against the board | Accepted — colour proven redundant (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
 | ISS-014 | Neither physical device will start a UI test runner | Blocker (hardware gate) |
@@ -75,6 +76,39 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Board/BoardLayout.swift`, `App/Keezly/Play/GameScreen+Layout.swift`,
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
+
+### ISS-019 — The physical device gate stops at a password prompt
+
+- **Status:** OPEN — blocked on a person, not on code
+- **Severity:** Blocker for the physical-device gate
+- **Component:** fastlane / device lanes
+- **Description:** `fastlane device_ipad` runs the app suite on the physical
+  iPad successfully — **27 suites passed** — and then, about a minute after the
+  last one, prints `Password:` and waits on standard input. Nothing supplies
+  it, so the lane hangs until it is killed.
+- **What it is not:** this is **not** ISS-014. ISS-014 is the UI test runner
+  refusing to start on either device. Here the unit phase completed on real
+  hardware and the stop is a credential prompt in the transition to the next
+  phase — most likely a codesigning identity or a developer-tools
+  authorisation that has not been unlocked for a non-interactive session.
+- **Reproduction:** `bundle exec fastlane device_ipad` with the iPad paired,
+  wired, tunnel connected and Developer Mode on. Observed 2026-09-22 at commit
+  `7314714`.
+- **Why it stays open rather than being worked around:** a password is the
+  device owner's to type. It is not written down here, it is not going into an
+  environment variable, and no lane in this repository will be changed to
+  accept one. Automating past a credential prompt is the wrong fix even when it
+  works (§107).
+- **What to try, in order, when somebody is at the machine:** run the lane
+  interactively once and see what the prompt actually belongs to; if it is the
+  login keychain, unlock the signing identity for the session; if it is
+  `DevToolsSecurity`, authorise developer mode for the user once. Then record
+  which it was here, because "a password prompt" is not yet a diagnosis.
+- **Impact:** the physical iPad gate cannot be reported as passed. It is not
+  reported as passed — `fastlane release_check` prints it as a separate line
+  and ends with "not releasable".
+- **Related files:** `fastlane/Fastfile`, `scripts/devices.sh`
+- **Related documents:** `docs/DEVICE_TESTING.md`
 
 ### ISS-017 — Hard's play depends on how busy the machine is
 
