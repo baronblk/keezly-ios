@@ -14,6 +14,17 @@ enum ScreenshotMode {
     /// True when the app was launched by a test or screenshot harness.
     static var isActive: Bool { arguments.contains("-KEEZLY_UI_TESTING") }
 
+    /// True when the process was started by XCTest.
+    ///
+    /// Separate from `isActive` on purpose. Several UI tests launch with no
+    /// arguments at all, to drive the real menu — so a check that relied on
+    /// `-KEEZLY_UI_TESTING` would miss exactly those runs. `XCTest` sets this
+    /// environment variable in the host application it launches, and nothing
+    /// else does.
+    static var isRunningTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     /// `-KEEZLY_UI_TEST_RESET_STATE YES` — forget everything this device has
     /// remembered, before the first view is built.
     ///

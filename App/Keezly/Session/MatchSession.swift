@@ -100,6 +100,9 @@ final class MatchSession {
     /// session that is not meant to outlive the screen — a test fixture, or a
     /// deterministic capture.
     let store: MatchStore?
+    /// Where earned achievements go. Injected so a test session reports into
+    /// nothing at all rather than into Apple.
+    let achievements: (any AchievementReporting)?
     /// What the last save did, if it failed. Surfaced rather than swallowed: a
     /// match that is quietly not being saved is worse than one that says so.
     private(set) var saveFailure: String?
@@ -136,7 +139,8 @@ final class MatchSession {
         agentSeed: UInt64 = 0x5EA7_0000_0000_0001,
         fixture: MatchFixture? = nil,
         fixtureLimit: Int = 600,
-        store: MatchStore? = nil
+        store: MatchStore? = nil,
+        achievements: (any AchievementReporting)? = nil
     ) {
         precondition(roles.count == configuration.seatCount, "one role per seat is required")
         self.state = GameState.newMatch(configuration: configuration, seed: seed)
@@ -144,6 +148,7 @@ final class MatchSession {
         self.roles = roles
         self.budget = budget
         self.store = store
+        self.achievements = achievements
 
         for (index, role) in roles.enumerated() {
             guard case .computer(let difficulty) = role else { continue }
@@ -161,12 +166,18 @@ final class MatchSession {
     /// The state comes from the restore, which has already replayed every
     /// action through the engine and checked that it produces this exact
     /// board. Nothing is recomputed here.
-    init(restored: RestoredMatch, budget: AIBudget = .interactive, store: MatchStore?) {
+    init(
+        restored: RestoredMatch,
+        budget: AIBudget = .interactive,
+        store: MatchStore?,
+        achievements: (any AchievementReporting)? = nil
+    ) {
         state = restored.state
         record = restored.record
         roles = restored.roles
         self.budget = budget
         self.store = store
+        self.achievements = achievements
         // Taken from the restored position, not left at its default. A match
         // that was already won would otherwise come back reporting no result,
         // and the screen would offer moves in a finished game.
@@ -357,10 +368,41 @@ final class MatchSession {
         persist()
 
         pendingEvents = transition.events
+        let wasFinished = result != nil
         result = transition.state.result
+        if !wasFinished, result != nil { reportAchievements() }
         // Closed until the board says it has caught up. The state is already
         // final; this only stops a second tap landing on a stale view (§63).
         isBusy = true
+    }
+
+    /// Tells Game Center what this match earned.
+    ///
+    /// Worked out by `AchievementEvaluator.unlocked(in:for:)`, which replays the
+    /// finished record and watches its events — the same events the board
+    /// animated. Nothing is counted as it happens, so there is no running
+    /// total that could disagree with the matches actually played.
+    ///
+    /// **Only for a table with one person at it.** In pass & play several
+    /// people share the device and only one of them owns the Game Center
+    /// account; crediting whoever happens to sit in the first seat would
+    /// attribute somebody else's win to the device's owner. A table of people
+    /// earns nothing, which is the honest answer rather than a convenient one.
+    private func reportAchievements() {
+        guard let achievements else { return }
+        let earned = achievementsEarned
+        guard !earned.isEmpty else { return }
+        achievements.report(earned)
+    }
+
+    /// What this match has earned the person holding the device, right now.
+    ///
+    /// Empty until the match is over, and empty for a table of people — kept
+    /// as a property rather than buried in the reporting call so the rule can
+    /// be tested without a Game Center of any kind.
+    var achievementsEarned: Set<Achievement> {
+        guard result != nil, !isPassAndPlay, let seat = localSeat else { return [] }
+        return AchievementEvaluator.unlocked(in: record, for: seat)
     }
 
     /// Writes the match as it now stands.

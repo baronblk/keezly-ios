@@ -31,6 +31,9 @@ struct RootView: View {
     @State private var matches: [MatchSummary] = []
 
     private let store: MatchStore?
+    /// Game Center, for the achievements a finished match earned. `nil` in a
+    /// deterministic run, which must not put a sign-in sheet over the board.
+    private let achievements: (any AchievementReporting)?
 
     init() {
         // Before anything reads a preference or lists a match. Does nothing
@@ -42,6 +45,7 @@ struct RootView: View {
         // must not overwrite a player's saved game, and its own matches must
         // not turn up in the list.
         store = ScreenshotMode.isActive ? nil : MatchStore()
+        achievements = GameCenterAchievements.isEnabled ? GameCenterAchievements() : nil
 
         if ScreenshotMode.isActive, ScreenshotMode.showsReplay {
             // A whole match, played out, then handed to the replay.
@@ -101,7 +105,14 @@ struct RootView: View {
                     onWatch: watch,
                     onOpen: open
                 )
-                .task { refreshResumable() }
+                .task {
+                    refreshResumable()
+                    // Asked for once, when the menu appears rather than at
+                    // launch: a sign-in sheet over a cold start is the first
+                    // thing a new player would see, and Keezly has nothing
+                    // that needs it.
+                    achievements?.start()
+                }
             }
         }
         .environment(\.boardTheme, theme)
@@ -137,7 +148,11 @@ struct RootView: View {
     private func open(_ summary: MatchSummary) {
         guard let store else { return }
         do {
-            session = MatchSession(restored: try store.restore(matchID: summary.matchID), store: store)
+            session = MatchSession(
+                restored: try store.restore(matchID: summary.matchID),
+                store: store,
+                achievements: achievements
+            )
             restoreFailure = nil
         } catch {
             store.quarantine(matchID: summary.matchID)
@@ -153,7 +168,8 @@ struct RootView: View {
             configuration: table.gameConfiguration,
             seed: SeededGenerator.systemSeeded().state,
             roles: table.roles,
-            store: store
+            store: store,
+            achievements: achievements
         )
     }
 
@@ -166,7 +182,7 @@ struct RootView: View {
         guard let store, let summary = resumable else { return }
         do {
             let restored = try store.restore(matchID: summary.matchID)
-            session = MatchSession(restored: restored, store: store)
+            session = MatchSession(restored: restored, store: store, achievements: achievements)
             restoreFailure = nil
         } catch {
             store.quarantine(matchID: summary.matchID)
