@@ -12,6 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
+| ISS-020 | `ui_tests` is red: one test fails only in a full suite run | Blocker (test harness) |
 | ISS-019 | The physical device gate stops at a password prompt | Blocker (hardware gate, needs a person) |
 | ISS-016 | A seat colour does not reach 3:1 against the board | Accepted — colour proven redundant (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
@@ -76,6 +77,48 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Board/BoardLayout.swift`, `App/Keezly/Play/GameScreen+Layout.swift`,
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
+
+### ISS-020 — A UI test fails only when the whole suite runs
+
+- **Status:** OPEN — characterised, not fixed
+- **Severity:** Blocker for the `ui_tests` lane, which is currently **red**
+- **Component:** UI test harness
+- **Description:** `PassAndPlayTests.testTheCoverReturnsForTheNextPlayer` fails
+  in a full `fastlane ui_tests` run with *"the device was not covered before the
+  next player"* — the handover cover did not appear after a card was played.
+- **What was measured, in order, because the first answer was wrong:**
+  1. Full suite on a loaded machine: **2 failures** — this one and
+     `DesignReviewScreenshots.testSevenMidSplit`.
+  2. Both tests in isolation at this morning's commit `fffd60c`: **pass**.
+  3. Both tests in isolation at `a8d0359`, after every layout change made
+     today: **pass**.
+  4. Full suite on an idle machine: **1 failure**. `testSevenMidSplit` passed,
+     so that one was load-sensitive — it waits ten wall-clock seconds for
+     `seven.progress`.
+  5. This test alone on the device it failed on, iPhone 17, at HEAD: **passes**.
+- **So it is order-dependent, not a regression and not simply slow.** It was
+  briefly recorded here as a regression on the strength of step 2 alone; steps
+  3 and 5 say otherwise, and the earlier claim was wrong.
+- **The mechanism, which is the part worth acting on:** nothing resets the
+  simulator's persisted state between UI tests. The app writes
+  `keezly.hasPlayed`, the two feedback switches, and **saved matches** — and
+  `PassAndPlayTests` line 184 deliberately depends on that, resuming a match
+  from the menu via `menu.continue`. Several other tests launch with
+  `launchArguments = []`, taking whatever the previous test left behind. A test
+  that expects a fresh deal from `-KEEZLY_SEED 2026` can therefore meet a
+  leftover match instead, play a different position, and not pass the turn.
+- **Why this is not "just a flaky test":** if a fixture that asks for a fixed
+  seed can be handed a resumed match instead, that is worth knowing about the
+  *app*, not only about the tests. The next step is to establish which of the
+  two it is, by resetting state between launches and seeing whether the failure
+  goes away — **not** by retrying until it is green.
+- **Proposed fix:** a debug-only launch argument that clears the app's
+  persistent domain at startup, passed by every UI test including the ones that
+  currently launch with no arguments. The one test that needs a saved match
+  keeps its dependency explicit by creating it itself.
+- **Related files:** `App/KeezlyUITests/PassAndPlayTests.swift`,
+  `App/Keezly/Session/ScreenshotMode.swift`, `App/Keezly/Storage/MatchStore.swift`
+- **Related tests:** `KeezlyUITests`
 
 ### ISS-019 — The physical device gate stops at a password prompt
 

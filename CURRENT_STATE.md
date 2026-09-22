@@ -503,7 +503,7 @@ App-level, on the iPad Pro 13" (M5) simulator, iOS 27.0:
 | Target | Result |
 |---|---|
 | `KeezlyTests` | **214 passed in 26 suites, 0 failed**, 10 s |
-| `KeezlyUITests` | **37 passed, 0 failed, 3 skipped** |
+| `KeezlyUITests` | **RED — 1 failure in a full run (ISS-020).** `testTheCoverReturnsForTheNextPlayer` fails only when the whole suite runs, and passes in isolation on both devices and at this morning's commit. Order-dependent: nothing resets the simulator's persisted state between tests, and one test deliberately resumes a saved match |
 
 The three skips are the keyboard tests, which report honestly that no hardware
 keyboard reached the app rather than passing without exercising anything
