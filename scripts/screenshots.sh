@@ -46,6 +46,32 @@ udid_for() {
   printf '%s' "$found"
 }
 
+# Brings a simulator up from a known state.
+#
+# Nothing here boots one explicitly — `xcodebuild test` does it — and a device
+# left half-running by an interrupted run answers the test runner with
+# "Application failed preflight checks … Busy". That cost a whole iPhone
+# capture set on the first real run of this script, which on a pipeline of this
+# length is a quarter of an hour for nothing. Shutting the device down first
+# costs seconds and removes the question.
+boot() {
+  local udid="$1"
+  xcrun simctl shutdown "$udid" >/dev/null 2>&1 || true
+  xcrun simctl boot "$udid" >/dev/null 2>&1 || true
+  xcrun simctl bootstatus "$udid" -b >/dev/null 2>&1 || true
+}
+
+run_capture() {
+  local udid="$1" label="$2" language="$3" region="$4" bundle="$5"
+  xcodebuild test \
+    -project Keezly.xcodeproj -scheme Keezly \
+    -destination "id=$udid" \
+    -only-testing:"$SUITE" \
+    -resultBundlePath "$bundle" \
+    -testLanguage "$language" -testRegion "$region" \
+    >"build/xcresult/${label}.log" 2>&1
+}
+
 capture() {
   local label="$1" udid="$2" language="$3" region="$4"
   local bundle="build/xcresult/${label}.xcresult"
@@ -55,14 +81,18 @@ capture() {
   mkdir -p "$(dirname "$bundle")" "$out"
 
   echo "  $label"
-  xcodebuild test \
-    -project Keezly.xcodeproj -scheme Keezly \
-    -destination "id=$udid" \
-    -only-testing:"$SUITE" \
-    -resultBundlePath "$bundle" \
-    -testLanguage "$language" -testRegion "$region" \
-    >"build/xcresult/${label}.log" 2>&1 \
-    || { echo "    FAILED — see build/xcresult/${label}.log" >&2; return 1; }
+  # Once more on failure, from a freshly booted simulator. A capture set is a
+  # quarter of an hour, and the commonest failure is a device that was busy
+  # rather than anything about the app — an interrupted run leaves one
+  # answering "Application failed preflight checks". A second attempt that also
+  # fails is worth reading the log for.
+  if ! run_capture "$udid" "$label" "$language" "$region" "$bundle"; then
+    echo "    $label did not launch; retrying from a fresh boot" >&2
+    boot "$udid"
+    rm -rf "$bundle"
+    run_capture "$udid" "$label" "$language" "$region" "$bundle" \
+      || { echo "    FAILED — see build/xcresult/${label}.log" >&2; return 1; }
+  fi
 
   xcrun xcresulttool export attachments \
     --path "$bundle" --output-path "$out" >/dev/null
@@ -77,6 +107,9 @@ IPAD_UDID=$(udid_for "$IPAD")
 IPHONE_UDID=$(udid_for "$IPHONE")
 
 echo "Writing to $DESTINATION:"
+boot "$IPAD_UDID"
+boot "$IPHONE_UDID"
+
 failed=0
 for pair in "${LOCALES[@]}"; do
   language="${pair%%:*}"
