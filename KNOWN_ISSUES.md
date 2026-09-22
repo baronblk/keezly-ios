@@ -12,7 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
-| ISS-020 | `ui_tests` is red: one test fails only in a full suite run | Blocker (test harness) |
+| ISS-020 | `ui_tests` is red: one test fails with two simulator destinations | Blocker (test harness) |
 | ISS-019 | The physical device gate stops at a password prompt | Blocker (hardware gate, needs a person) |
 | ISS-016 | A seat colour does not reach 3:1 against the board | Accepted — colour proven redundant (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
@@ -118,12 +118,48 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 - **Not purely machine load.** An idle machine removed one of the two failures
   and not this one.
 
+#### 2026-09-22 — it is not about suite scope
+
+The title of this entry is now wrong and is left standing so the record is not
+quietly rewritten. Measured today, all at HEAD:
+
+| Run | Result |
+|---|---|
+| `fastlane scan`, 2 destinations, whole UI suite | FAIL, 4 times out of 4 |
+| scan's exact `xcodebuild` line replayed by hand, 2 destinations | **FAIL**, exit 65 |
+| the same line with `-only-testing:KeezlyUITests/PassAndPlayTests` alone | **FAIL** in 5 minutes |
+| plain `xcodebuild`, 1 destination | pass |
+| plain `xcodebuild`, 2 destinations, four UI classes | pass |
+
+Two things follow. The cause is in the **command line**, not in scan's simulator
+preparation — replaying the line by hand reproduces it. And it does **not** need
+the rest of the suite: `PassAndPlayTests` on its own is enough, which turns a
+40-minute experiment into a 5-minute one.
+
+It fails on `iPhone 17` and passes on `iPad Pro 13-inch (M5)` in the same run,
+every time.
+
+The failure, read out of the result bundle rather than inferred from the log:
+
+```
+XCTAssertTrue failed - the device was not covered before the next player
+PassAndPlayTests/testTheCoverReturnsForTheNextPlayer()
+```
+
+Three differences between the passing and failing invocations remain, and are
+being bisected one at a time: `-derivedDataPath`, `env NSUnbufferedIO=YES`, and
+`build test` versus `test`. A second destination is also still a candidate in
+its own right, because the passing plain runs and the failing scan-like run
+differ in more than one way at once.
+
+**No cause is claimed until one variant flips it reproducibly.** A note in
+`ScreenshotMode.swift` previously recorded the cause as a test tapping a
+Seven's partial-leg target; that fix is in and the test still fails, so that
+was at best only one of the faults and the note has been corrected.
+
 #### What is still open
 
-Something else in the suite — `LaunchTests`, `MenuFlowTests` or
-`PlayFlowTests` — or a genuine intermittent at the twenty-second boundary that
-only a full run is long enough to hit. Bisecting the suite by class is the next
-step, and it costs one full-suite run per split.
+Which of those four differences it is.
 
 **It must not be closed by re-running until it is green.** The failing
 assertion guards the pass-and-play privacy rule (§34): the device must be

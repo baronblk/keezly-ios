@@ -36,10 +36,11 @@ enum ScreenshotMode {
     ///
     /// It has not, so far: ISS-020 looked like state leakage and was not.
     /// `RootView` builds no `MatchStore` under `-KEEZLY_UI_TESTING`, so a
-    /// saved match cannot cross from one test to the next, and the real cause
-    /// was a test tapping a Seven's leg target and waiting for a turn that had
-    /// deliberately not ended. This flag must not be recorded as having solved
-    /// that.
+    /// saved match cannot cross from one test to the next. This flag must not
+    /// be recorded as having solved ISS-020, and neither must the Seven's-leg
+    /// fix an earlier version of this comment credited: that fix is in and the
+    /// test still fails with two simulator destinations. The cause is still
+    /// open, and KNOWN_ISSUES.md has the measurements.
     ///
     /// Deliberately **not** gated on `isActive` as well. The tests that most
     /// need isolating are the ones that launch with no arguments at all, to
