@@ -114,29 +114,59 @@ final class DesignReviewScreenshots: XCTestCase {
             XCTFail("\(name): the capture could not be encoded as PNG")
             return
         }
+
+        // **Measured after encoding, on the bytes themselves.**
+        //
+        // Everything above this line measures a `UIImage`, and a `UIImage` can
+        // report one size while its bytes carry another — orientation is
+        // metadata. Every assertion in this function passed while the exported
+        // file was the uncorrected portrait capture, so the only measurement
+        // worth making is the one on what is actually written.
+        let encoded = UIImage(data: png)?.size ?? .zero
+        XCTAssertEqual(
+            encoded, size,
+            "\(name): the attached bytes are \(encoded) but the image was \(size) — "
+                + "the correction did not survive encoding (ISS-012)"
+        )
+
         let attachment = XCTAttachment(data: png, uniformTypeIdentifier: "public.png")
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
     }
 
-    /// A screenshot as an image that definitely has pixels behind it.
+    /// A screenshot as an image whose **pixels** are what its size says.
+    ///
+    /// Two separate traps, and the second one is the expensive one.
     ///
     /// `XCUIScreenshot.image` can arrive without a `cgImage`, which made every
     /// attempt to turn it quietly return the original. Decoding the API's own
-    /// PNG gives a bitmap-backed image; redrawing is the fallback.
+    /// PNG gives a bitmap-backed image.
+    ///
+    /// **And that decoded image lies about its shape.** On a rotated iPad its
+    /// `size` reports 2752×2064 — landscape, correct — while the bytes behind
+    /// it are 2064×2752 portrait plus an orientation tag. UIKit honours the
+    /// tag, so every measurement inside this file agreed the capture was
+    /// landscape. Nothing else honours it: `Pillow` reads the exported file as
+    /// portrait, and so would App Store Connect.
+    ///
+    /// The evidence was a file of **2,550,479 bytes** that the test measured as
+    /// 2752×2064 and the disk measured as 2064×2752 — the same bytes, read two
+    /// ways. `scripts/screenshots-verify.py` is what made that visible, and it
+    /// is the argument for checking captures as files in one line.
+    ///
+    /// So an image that is not already upright is redrawn, which puts the
+    /// orientation into the pixels and leaves nothing for a reader to
+    /// interpret.
     private static func flattened(_ screenshot: XCUIScreenshot) -> UIImage {
-        if let decoded = UIImage(data: screenshot.pngRepresentation), decoded.cgImage != nil {
-            return decoded
-        }
-        let image = screenshot.image
-        guard image.cgImage == nil else { return image }
+        let decoded = UIImage(data: screenshot.pngRepresentation) ?? screenshot.image
+        guard decoded.imageOrientation != .up || decoded.cgImage == nil else { return decoded }
 
         let format = UIGraphicsImageRendererFormat.default()
-        format.scale = image.scale
+        format.scale = decoded.scale
         format.opaque = true
-        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
-            image.draw(in: CGRect(origin: .zero, size: image.size))
+        return UIGraphicsImageRenderer(size: decoded.size, format: format).image { _ in
+            decoded.draw(in: CGRect(origin: .zero, size: decoded.size))
         }
     }
 
