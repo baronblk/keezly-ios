@@ -78,46 +78,61 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
 
-### ISS-020 — A UI test fails only when the whole suite runs
+### ISS-020 — A UI test fails only when the whole suite runs, and nobody knows why yet
 
-- **Status:** OPEN — characterised, not fixed
+- **Status:** OPEN — reproducible only at full-suite scope; **cause not
+  identified**
 - **Severity:** Blocker for the `ui_tests` lane, which is currently **red**
-- **Component:** UI test harness
+- **Component:** UI test harness, or the app — that is exactly what is not yet
+  known
 - **Description:** `PassAndPlayTests.testTheCoverReturnsForTheNextPlayer` fails
   in a full `fastlane ui_tests` run with *"the device was not covered before the
   next player"* — the handover cover did not appear after a card was played.
-- **What was measured, in order, because the first answer was wrong:**
-  1. Full suite on a loaded machine: **2 failures** — this one and
-     `DesignReviewScreenshots.testSevenMidSplit`.
-  2. Both tests in isolation at this morning's commit `fffd60c`: **pass**.
-  3. Both tests in isolation at `a8d0359`, after every layout change made
-     today: **pass**.
-  4. Full suite on an idle machine: **1 failure**. `testSevenMidSplit` passed,
-     so that one was load-sensitive — it waits ten wall-clock seconds for
-     `seven.progress`.
-  5. This test alone on the device it failed on, iPhone 17, at HEAD: **passes**.
-- **So it is order-dependent, not a regression and not simply slow.** It was
-  briefly recorded here as a regression on the strength of step 2 alone; steps
-  3 and 5 say otherwise, and the earlier claim was wrong.
-- **The mechanism, which is the part worth acting on:** nothing resets the
-  simulator's persisted state between UI tests. The app writes
-  `keezly.hasPlayed`, the two feedback switches, and **saved matches** — and
-  `PassAndPlayTests` line 184 deliberately depends on that, resuming a match
-  from the menu via `menu.continue`. Several other tests launch with
-  `launchArguments = []`, taking whatever the previous test left behind. A test
-  that expects a fresh deal from `-KEEZLY_SEED 2026` can therefore meet a
-  leftover match instead, play a different position, and not pass the turn.
-- **Why this is not "just a flaky test":** if a fixture that asks for a fixed
-  seed can be handed a resumed match instead, that is worth knowing about the
-  *app*, not only about the tests. The next step is to establish which of the
-  two it is, by resetting state between launches and seeing whether the failure
-  goes away — **not** by retrying until it is green.
-- **Proposed fix:** a debug-only launch argument that clears the app's
-  persistent domain at startup, passed by every UI test including the ones that
-  currently launch with no arguments. The one test that needs a saved match
-  keeps its dependency explicit by creating it itself.
+  The assertion before it passed, so a move really was made; the turn did not
+  pass on.
+
+#### What has been measured
+
+| Run | Result |
+|---|---|
+| Full suite, loaded machine | 2 failures — this and `testSevenMidSplit` |
+| Both tests in isolation at `fffd60c`, before today's work | pass |
+| Both tests in isolation at `a8d0359`, after every layout change today | pass |
+| Full suite, idle machine | 1 failure — `testSevenMidSplit` passed, so that one was load-sensitive |
+| This test alone, iPhone 17, at HEAD | pass |
+| The whole `PassAndPlayTests` class, iPhone 17, at HEAD | pass, 4 tests |
+| A landscape screenshot test then this test, iPhone 17, clean boot | pass |
+
+#### What that rules out
+
+- **Not a regression from today's work.** It passes at this morning's commit
+  *and* after every layout change made since.
+- **Not interference inside its own class.** The class passes whole.
+- **Not leftover device orientation.** `DesignReviewScreenshots` does leave the
+  device rotated, which is its own untidiness, but running a landscape capture
+  immediately before this test does not reproduce the failure.
+- **Not leftover saved matches.** `RootView` builds no `MatchStore` at all when
+  `-KEEZLY_UI_TESTING` is set, so a match left by an earlier test cannot be
+  resumed into this one. An earlier version of this entry gave that as the
+  mechanism; it was wrong.
+- **Not purely machine load.** An idle machine removed one of the two failures
+  and not this one.
+
+#### What is still open
+
+Something else in the suite — `LaunchTests`, `MenuFlowTests` or
+`PlayFlowTests` — or a genuine intermittent at the twenty-second boundary that
+only a full run is long enough to hit. Bisecting the suite by class is the next
+step, and it costs one full-suite run per split.
+
+**It must not be closed by re-running until it is green.** The failing
+assertion guards the pass-and-play privacy rule (§34): the device must be
+covered before the next player takes it. A test that sometimes says that did
+not happen is either a bad test or a real fault, and the two are worth
+distinguishing.
+
 - **Related files:** `App/KeezlyUITests/PassAndPlayTests.swift`,
-  `App/Keezly/Session/ScreenshotMode.swift`, `App/Keezly/Storage/MatchStore.swift`
+  `App/KeezlyUITests/DesignReviewScreenshots.swift`, `App/Keezly/RootView.swift`
 - **Related tests:** `KeezlyUITests`
 
 ### ISS-019 — The physical device gate stops at a password prompt
