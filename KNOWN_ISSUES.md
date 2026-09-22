@@ -12,7 +12,7 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 | # | Summary | Severity |
 |---|---|---|
-| ISS-016 | A seat colour does not reach 3:1 against the board | Accepted limitation (contrast) |
+| ISS-016 | A seat colour does not reach 3:1 against the board | Accepted — colour proven redundant (contrast) |
 | ISS-015 | Online play hides nothing from a modified client | Accepted limitation (fairness) |
 | ISS-014 | Neither physical device will start a UI test runner | Blocker (hardware gate) |
 | ISS-012 | Landscape captures carry a 25% black margin | Minor (tooling) |
@@ -61,39 +61,66 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 
 ### ISS-016 — A seat colour does not reach 3:1 against the board
 
-- **Status:** OPEN — accepted limitation, measured and recorded
+- **Status:** OPEN — accepted, and only after a structural review found colour
+  to be redundant everywhere it carries meaning
 - **Severity:** Accepted limitation (contrast)
 - **Component:** Design system, board
-- **Measured** by `ContrastTests`, in the light appearance, against the board's
-  own wood:
 
-  | | Ratio |
-  |---|---|
-  | Amber pawn | **1.23:1** |
-  | Green pawn | 2.14:1 |
-  | Blue pawn | 2.41:1 |
-  | Red pawn | 2.50:1 |
-  | The dark outline every piece carries | 2.03:1 |
+#### The measurement
 
-- **Expected:** WCAG 1.4.11 asks 3:1 for the boundary of a graphical element
-  that carries meaning.
-- **Actual:** Nothing in the current palette reaches it. The board is a light
-  maple panel by design (DEC-018), and pieces on a light board are lighter than
-  3:1 allows unless the board itself is darkened.
-- **Why it is accepted rather than fixed:** the board's appearance is settled
-  and was reviewed and accepted as a whole. More to the point, **colour is not
-  what carries a seat's identity here**: every seat has its own mark on the
-  piece, every piece is named in words by `MoveNarrator` ("red pawn 2, eleven
-  squares from home"), and every move is reachable from the action list without
-  looking at the board at all. A player who cannot separate amber from maple
-  can still play the whole game.
-- **What would fix it:** a materially darker board, or a second "high contrast"
-  board material. Both are design decisions, not adjustments, and neither is in
-  1.0.0.
-- **Guarded:** `ContrastTests.seatColoursAreNotInvisible` fails if any seat gets
-  *weaker* than it is today, so the shortfall cannot quietly grow.
+`ContrastTests`, in the light appearance, against the board's own wood:
+
+| | Ratio |
+|---|---|
+| Amber pawn | **1.23:1** |
+| Green pawn | 2.14:1 |
+| Blue pawn | 2.41:1 |
+| Red pawn | 2.50:1 |
+| The dark outline every piece carries | 2.03:1 |
+
+WCAG 1.4.11 asks 3:1 for the boundary of a graphical element that carries
+meaning. Nothing in this palette reaches it, and nothing will without darkening
+a board whose appearance is settled (DEC-018).
+
+#### Why that is acceptable — checked rather than asserted
+
+A hue below the bar only matters if the hue is carrying information on its own.
+Every distinction the board makes was gone through one at a time, and the two
+that turned out to depend on colour were **fixed**, not excused:
+
+| Question | Answer |
+|---|---|
+| Is a piece's owner identifiable without colour? | **Yes.** Every seat has its own `PawnMark` — circle, triangle, square, diamond, hexagon, chevron — drawn in white on the piece. Unique by test |
+| Is a **waiting area** identifiable without colour? | **Now yes.** It was a coloured tray and nothing else; an *empty* one belonged to nobody visibly. It now carries the seat's own mark, engraved |
+| Is a **home lane** identifiable without colour? | **Now yes.** Same fix. The generic ornamental chevron that used to sit at the lane's inner end has been *replaced* by the seat's mark — one shape doing the same job and saying more |
+| Is a **protected start square** identifiable without colour? | **Yes.** It carries a solid ring the other holes do not |
+| Is a **legal target** identifiable without colour? | **Now yes.** It was a solid ring in green — the same shape as a start square's ring, in a different hue. It is now **dashed**, and drawn outside the start square's rings rather than between them |
+| Are **selected / selectable / focused** distinguishable without colour? | **Yes.** A selected card is raised out of the hand; a selectable piece is ringed; a selected piece is ringed *and* scaled; keyboard focus is a black-and-white double ring. All are shape or position |
+| Does it work in greyscale? | **Yes** — looked at, and measured |
+
+#### How it is checked
+
+- `GrayscaleTests` renders the board twice, desaturates both, and compares the
+  patch that should have changed. A distinction that survives only in colour
+  scores near zero. **It found one**: a legal target drawn on a start square
+  measured 3/255 in greyscale, because the dashed ring landed between the start
+  square's halo and its ring. Moving it outside them fixed it.
+- `scripts/grayscale-review.sh` writes six real board states — four, six and
+  two players, free-for-all, a Jack ready, a Seven ready — each in colour, in
+  greyscale, and stacked for comparison.
+- `ContrastTests.seatColoursAreNotInvisible` fails if any seat gets *weaker*
+  than it is today, so the shortfall cannot quietly grow.
+
+#### What would still fix it properly
+
+A materially darker board, or a second "high contrast" material. Both are
+design decisions rather than adjustments, and neither is in 1.0.0. The board
+was **not** darkened globally to chase a number, because a local
+contour-and-mark answer turned out to be enough — and is the better answer
+anyway: a shape helps somebody using the app in bright sunlight too.
+
 - **Related files:** `App/Keezly/DesignSystem/PlayerIdentity.swift`,
-  `App/Keezly/Board/PawnView.swift`
+  `App/Keezly/Board/PawnView.swift`, `App/Keezly/Board/BoardSurface.swift`
 
 ---
 

@@ -27,7 +27,6 @@ struct BoardSurface: View {
             drawGrain(clippedTo: panel, in: &context, size: size, hole: hole)
             drawBorderOrnament(in: &context, hole: hole)
             drawPlayerAreas(in: &context, hole: hole)
-            drawHomeChevrons(in: &context, hole: hole)
             drawHoles(in: &context, hole: hole)
             drawMedallion(in: &context, hole: hole)
         }
@@ -160,8 +159,20 @@ struct BoardSurface: View {
             // areas simply vanished. The mark is the same one the seat's
             // pieces carry, so identity is shape as well as hue everywhere it
             // matters (§42, §53).
-            drawSeatMark(for: seat, centredOn: CGPoint(x: rect.midX, y: rect.midY), hole: hole, in: &context)
-            drawSeatMark(for: seat, centredOn: homeMarkAnchor(for: seat), hole: hole, in: &context)
+            drawSeatMark(
+                for: seat,
+                centredOn: CGPoint(x: rect.midX, y: rect.midY),
+                size: hole * 0.66,
+                in: &context,
+                hole: hole
+            )
+            drawSeatMark(
+                for: seat,
+                centredOn: homeMarkAnchor(for: seat),
+                size: hole * 0.62,
+                in: &context,
+                hole: hole
+            )
         }
     }
 
@@ -184,16 +195,19 @@ struct BoardSurface: View {
     private func drawSeatMark(
         for seat: Seat,
         centredOn centre: CGPoint,
-        hole: CGFloat,
-        in context: inout GraphicsContext
+        size: CGFloat,
+        in context: inout GraphicsContext,
+        hole: CGFloat
     ) {
         // Below this a mark is a smudge, and a smudge helps nobody.
         guard hole >= 9 else { return }
-        let size = hole * 0.52
         let shape = PlayerIdentity.identity(for: seat).mark.path(in: CGRect(
             x: centre.x - size / 2, y: centre.y - size / 2, width: size, height: size
         ))
-        engrave(shape, in: &context, width: max(0.5, hole * 0.05), tint: theme.edge, strength: 0.34)
+        // Deeper than the border ornament. This one is not decoration: it is
+        // how an *empty* tray or lane says whose it is, and a mark nobody can
+        // see is the same as no mark at all.
+        engrave(shape, in: &context, width: max(0.6, hole * 0.07), tint: theme.edge, strength: 0.62)
     }
 
     // MARK: - Holes
@@ -280,13 +294,18 @@ struct BoardSurface: View {
                 // to anybody reading the board in greyscale — which is the
                 // one distinction a player cannot afford to lose, because it
                 // separates "you may move here" from "nobody may pass" (§53).
+                // Outside the start square's own rings, not between them. A
+                // start square already carries a halo at 0.20 and a ring at
+                // 0.09; a target drawn at 0.16 landed in the gap and, with the
+                // colour taken away, disappeared into them — measured at
+                // 3/255 by `GrayscaleTests` before this moved.
                 context.stroke(
-                    Path(ellipseIn: rect.insetBy(dx: -hole * 0.16, dy: -hole * 0.16)),
+                    Path(ellipseIn: rect.insetBy(dx: -hole * 0.34, dy: -hole * 0.34)),
                     with: .color(Keezly.Palette.legalTarget),
                     style: StrokeStyle(
-                        lineWidth: max(1.5, hole * 0.14),
+                        lineWidth: max(1.6, hole * 0.16),
                         lineCap: .round,
-                        dash: [hole * 0.34, hole * 0.26]
+                        dash: [hole * 0.40, hole * 0.30]
                     )
                 )
             }
@@ -378,37 +397,6 @@ struct BoardSurface: View {
     /// Linear on purpose: anything round this close to the holes would be read
     /// as another square. It carries no player colour either — the lane inlay
     /// already does that, and the colour must stay the loudest thing here.
-    private func drawHomeChevrons(in context: inout GraphicsContext, hole: CGFloat) {
-        guard hole >= 9 else { return }
-        let size = hole * 0.5
-
-        for seat in layout.board.seats {
-            let lane = layout.homePoints[seat.index]
-            guard let deepest = lane.last, let entry = lane.first else { continue }
-
-            // Just past the deepest home square, continuing the lane's line.
-            let direction = CGPoint(x: deepest.x - entry.x, y: deepest.y - entry.y)
-            let length = hypot(direction.x, direction.y)
-            guard length > 0 else { continue }
-            let unit = CGPoint(x: direction.x / length, y: direction.y / length)
-            let anchor = CGPoint(
-                x: deepest.x + unit.x * layout.pitch * 0.85,
-                y: deepest.y + unit.y * layout.pitch * 0.85
-            )
-
-            let rotation = atan2(unit.y, unit.x) - .pi / 2
-            var shape = Path(BoardOrnament.chevron(size: size))
-            shape = shape.applying(
-                CGAffineTransform(rotationAngle: rotation)
-                    .concatenating(CGAffineTransform(
-                        translationX: transform.point(anchor).x,
-                        y: transform.point(anchor).y
-                    ))
-            )
-            engrave(shape, in: &context, width: max(0.5, hole * 0.05), tint: theme.edge, strength: 0.22)
-        }
-    }
-
     /// The medallion at the centre: two fine rings, a petal in each gap
     /// between the home lanes, and one small orange keystone.
     ///
