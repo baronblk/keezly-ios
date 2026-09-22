@@ -14,6 +14,7 @@ external TestFlight beta review, no automatic release.
 | Platform | iOS — iPhone and iPad |
 | Categories | `GAMES` / `GAMES_BOARD` / `GAMES_CARD` |
 | Copyright | `© 2026 Rene Süß` |
+| Price | **€2.99**, base territory Germany (proceeds €2.14) |
 
 Everything below is separated into **LOCAL PREPARED**, **ASC UPLOADED** and
 **ASC VERIFIED**. Verified means it was read back out of App Store Connect
@@ -115,7 +116,20 @@ owner's name and is not something to automate.
 
 ---
 
-## Game Center — LOCAL PREPARED
+## Pricing — ASC VERIFIED
+
+**€2.99**, base territory `DEU`, set as a manual price on the app's price
+schedule and read back from Apple. Apple derives every other territory from the
+German price.
+
+The owner gave the figure as "2,99". Read as euro — German decimal comma,
+German-primary app, German seller — and confirmed against Apple's own price
+point for `DEU`, which lists a customer price of 2.99 and proceeds of 2.14. If
+a different currency was meant, the schedule is a single call to change.
+
+---
+
+## Game Center — ASC VERIFIED (metadata only)
 
 Enabled on the App ID. The ten achievements are defined in code, which is the
 source of truth because **achievement ids are permanent**:
@@ -143,12 +157,31 @@ catalogue. Artwork is generated from source by `Tools/achievementart.py` — ten
 **No leaderboards**, and none will be created: online results cannot be ranked
 honestly while a modified client can read every hand (DEC-025).
 
-`scripts/asc_push_achievements.rb` validates everything — unique ids, points
-within Apple's limits, all three locales present, every image on disk — and
-then reports that **Apple's Game Center endpoints are not reachable through
-this tooling**: `fastlane` 2.240 has no `GameCenterDetail` model, and the raw
-paths answer *"The path provided does not match a defined resource type."*
-Creating them is a web-form step.
+All ten exist in App Store Connect, created through the REST API by
+`scripts/asc_game_center.rb` and **read back afterwards** rather than inferred
+from a 201:
+
+| Vendor identifier | Points | Apple id | DE | NL | EN | Images |
+|---|---|---|---|---|---|---|
+| `…achievement.backwards` | 5 | `675c5e5c-decd-47c2-9fe2-2884d3652555` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.finished` | 5 | `d942c90a-9230-4387-8cd6-f1eb1dbe72ba` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.fullTable` | 10 | `d7aac7ed-ac7a-4b1b-9941-695d1b348e8e` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.knockout` | 5 | `22495c63-4cdd-47ea-8901-9f556ae5ae64` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.partners` | 15 | `0ceba930-67d6-4db4-9b39-0bc278164b94` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.resilient` | 15 | `51ade891-8654-448a-b140-75e907d6882b` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.split` | 10 | `e0297192-f15a-4288-8902-8bd8a2d041b6` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.swapped` | 5 | `8f0291a8-72f1-48fb-b239-fafd68ece398` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.untouched` | 20 | `ad267c89-cbf6-4861-924c-153807e5b635` | ✓ | ✓ | ✓ | COMPLETE |
+| `…achievement.won` | 10 | `983e9ab0-cecc-4e37-a625-c2b5841921fe` | ✓ | ✓ | ✓ | COMPLETE |
+
+Game Center detail: `0b989385-b0bf-42a1-acac-c962cdce951b`.
+
+An earlier version of this document said these needed a web form. That was
+wrong: only **v1** paths had been probed, and the v2 resources that Apple
+documents were never tested. `POST /v2/gameCenterAchievements` works.
+
+**GAME CENTER E2E = NOT VERIFIED.** Metadata existing is not the same as two
+real accounts playing a match on two real devices.
 
 ---
 
@@ -168,7 +201,5 @@ device and locale selected — Apple allows ten, the pipeline produces fourteen.
 | App Privacy declaration | Owner, in the web form |
 | Age rating questionnaire | Owner, in the web form |
 | DSA trader status | Owner — a legal self-declaration |
-| Pricing and availability | Owner decision, not documented anywhere yet |
-| Game Center achievements | Web form; everything they need is prepared |
 | Screenshots | Fresh matrix, then upload |
 | TestFlight | A green build |
