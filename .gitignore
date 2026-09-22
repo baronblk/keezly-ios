@@ -78,3 +78,7 @@ Config/BuildNumber.xcconfig
 # the build is reproducible with `python3 website/build.py`.
 website/dist/
 website/website-keezly-*.zip
+
+# Python bytecode from the website build.
+__pycache__/
+*.pyc
