@@ -194,12 +194,17 @@ called complete until the gameplay items above are implemented and re-run.
 - [ ] Screenshot set regenerated with the status bar pinned **and the
       simulator in the right locale** — the set that proved the pipeline
       predates both. `-testLanguage` sets the app's language and nothing else,
-      so the Dutch captures carry a German date across the status bar over an
-      app saying "Jouw beurt". Cosmetic to a machine; to a Dutch reader it is
-      the first thing on the screen and the first thing that says the
-      screenshot was faked. It must not reach a listing
+      so **the whole set** carries a German status bar — the simulator was left
+      in German by the first capture and never changed. Checked on three
+      captures in three locales: "Dienstag 22. Sept." over an app saying "Jouw
+      beurt", and again over an English menu. Cosmetic to a machine; to a Dutch
+      or English reader it is the first thing on the screen and the first thing
+      that says the screenshot was faked. It must not reach a listing
 - [ ] Screenshot **human** gate, which no script here performs and none
-      pretends to: somebody opens the set and confirms there is no debug
+      pretends to. **Three of the 84 have been looked at** — the English menu,
+      the English phone mid-match and the Dutch two-player iPad — and apart
+      from the status-bar locale above they carry nothing they should not. The
+      other 81 have not been looked at by anyone: somebody opens the set and confirms there is no debug
       overlay, no keyboard, no loading spinner, no test identifier, no raw
       localisation key, no placeholder name and nobody's personal data. Finding
       text in a PNG needs OCR this project has no business carrying, so this
