@@ -69,6 +69,24 @@ boot() {
     >/dev/null 2>&1 || true
 }
 
+# Puts the *simulator* into the locale, not just the app.
+#
+# `-testLanguage` / `-testRegion` set the language the app under test comes up
+# in, and nothing else. The status bar is drawn by the system, so a Dutch
+# capture came out with a German date across the top of it — "Dienstag 22.
+# Sept." over an app saying "Jouw beurt". On a store listing that is the first
+# thing a Dutch reader sees and the first thing that tells them the screenshot
+# was faked.
+#
+# Written to the shut-down device's own defaults and read at boot, which is why
+# this has to happen before `boot` rather than after it.
+set_locale() {
+  local udid="$1" language="$2" region="$3"
+  xcrun simctl shutdown "$udid" >/dev/null 2>&1 || true
+  xcrun simctl spawn "$udid" defaults write -g AppleLanguages -array "$language" >/dev/null 2>&1 || true
+  xcrun simctl spawn "$udid" defaults write -g AppleLocale -string "${language}_${region}" >/dev/null 2>&1 || true
+}
+
 run_capture() {
   local udid="$1" label="$2" language="$3" region="$4" bundle="$5"
   xcodebuild test \
@@ -89,6 +107,8 @@ capture() {
   mkdir -p "$(dirname "$bundle")" "$out"
 
   echo "  $label"
+  set_locale "$udid" "$language" "$region"
+  boot "$udid"
   # Once more on failure, from a freshly booted simulator. A capture set is a
   # quarter of an hour, and the commonest failure is a device that was busy
   # rather than anything about the app — an interrupted run leaves one
@@ -115,9 +135,6 @@ IPAD_UDID=$(udid_for "$IPAD")
 IPHONE_UDID=$(udid_for "$IPHONE")
 
 echo "Writing to $DESTINATION:"
-boot "$IPAD_UDID"
-boot "$IPHONE_UDID"
-
 failed=0
 for pair in "${LOCALES[@]}"; do
   language="${pair%%:*}"

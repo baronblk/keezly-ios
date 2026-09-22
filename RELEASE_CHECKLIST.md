@@ -191,11 +191,13 @@ called complete until the gameplay items above are implemented and re-run.
       13" and an iPhone 17 Pro Max, 14 each, 0 with faults.** Every capture the right way up, no
       dead band on any edge, short edge at or above App Store Connect's 1290px
       (the iPhone set is 1320×2868). Re-run this after any capture change
-- [ ] Screenshot set regenerated with the status bar pinned — the set that
-      proved the pipeline was captured before `screenshots.sh` began
-      overriding the clock, so its status bars carry the machine's time rather
-      than 9:41 and disagree between captures. Cosmetic, and it must not reach
-      a listing
+- [ ] Screenshot set regenerated with the status bar pinned **and the
+      simulator in the right locale** — the set that proved the pipeline
+      predates both. `-testLanguage` sets the app's language and nothing else,
+      so the Dutch captures carry a German date across the status bar over an
+      app saying "Jouw beurt". Cosmetic to a machine; to a Dutch reader it is
+      the first thing on the screen and the first thing that says the
+      screenshot was faked. It must not reach a listing
 - [ ] Screenshot **human** gate, which no script here performs and none
       pretends to: somebody opens the set and confirms there is no debug
       overlay, no keyboard, no loading spinner, no test identifier, no raw
