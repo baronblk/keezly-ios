@@ -187,8 +187,8 @@ called complete until the gameplay items above are implemented and re-run.
 - [ ] Screenshots complete for de-DE, nl-NL, en — iPhone and iPad
 - [ ] iPad 13" landscape screenshots lead the iPad set
 - [x] Screenshot **mechanical** gate: `fastlane screenshots_verify` green —
-      **70 captures across de-DE, nl-NL and en on an iPad Pro 13" and an
-      iPhone 17 Pro Max, 0 with faults.** Every capture the right way up, no
+      **84 captures — the full matrix of de-DE, nl-NL and en on an iPad Pro
+      13" and an iPhone 17 Pro Max, 14 each, 0 with faults.** Every capture the right way up, no
       dead band on any edge, short edge at or above App Store Connect's 1290px
       (the iPhone set is 1320×2868). Re-run this after any capture change
 - [ ] Screenshot set regenerated with the status bar pinned — the set that

@@ -281,10 +281,10 @@ Tracked as a release blocker in `CURRENT_STATE.md` and decided in DEC-027.
 | M11.2 Xcode Cloud "Keezly Main" workflow (build + test + analyze) | NOT STARTED |
 | M11.3 Xcode Cloud "Keezly Release" workflow (+ archive + TestFlight) | NOT STARTED |
 | M11.4 Screenshot harness, fixtures and deterministic screenshot mode | **DONE** — `DesignReviewScreenshots` captures from `XCUIScreen.main`, asserts its own orientation, and the set is now exported to files and checked as files (ISS-012) |
-| M11.5 `fastlane screenshots` / `screenshots_verify` | **IMPLEMENTED, NOT YET RUN END TO END** — both lanes exist and delegate to `scripts/screenshots.sh` and `scripts/screenshots-verify.py`; the verifier has been run against a set that does carry black bands and named them |
+| M11.5 `fastlane screenshots` / `screenshots_verify` | **DONE, RUN** — the full matrix captured and verified, 84 files, 0 faults. Running it for real found four things no test had: the exported orientation was a tag rather than pixels, the capture device was below App Store Connect's minimum, the turn indicator could vanish between the board and the line under it, and a busy simulator could lose a whole set |
 | M11.6 `fastlane qa` and `fastlane release_check` | **PARTIAL** — `lint` run and green; it found four files that had never passed `swiftformat`, because on the previously pinned Ruby no lane could run at all |
 | M11.7 Large-scale AI simulation in CI | **DONE, VERIFIED** — `SoakTests`, **630 complete matches in 213 s, clean**, across every strength, table size, team mode and rule variant, gated behind `KEEZLY_EXTENDED_SIM=1`. It found ISS-017 and ISS-018 on its first run. Not wired into Xcode Cloud, which is blocked on MAN-02/MAN-04 |
-| M11.8 Simulator/orientation/localisation UI test matrix | **IMPLEMENTED, NOT YET RUN** — `scripts/screenshots.sh` sweeps de-DE, nl-NL and en across an iPhone and an iPad with `-testLanguage`/`-testRegion` |
+| M11.8 Simulator/orientation/localisation UI test matrix | **DONE, RUN** — de-DE, nl-NL and en across an iPhone and an iPad, both orientations, 84 captures verified as files |
 | M11.9 Role-based physical device discovery (`scripts/devices.sh`) | DONE |
 | M11.10 fastlane device lanes (`device_smoke`, `device_iphone`, `device_ipad`, `device_gate`) | DONE |
 | M11.11 Physical iPhone quality gate | PARTIAL — 58/58 on an iPhone 17 Pro (iOS 27.0); haptics, audio and Game Center items wait on those features |
@@ -316,7 +316,7 @@ done (§178).
 | M12.0 `MARKETING_VERSION` is 1.0.0 | **DONE** — in `Config/Keezly.xcconfig`, deliberately not on the project, so a CI build-number override still wins |
 | M12.1 `RELEASE_CHECKLIST.md` fully ticked with evidence | **PARTIAL** — every gate that can be run here is run and recorded with its numbers; the rest name what they are waiting for rather than being left blank |
 | M12.2 App Store metadata in nl-NL, de-DE, en | **DONE except MAN-13** — every text field written per language and checked by `scripts/metadata-check.sh` against App Store Connect's character limits and against any claim the build cannot keep. The copyright holder and the support and privacy URLs are somebody's to supply; the check fails while they are missing |
-| M12.3 Screenshot sets (iPad 13" landscape first) | **IN PROGRESS** — pipeline complete and verified as files; the set itself is being captured across three locales and two devices |
+| M12.3 Screenshot sets (iPad 13" landscape first) | **CAPTURED AND MECHANICALLY VERIFIED** — 84 captures, the full matrix of de-DE, nl-NL and en across an iPad Pro 13" and an iPhone 17 Pro Max, 14 each, **0 with faults**. Needs one more run with the status bar pinned, and a person to look at them |
 | M12.4 Privacy manifest and App Store privacy answers | **MANIFEST DONE** — `App/Keezly/PrivacyInfo.xcprivacy` declares the one required-reason API (`UserDefaults`, CA92.1), tracking false, collected data empty, each because it is. `PRIVACY.md` is the source for the listing text. The answers in the web form are a declaration made under somebody's own name |
 | M12.5 TestFlight build verified | **BLOCKED** — MAN-02, then MAN-04 |
 
