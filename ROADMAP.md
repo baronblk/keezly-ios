@@ -20,7 +20,7 @@ Operative detail — what works today, what is next — lives in `CURRENT_STATE.
 | M9 | Statistics / Replay / Game Center Meta | DONE — achievement reporting BLOCKED (MAN-02) |
 | M10 | Localisation | DONE |
 | M11 | CI / QA / Hardening | IN PROGRESS |
-| M12 | Release Candidate 1.0.0 | NOT STARTED |
+| M12 | Release Candidate 1.0.0 | RC PREPARED |
 
 ---
 
@@ -303,15 +303,36 @@ Xcode Cloud has not been authorised (MAN-04). This is tracked, not hidden.
 
 ---
 
-## M12 — Release Candidate 1.0.0 — NOT STARTED
+## M12 — Release Candidate 1.0.0 — RC PREPARED
+
+**RC PREPARED, not RELEASE READY, and the difference is not a formality.**
+Everything that can be decided and checked inside this repository is done.
+Everything that needs an Apple account, a domain, a person's legal name or a
+pair of ears is not, and none of it is ticked on the strength of the rest being
+done (§178).
 
 | Task | Status |
 |---|---|
-| M12.1 `RELEASE_CHECKLIST.md` fully ticked with evidence | NOT STARTED |
-| M12.2 App Store metadata in nl-NL, de-DE, en | NOT STARTED |
-| M12.3 Screenshot sets (iPad 13" landscape first) | NOT STARTED |
-| M12.4 Privacy manifest and App Store privacy answers | NOT STARTED |
-| M12.5 TestFlight build verified | NOT STARTED |
+| M12.0 `MARKETING_VERSION` is 1.0.0 | **DONE** — in `Config/Keezly.xcconfig`, deliberately not on the project, so a CI build-number override still wins |
+| M12.1 `RELEASE_CHECKLIST.md` fully ticked with evidence | **PARTIAL** — every gate that can be run here is run and recorded with its numbers; the rest name what they are waiting for rather than being left blank |
+| M12.2 App Store metadata in nl-NL, de-DE, en | **DONE except MAN-13** — every text field written per language and checked by `scripts/metadata-check.sh` against App Store Connect's character limits and against any claim the build cannot keep. The copyright holder and the support and privacy URLs are somebody's to supply; the check fails while they are missing |
+| M12.3 Screenshot sets (iPad 13" landscape first) | **IN PROGRESS** — pipeline complete and verified as files; the set itself is being captured across three locales and two devices |
+| M12.4 Privacy manifest and App Store privacy answers | **MANIFEST DONE** — `App/Keezly/PrivacyInfo.xcprivacy` declares the one required-reason API (`UserDefaults`, CA92.1), tracking false, collected data empty, each because it is. `PRIVACY.md` is the source for the listing text. The answers in the web form are a declaration made under somebody's own name |
+| M12.5 TestFlight build verified | **BLOCKED** — MAN-02, then MAN-04 |
+
+### What stands between RC PREPARED and RELEASE READY
+
+None of these is code, and none of them can be closed from here:
+
+| Gate | Waiting on |
+|---|---|
+| An App Store Connect record for `de.gcng.keezly` | MAN-02 — blocks TestFlight, Game Center and Xcode Cloud |
+| Xcode Cloud authorised and its three workflows run for real | MAN-04, after MAN-02. Not simulated, not described as done |
+| The app icon seen on a physical device | The icon is integrated and verified in the built `Assets.car` and on both simulators; nobody has looked at a physical home screen |
+| The seven sound cues listened to | On real hardware, speaker and headphones, at playing volume. No test here can stand in for it (M8) |
+| A real Game Center match between two Apple Accounts | MAN-05, MAN-11, MAN-12 |
+| The copyright holder, support URL and privacy URL | MAN-13 |
+| A person looking at the screenshot set | The mechanical gate is automated; "no debug overlay, no placeholder, nobody's name" is not |
 
 ---
 

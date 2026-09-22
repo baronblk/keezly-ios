@@ -8,10 +8,13 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-1a03343  feat(l10n): gate the String Catalog, and say one thing one way per language
+36446af  fix(screenshots): put the orientation in the pixels, not in a tag
 ```
 
-Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
+Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64):
+`KeezlyCore` 176 tests in 16 suites green in 145 s, the soak 630 complete
+matches green in 213 s, `fastlane lint` green, and the screenshot set measured
+on disk rather than in memory.
 
 ---
 

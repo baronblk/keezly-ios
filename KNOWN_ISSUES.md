@@ -309,18 +309,28 @@ anyway: a shape helps somebody using the app in bright sunlight too.
   quarter-turn in `attach` was kept as a guard rather than deleted when it
   stopped firing, which is the only reason this was a correction rather than a
   rediscovery.
-- **And a second defect underneath it: the in-test assertion was proving
-  nothing.** `attach` asserts that a landscape capture is wider than it is
-  tall, and those assertions passed — on the `UIImage` in memory. The
-  attachment did not carry it. A whole exported set of fourteen captures came
-  out 2064×2752, every one of them, including the ones just asserted to be
-  landscape. `XCTAttachment(image:)` is now `XCTAttachment(data:)` with the
-  corrected image's own PNG bytes.
+- **And the defect underneath it, which is the real one: the orientation was
+  in a tag rather than in the pixels.** `UIImage(data:
+  screenshot.pngRepresentation)` reports its `size` as 2752×2064 — landscape,
+  and correct — while the bytes behind it are 2064×2752 portrait plus an
+  orientation tag. UIKit honours the tag, so `size`, the quarter-turn guard and
+  every assertion in `attach` agreed the capture was landscape. Nothing else
+  honours it: Pillow reads the exported file as portrait, and so would App
+  Store Connect.
 
-  The general lesson is worth keeping: **an assertion about a capture proves
-  nothing about the capture that ships.** It is precisely why the set is
-  exported to files and checked as files, and the file check caught this within
-  a minute of first being pointed at a real set.
+  The evidence was a single file of **2,550,479 bytes** that the test measured
+  as 2752×2064 and the disk measured as 2064×2752 — the same bytes, read two
+  ways, and only one of the two readers is the one that matters.
+
+  `flattened` now redraws any image that is not already `.up`, which puts the
+  orientation into the pixels. `attach` also measures the **encoded bytes**
+  before attaching them, because that is the only measurement in that file
+  which was ever going to catch this.
+- **The lesson, which is worth more than the fix:** an assertion about a
+  capture proves nothing about the capture that ships. Every check in the test
+  passed throughout. The file check found it within a minute of first being
+  pointed at a real set, which is the entire argument for exporting captures to
+  disk instead of leaving them as attachments.
 - **Explicitly not the answer:** cropping a fixed black margin, or any
   correction tuned to one device's proportions. The margin is an artefact of
   the wrong capture source, not something to trim off.
@@ -335,10 +345,12 @@ anyway: a shape helps somebody using the app in bright sunlight too.
   capture source is wrong and not to crop it, because a crop constant tuned to
   one device's proportions would make the symptom disappear and leave the
   defect (§43).
-- **Verified by:** the verifier run against a capture set that *does* carry
-  black bands — the letterboxed pane captures from `board-review.sh` — where it
-  names them and gives the share of the frame. A check that has never fired is
-  not a check.
+- **Verified by:** measured on disk, not in memory —
+  `four-players-landscape.png` comes out **2752×2064** and
+  `four-players-portrait.png` **2064×2752**. And the black-band check was
+  exercised against a set that *does* carry bands — the letterboxed pane
+  captures from `board-review.sh` — where it names them and gives the share of
+  the frame. A check that has never fired is not a check.
 - **Related files:** `App/KeezlyUITests/DesignReviewScreenshots.swift`,
   `scripts/screenshots.sh`, `scripts/screenshots-verify.py`
 

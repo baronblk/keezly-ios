@@ -6,15 +6,18 @@ stays unticked and is marked `NOT RUN` — never "probably fine" (§139).
 
 ---
 
-## Release 1.0.0 — status: **NOT READY**
+## Release 1.0.0 — status: **RC PREPARED — NOT RELEASE READY**
 
-The app builds and runs on simulator and on a physical iPhone, but there is no
-gameplay yet. This checklist is filled in as work lands, not reconstructed at
-the end.
+Everything that can be decided and checked inside this repository is done and
+recorded below with its numbers. Everything that needs an Apple account, a
+domain, a person's legal name or a pair of ears is not, and nothing is ticked
+on the strength of the rest being done (§178). This checklist is filled in as
+work lands, not reconstructed at the end.
 
 ### Build and versioning
 
-- [ ] `MARKETING_VERSION` is `1.0.0`
+- [x] `MARKETING_VERSION` is `1.0.0` — in `Config/Keezly.xcconfig` rather than
+      on the project, so a CI build-number override still wins
 - [ ] Build number is monotonic and derived from CI
 - [ ] Git tree clean, release commit tagged
 - [ ] Release configuration contains no debug menu, AI debug output or board overlay
@@ -30,7 +33,15 @@ the end.
       `8c9fa43`. Scope is launch, rotation, the card-interaction flow, the
       animation pipeline, the ornament geometry and the capture fixtures; the
       rule-specific gameplay items below are not yet scripted.
-- [ ] Large-scale randomised simulation green — partial: 221 matches in the invariant suite
+- [x] Large-scale randomised simulation green — **630 complete matches in
+      213 s, clean**, over every strength against every table size from two
+      seats to six, tables of mixed strengths, both team modes and six rule
+      variants (`KEEZLY_EXTENDED_SIM=1 swift test --filter Soak`), on top of
+      the 221 the invariant suite already played. It found two defects on its
+      first run: ISS-018, an assertion that called a legal end position a
+      broken rule engine, and ISS-017, `HardAgent` stopping its search on a
+      wall clock in the headless harness so that the same seed played a
+      different match depending on machine load. Both fixed
 - [ ] No known critical bugs — *currently true; see `KNOWN_ISSUES.md`*
 
 ### Simulator matrix
