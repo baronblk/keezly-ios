@@ -265,6 +265,11 @@ platform :ios do
     icon_dir = File.join(REPO_ROOT, "App/Keezly/Assets.xcassets/AppIcon.appiconset")
     results["App icon present"] = !Dir.glob(File.join(icon_dir, "*.png")).empty?
 
+    # The shipped cues must still be the ones the generator makes. "Generated
+    # from source" is a claim about provenance, and a claim nobody can check is
+    # a story (§77).
+    results["Sounds match their source"] = system("cd #{REPO_ROOT} && ./scripts/sounds-check.sh >/dev/null")
+
     # Screenshots. Reported as its own gate rather than folded into the others,
     # and absent is absent — a release check that passed with no screenshots at
     # all would be telling a useful lie.
