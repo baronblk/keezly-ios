@@ -74,32 +74,33 @@ struct AchievementReportingTests {
 
     // MARK: - The wiring
 
-    /// Plays a real match through `submit` and the agents, which is the only
-    /// path that reports. `fastForward` deliberately does not go through it.
-    @Test("finishing a match reports it, exactly once")
-    func finishingReportsOnce() async throws {
+    /// The gap this whole file exists for: the evaluator was right, and
+    /// nothing called it.
+    @Test("a match that finishes reports it, exactly once")
+    func finishingReportsOnce() throws {
         let spy = Spy()
-        let match = session(seats: 2, spy: spy)
-        var generator = SeededGenerator(seed: 0xA11CE)
+        let match = session(fixture: .movesPlayed(2000), spy: spy)
+        try #require(match.result != nil, "the fixture never finished, so nothing could be reported")
 
-        for _ in 0..<4000 {
-            if match.result != nil { break }
-            if match.isBusy || !match.currentRole.isHuman {
-                match.animationsFinished()
-                await Task.yield()
-                continue
-            }
-            let moves = MoveGenerator.legalMoves(in: match.state, for: match.state.currentSeat)
-            let action: PlayerAction = moves.isEmpty
-                ? .foldHand(seat: match.state.currentSeat)
-                : .play(moves[Int.random(in: 0..<moves.count, using: &generator)])
-            _ = match.submit(action, atRevision: match.state.revision)
-        }
-
-        try #require(match.result != nil, "the match never finished, so nothing could be reported")
-        #expect(spy.reports.count == 1, "a match that ended once reported once")
+        #expect(spy.reports.count == 1)
         #expect(spy.reports.first == match.achievementsEarned)
         #expect(spy.reports.first?.contains(.finished) == true)
+    }
+
+    @Test("a match still going has reported nothing")
+    func midMatchReportsNothing() {
+        let spy = Spy()
+        let match = session(fixture: .movesPlayed(20), spy: spy)
+        #expect(match.result == nil)
+        #expect(spy.reports.isEmpty)
+    }
+
+    @Test("a table of people reports nothing even when it ends")
+    func passAndPlayReportsNothing() throws {
+        let spy = Spy()
+        let match = session(humans: 4, fixture: .movesPlayed(2000), spy: spy)
+        try #require(match.result != nil)
+        #expect(spy.reports.isEmpty)
     }
 
     // MARK: - The harness

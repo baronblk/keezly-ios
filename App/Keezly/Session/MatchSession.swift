@@ -275,7 +275,14 @@ final class MatchSession {
             guard let advanced = try? GameReducer.apply(action, to: state) else { return false }
             state = advanced.state
             record.append(action)
-            result = advanced.state.result
+            // Noted as well as appended, exactly as `apply` does. Without this
+            // the record's status stayed `.active` on a match the fixture had
+            // played to its end, and a status that disagrees with the position
+            // is the one thing `note` exists to prevent — it also made the
+            // record earn no achievements, since an unfinished match earns
+            // none.
+            record.note(advanced.state)
+            noteResult(advanced.state.result)
         }
 
         // Ran out of moves without arriving. Say so rather than leaving the
@@ -368,9 +375,7 @@ final class MatchSession {
         persist()
 
         pendingEvents = transition.events
-        let wasFinished = result != nil
-        result = transition.state.result
-        if !wasFinished, result != nil { reportAchievements() }
+        noteResult(transition.state.result)
         // Closed until the board says it has caught up. The state is already
         // final; this only stops a second tap landing on a stale view (§63).
         isBusy = true
@@ -388,7 +393,18 @@ final class MatchSession {
     /// account; crediting whoever happens to sit in the first seat would
     /// attribute somebody else's win to the device's owner. A table of people
     /// earns nothing, which is the honest answer rather than a convenient one.
-    private func reportAchievements() {
+    /// The one place a match is noticed to be over.
+    ///
+    /// Both paths that can finish one go through here — an accepted action and
+    /// `fastForward` — so there is no second way to reach a finished match
+    /// that forgets to report it. That is not hypothetical tidiness: the whole
+    /// reason this exists is that a feature was registered with Apple and
+    /// never reported by anything.
+    private func noteResult(_ newResult: GameResult?) {
+        let wasFinished = result != nil
+        result = newResult
+        guard !wasFinished, newResult != nil else { return }
+
         guard let achievements else { return }
         let earned = achievementsEarned
         guard !earned.isEmpty else { return }
