@@ -12,15 +12,13 @@ Two sources of truth, and no third:
   matches into Application Support, and `GameCenterTransport` is the only file
   in the project that touches a network at all.
 
-Anything neither source settles is marked `LEGAL REVIEW REQUIRED` in place,
-visibly, rather than filled in with something plausible. A privacy policy that
-guesses is worse than one that admits a gap.
+The provider's legal particulars were supplied and confirmed by the owner and
+live in `content.IMPRESSUM`. Nothing here is inferred, and nothing here may
+carry an internal note: `scripts/website-check.py` fails the build if a draft
+marker reaches a public page.
 """
 
-REVIEW = ("LEGAL REVIEW REQUIRED", "LEGAL REVIEW REQUIRED", "LEGAL REVIEW REQUIRED")
-
 PRIVACY_BODY = {}
-IMPRINT_NOTE = {}
 A11Y_BODY = {}
 
 # ------------------------------------------------------------------- German
@@ -103,16 +101,6 @@ PRIVACY_BODY["de"] = """
     <a href="mailto:support@gcng.de">support@gcng.de</a>.</p>
 """
 
-IMPRINT_NOTE["de"] = """
-    <div class="note">
-      <p>Diese Angaben sind von der bestehenden Rechtsseite des Anbieters
-      übernommen (<a href="https://support.gcng.de/legal/impressum.html">support.gcng.de</a>,
-      Stand 22.09.2026). Eine Umsatzsteuer-Identifikationsnummer ist dort nicht
-      angegeben und wird hier deshalb auch nicht genannt.</p>
-      <p><strong>Entwurf — rechtliche Prüfung erforderlich.</strong> Ob für
-      Keezly zusätzliche Angaben nötig sind, hat ein Mensch zu entscheiden.</p>
-    </div>
-"""
 
 A11Y_BODY["de"] = """
     <h2>VoiceOver</h2>
@@ -146,11 +134,6 @@ A11Y_BODY["de"] = """
     die Eingabetaste führt aus, Escape bricht ab. Der Fokusrahmen ist in
     Schwarz und Weiß gezeichnet und damit unabhängig von der Farbe erkennbar.</p>
 
-    <div class="note">
-      <p>Was hier steht, ist umgesetzt und geprüft. Eine Prüfung mit
-      Tastatur und Zeigegerät auf echter Hardware steht noch aus, weil dafür
-      Geräte fehlen; das ist im Projekt als offener Punkt vermerkt.</p>
-    </div>
 
     <h2>Rückmeldung</h2>
     <p>Wenn Ihnen etwas begegnet, das sich nicht bedienen lässt, schreiben Sie
@@ -232,16 +215,6 @@ PRIVACY_BODY["nl"] = """
     privacy gaan naar <a href="mailto:support@gcng.de">support@gcng.de</a>.</p>
 """
 
-IMPRINT_NOTE["nl"] = """
-    <div class="note">
-      <p>Deze gegevens zijn overgenomen van de bestaande rechtspagina van de
-      aanbieder (<a href="https://support.gcng.de/legal/impressum.html">support.gcng.de</a>,
-      geraadpleegd 22-09-2026). Daar staat geen btw-identificatienummer vermeld,
-      dus het wordt hier ook niet genoemd.</p>
-      <p><strong>Concept — juridische toetsing vereist.</strong> Of Keezly
-      aanvullende vermeldingen nodig heeft, is aan een mens om te beoordelen.</p>
-    </div>
-"""
 
 A11Y_BODY["nl"] = """
     <h2>VoiceOver</h2>
@@ -275,11 +248,6 @@ A11Y_BODY["nl"] = """
     uit en Escape annuleert. De focusrand is in zwart en wit getekend en dus
     onafhankelijk van kleur te zien.</p>
 
-    <div class="note">
-      <p>Wat hier staat is gebouwd en getest. Een controle met toetsenbord en
-      aanwijsapparaat op echte hardware staat nog open omdat daarvoor apparaten
-      ontbreken; dat is in het project als openstaand punt vastgelegd.</p>
-    </div>
 
     <h2>Terugkoppeling</h2>
     <p>Komt u iets tegen dat niet te bedienen is, schrijf dan naar
@@ -359,16 +327,6 @@ PRIVACY_BODY["en"] = """
     <a href="mailto:support@gcng.de">support@gcng.de</a>.</p>
 """
 
-IMPRINT_NOTE["en"] = """
-    <div class="note">
-      <p>These details are transcribed from the provider's existing legal page
-      (<a href="https://support.gcng.de/legal/impressum.html">support.gcng.de</a>,
-      read 22 September 2026). No VAT identification number is stated there, so
-      none is stated here.</p>
-      <p><strong>Draft — human legal review required.</strong> Whether Keezly
-      needs any further disclosure is for a person to decide.</p>
-    </div>
-"""
 
 A11Y_BODY["en"] = """
     <h2>VoiceOver</h2>
@@ -402,12 +360,6 @@ A11Y_BODY["en"] = """
     acts and Escape cancels. The focus ring is drawn in black and white, so it
     does not depend on colour.</p>
 
-    <div class="note">
-      <p>What is described here is built and tested. A check with a hardware
-      keyboard and pointer on real equipment is still outstanding because the
-      hardware is not available; that is recorded as an open item in the
-      project.</p>
-    </div>
 
     <h2>Feedback</h2>
     <p>If you meet something you cannot operate, please write to

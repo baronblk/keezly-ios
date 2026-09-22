@@ -289,21 +289,29 @@ def imprint(locale):
 <section>
   <div class="wrap prose">
     <h1>{esc(i['h1'])}</h1>
+    <p>{esc(i['intro'])}</p>
+
+    <h2>{esc(i['provider_h'])}</h2>
     <address>
-      {esc(m['name'])} ({esc(m['role'])})<br>
+      {esc(m['name'])}<br>
       {esc(m['street'])}<br>
       {esc(m['postcode'])} {esc(m['city'])}<br>
       {esc(m['country'])}
     </address>
+
+    <h2>{esc(i['contact_h'])}</h2>
     <dl class="facts">
-      <dt>E-Mail</dt>
+      <dt>{esc(i['email_label'])}</dt>
       <dd><a href="mailto:{esc(m['email'])}">{esc(m['email'])}</a></dd>
-      <dt>Telefon</dt>
+      <dt>{esc(i['phone_label'])}</dt>
       <dd>{esc(m['phone'])}</dd>
-      <dt>{esc(i['responsible_h'])}</dt>
-      <dd>{esc(m['responsible'])}</dd>
     </dl>
-{IMPRINT_NOTE[locale]}
+
+    <h2>{esc(i['vat_h'])}</h2>
+    <p>{esc(i['vat_p'])}</p>
+
+    <h2>{esc(i['dispute_h'])}</h2>
+    <p>{esc(i['dispute_p'])}</p>
   </div>
 </section>
 """
@@ -327,14 +335,12 @@ def a11y(locale):
 # assembled from fragments: a privacy statement has to read as one document to
 # a person, not as a template that happens to render.
 PRIVACY_BODY = {}
-IMPRINT_NOTE = {}
 A11Y_BODY = {}
 
 
 def load_prose():
     mod = __import__("prose")
     PRIVACY_BODY.update(mod.PRIVACY_BODY)
-    IMPRINT_NOTE.update(mod.IMPRINT_NOTE)
     A11Y_BODY.update(mod.A11Y_BODY)
 
 

@@ -13,29 +13,27 @@ rather than by reading HTML. Two rules govern what may go in here:
 
 `scripts/website-check.py` enforces both against the built HTML.
 
-The legal details are transcribed from the owner's own published pages at
-support.gcng.de and are not invented here. Anything those pages do not state
-is marked for review rather than filled in.
+The legal details in `IMPRESSUM` are the provider's binding particulars,
+supplied and confirmed by the owner. They are not inferred from anywhere and
+must not be edited without them.
 """
 
-# Verified 2026-09-22 from https://support.gcng.de/legal/impressum.html
+# The provider's binding legal details, confirmed by the owner 2026-09-22.
 IMPRESSUM = {
-    "name": "Rene Suess",
-    "role": "Freiberufler",
+    "name": "Rene Süß",
     "street": "Barbarossastraße 91",
     "postcode": "09112",
     "city": "Chemnitz",
     "country": "Deutschland",
     "email": "support@gcng.de",
-    "phone": "+49 (0) 176 222 92 818",
-    "responsible": "Rene Suess",
+    "phone": "0151 55386821",
 }
 
 SUPPORT_EMAIL = "support@gcng.de"
 SUPPORT_HUB = "https://support.gcng.de/"
 BASE = "/KEEZLY/"
 CANONICAL_ROOT = "https://gcng.de/KEEZLY/"
-COPYRIGHT = "© 2026 Rene Suess"
+COPYRIGHT = "© 2026 Rene Süß"
 
 LOCALES = ["de", "nl", "en"]
 HREFLANG = {"de": "de-DE", "nl": "nl-NL", "en": "en"}
@@ -155,7 +153,18 @@ T["de"] = {
         "title": "Impressum — Keezly",
         "meta": "Impressum und Anbieterkennzeichnung.",
         "h1": "Impressum",
-        "responsible_h": "Verantwortlich für den Inhalt",
+        "intro": "Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).",
+        "provider_h": "Diensteanbieter",
+        "contact_h": "Kontakt",
+        "vat_h": "Umsatzsteuer",
+        "vat_p": "Kleinunternehmer gemäß § 19 UStG. Eine Umsatzsteuer-"
+                 "Identifikationsnummer nach § 27a UStG ist nicht vorhanden.",
+        "dispute_h": "Verbraucherstreitbeilegung",
+        "dispute_p": "Zur Teilnahme an einem Streitbeilegungsverfahren vor einer "
+                     "Verbraucherschlichtungsstelle bin ich weder bereit noch "
+                     "verpflichtet.",
+        "email_label": "E-Mail",
+        "phone_label": "Telefon",
     },
     "a11y": {
         "title": "Barrierefreiheit — Keezly",
@@ -265,7 +274,18 @@ T["nl"] = {
         "title": "Colofon — Keezly",
         "meta": "Colofon en aanbiedergegevens.",
         "h1": "Colofon",
-        "responsible_h": "Verantwoordelijk voor de inhoud",
+        "intro": "Gegevens conform § 5 van de Duitse Digitale-Dienste-Gesetz (DDG).",
+        "provider_h": "Dienstverlener",
+        "contact_h": "Contact",
+        "vat_h": "Omzetbelasting",
+        "vat_p": "Kleineondernemersregeling conform § 19 UStG. Er is geen "
+                 "btw-identificatienummer conform § 27a UStG.",
+        "dispute_h": "Geschillenbeslechting voor consumenten",
+        "dispute_p": "Ik ben niet bereid en niet verplicht deel te nemen aan een "
+                     "geschillenbeslechtingsprocedure voor een "
+                     "consumentengeschillencommissie.",
+        "email_label": "E-mail",
+        "phone_label": "Telefoon",
     },
     "a11y": {
         "title": "Toegankelijkheid — Keezly",
@@ -374,7 +394,17 @@ T["en"] = {
         "title": "Imprint — Keezly",
         "meta": "Imprint and provider identification.",
         "h1": "Imprint",
-        "responsible_h": "Responsible for content",
+        "intro": "Information pursuant to § 5 of the German Digital Services Act (DDG).",
+        "provider_h": "Service provider",
+        "contact_h": "Contact",
+        "vat_h": "Value added tax",
+        "vat_p": "Small-business status under § 19 of the German VAT Act. No VAT "
+                 "identification number under § 27a of the German VAT Act exists.",
+        "dispute_h": "Consumer dispute resolution",
+        "dispute_p": "I am neither willing nor obliged to take part in dispute "
+                     "resolution proceedings before a consumer arbitration board.",
+        "email_label": "Email",
+        "phone_label": "Telephone",
     },
     "a11y": {
         "title": "Accessibility — Keezly",

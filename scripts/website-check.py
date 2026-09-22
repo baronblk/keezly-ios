@@ -56,6 +56,20 @@ EXTERNAL_ASSET = re.compile(r"^(https?:)?//", re.I)
 
 ALLOWED_EXTERNAL_LINKS = {"support.gcng.de", "gcng.de"}
 
+# Internal notes must never reach a published page.
+#
+# The site carried "draft — human legal review required" while the provider's
+# particulars were still being confirmed. That was right at the time and wrong
+# to ship: a visitor reading an imprint does not want to know about the
+# project's internal state, and a privacy page that calls itself a draft is
+# worse than useless. The notes now live in WEBSITE.md.
+INTERNAL_MARKERS = re.compile(
+    r"\bDRAFT\b|\bENTWURF\b|LEGAL REVIEW REQUIRED|OWNER (ACTION|DECISION|CONFIRMATION)|"
+    r"rechtliche Prüfung erforderlich|juridische toetsing|human legal review|"
+    r"TODO|FIXME|PLACEHOLDER|LOREM IPSUM",
+    re.I,
+)
+
 
 class Page(html.parser.HTMLParser):
     def __init__(self):
@@ -125,6 +139,9 @@ def check(root: Path):
                 continue
             fail(path, f"claims something the software cannot keep: {hit.group(0)!r}")
 
+        for hit in INTERNAL_MARKERS.finditer(raw):
+            fail(path, f"carries an internal note into a public page: {hit.group(0)!r}")
+
         for src in p.scripts:
             fail(path, f"carries JavaScript ({src}) — the site is meant to have none")
 
@@ -187,7 +204,8 @@ def check(root: Path):
         return 1
 
     print("Every page: relative links only, all references resolve, every image has "
-          "alt text, no JavaScript, no off-site assets, no claim the app cannot keep.")
+          "alt text, no JavaScript, no off-site assets, no claim the app cannot keep,\n"
+          "and no internal note left in a published page.")
     print("What this cannot tell you is whether the writing and the design are any "
           "good. That needs a person, and for the Dutch, a Dutch one.")
     return 0
