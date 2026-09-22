@@ -1,4 +1,5 @@
 @testable import Keezly
+import AVFoundation
 import Foundation
 import KeezlyCore
 import Testing
@@ -21,6 +22,8 @@ struct FeedbackTests {
 
         func play(_ cue: FeedbackCue) { played.append(cue) }
         func prepare() { prepared = true }
+        // Both channels are recorded the same way, so one recorder serves both
+        // protocols and a test can see whichever it is asking about.
         func hasAsset(for cue: FeedbackCue) -> Bool { assets.contains(cue) }
     }
 
@@ -177,19 +180,56 @@ struct FeedbackTests {
         #expect(worst <= 4, "one turn produced \(worst) separate cues, which is a stutter")
     }
 
-    // MARK: - Sound is not here yet
+    // MARK: - The sounds themselves
 
-    /// **ASSET PENDING**, said out loud rather than implied by silence.
-    @Test("the shipped sound channel has no recordings behind it")
-    func soundIsPending() {
+    /// **Every cue has a recording, and it is one we made.**
+    ///
+    /// The set is synthesised by `Tools/soundforge.py` and installed by
+    /// `scripts/sounds-build.sh`: nothing sampled, nothing downloaded, no
+    /// licence to wonder about (§77). A cue without a file is a moment that
+    /// happens in silence while the others do not, which is worse than a game
+    /// with no sound at all.
+    @Test("every cue has a sound behind it")
+    func everyCueHasASound() {
         let sounds = BundledSounds()
         for cue in FeedbackCue.allCases {
-            #expect(!sounds.hasAsset(for: cue), "\(cue.rawValue) has an asset — update this test and the docs")
+            #expect(sounds.hasAsset(for: cue), "\(cue.rawValue) has no recording")
         }
-        #expect(!Feedback(preferences: Preferences(defaults: store())).hasAnySound)
-        // And the place a recording would go is named, so adding one is a
-        // matter of dropping a file in rather than finding the code.
-        #expect(BundledSounds.fileName(for: .capture) == "capture.caf")
+        #expect(Feedback(preferences: Preferences(defaults: store())).hasAnySound)
+    }
+
+    /// The file a cue looks for is the one the build script writes.
+    @Test("a cue and its file agree on the name")
+    func namesLineUp() {
+        for cue in FeedbackCue.allCases {
+            #expect(BundledSounds.fileName(for: cue) == "\(cue.rawValue).caf")
+            #expect(SoundBank.shared.url(for: cue) != nil, "\(cue.rawValue).caf is not in the bundle")
+        }
+    }
+
+    /// **A cue is short enough to be heard two hundred times.**
+    ///
+    /// Measured from the bundled file rather than trusted from the generator:
+    /// what ships is what matters. The victory cue is allowed to be the long
+    /// one; it is heard once a match.
+    @Test("no cue outstays its welcome")
+    func cuesAreShort() throws {
+        for cue in FeedbackCue.allCases {
+            let url = try #require(SoundBank.shared.url(for: cue))
+            let player = try AVAudioPlayer(contentsOf: url)
+            // The two musical cues are allowed to ring; a contact is not.
+            let limit: Double
+            switch cue {
+            case .victory: limit = 2.0
+            case .home: limit = 1.0
+            default: limit = 0.6
+            }
+            #expect(
+                player.duration <= limit,
+                "\(cue.rawValue) runs \(String(format: "%.2f", player.duration))s"
+            )
+            #expect(player.duration > 0.01, "\(cue.rawValue) is empty")
+        }
     }
 
     @Test("haptics stay quiet enough to play a whole match with")

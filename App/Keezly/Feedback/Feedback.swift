@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import Observation
 import UIKit
@@ -27,9 +28,9 @@ final class Preferences {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        // On by default, because a board game that makes no sound when you put
-        // a piece down feels broken — but see `SoundPlayer`: until there are
-        // sounds to play, this switch governs silence.
+        // On by default, because a board game that makes no sound when you
+        // put a piece down feels broken. Quiet enough that leaving it on is
+        // not a decision anybody has to regret.
         playsSound = defaults.object(forKey: Keys.sound) as? Bool ?? true
         playsHaptics = defaults.object(forKey: Keys.haptics) as? Bool ?? true
     }
@@ -47,6 +48,8 @@ protocol HapticChannel: Sendable {
 /// Something that can make a sound.
 protocol SoundChannel: Sendable {
     @MainActor func play(_ cue: FeedbackCue)
+    /// Loads whatever it needs, so the first cue is not late.
+    @MainActor func prepare()
     /// Whether this cue has an actual recording behind it.
     @MainActor func hasAsset(for cue: FeedbackCue) -> Bool
 }
@@ -82,33 +85,100 @@ struct SystemHaptics: HapticChannel {
 
 /// The sound channel.
 ///
-/// **ASSET PENDING.** The architecture is here and the cues are wired; there
-/// are no recordings behind them yet, so every call is silence.
+/// Seven cues, all synthesised by `Tools/soundforge.py` and installed by
+/// `scripts/sounds-build.sh`. Nothing is sampled and nothing is downloaded:
+/// the provenance of the audio is the source code that made it, which is the
+/// only kind of provenance worth having (§77).
 ///
-/// That is a decision rather than an oversight. Keezly may only ship audio it
-/// owns or can clearly account for (§77), and a set of mediocre placeholder
-/// noises would be worse than none: they would be heard on every move, they
-/// would set the tone of the whole game, and they would be very hard to
-/// justify removing later. `hasAsset(for:)` answers honestly, and the settings
-/// screen says so rather than offering a switch that does nothing.
+/// They are modal synthesis — the way a struck object actually sounds. A piece
+/// set down on a board rings at a few inharmonic frequencies that decay at
+/// different rates; a card is broadband noise that is over almost immediately.
+/// That is why the set reads as wood and paper rather than as beeps, and it is
+/// what keeps it inside the board's own design language.
 ///
-/// When the recordings exist they drop into the bundle under the cue's own
-/// name — `place.caf`, `capture.caf` — and nothing else changes.
+/// Played through `AVAudioPlayer` on the **ambient** session category, which
+/// is the correct choice for a board game: it respects the silent switch and
+/// it does not stop whatever the player was listening to.
 struct BundledSounds: SoundChannel {
-    /// Where a recording for a cue would be found.
+    /// Where a recording for a cue lives.
     static func fileName(for cue: FeedbackCue) -> String { "\(cue.rawValue).caf" }
 
     @MainActor
     func hasAsset(for cue: FeedbackCue) -> Bool {
-        Bundle.main.url(forResource: cue.rawValue, withExtension: "caf") != nil
+        SoundBank.shared.url(for: cue) != nil
+    }
+
+    @MainActor
+    func prepare() {
+        SoundBank.shared.prepare()
     }
 
     @MainActor
     func play(_ cue: FeedbackCue) {
-        guard hasAsset(for: cue) else { return }
-        // Intentionally unimplemented until there is something to play. A
-        // player who has never heard a sound from Keezly has heard exactly
-        // what this release promises.
+        SoundBank.shared.play(cue)
+    }
+}
+
+/// Holds the players so a cue lands the instant it is asked for.
+///
+/// Building an `AVAudioPlayer` takes long enough to be heard as lateness on a
+/// sound that is meant to coincide with a piece going down, so each cue is
+/// prepared once. Two players per cue, alternated: a Seven can put two pieces
+/// down close enough together that the second would otherwise cut the first
+/// off mid-knock.
+@MainActor
+final class SoundBank {
+    static let shared = SoundBank()
+
+    private var players: [FeedbackCue: [AVAudioPlayer]] = [:]
+    private var next: [FeedbackCue: Int] = [:]
+    private var sessionReady = false
+
+    private init() {}
+
+    func url(for cue: FeedbackCue) -> URL? {
+        Bundle.main.url(forResource: cue.rawValue, withExtension: "caf")
+    }
+
+    /// Loads every cue and readies the audio session.
+    ///
+    /// Called when a board appears. Doing it lazily on the first cue would put
+    /// the cost exactly where it is most audible.
+    func prepare() {
+        guard !sessionReady else { return }
+        sessionReady = true
+
+        do {
+            // Ambient: the silent switch silences it, and the player's own
+            // music keeps playing. A game that stopped somebody's podcast to
+            // click at them would deserve what it got.
+            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            // Sound is not worth failing over. The game is silent and plays on.
+            return
+        }
+
+        for cue in FeedbackCue.allCases {
+            guard let url = url(for: cue) else { continue }
+            let pair = (0..<2).compactMap { _ -> AVAudioPlayer? in
+                guard let player = try? AVAudioPlayer(contentsOf: url) else { return nil }
+                player.prepareToPlay()
+                return player
+            }
+            if !pair.isEmpty { players[cue] = pair }
+        }
+    }
+
+    func play(_ cue: FeedbackCue) {
+        prepare()
+        guard let pair = players[cue], !pair.isEmpty else { return }
+        let index = (next[cue] ?? 0) % pair.count
+        next[cue] = index + 1
+
+        let player = pair[index]
+        player.currentTime = 0
+        player.play()
     }
 }
 
@@ -125,8 +195,8 @@ struct Feedback {
     var sounds: any SoundChannel = BundledSounds()
 
     func prepare() {
-        guard preferences.playsHaptics else { return }
-        haptics.prepare()
+        if preferences.playsHaptics { haptics.prepare() }
+        if preferences.playsSound { sounds.prepare() }
     }
 
     /// Plays whatever this run of events is worth.
