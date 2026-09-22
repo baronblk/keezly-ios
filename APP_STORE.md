@@ -180,8 +180,81 @@ An earlier version of this document said these needed a web form. That was
 wrong: only **v1** paths had been probed, and the v2 resources that Apple
 documents were never tested. `POST /v2/gameCenterAchievements` works.
 
-**GAME CENTER E2E = NOT VERIFIED.** Metadata existing is not the same as two
-real accounts playing a match on two real devices.
+### The app did not report any of them
+
+Found by reading the app rather than the record, on 2026-09-22. All ten existed
+at Apple, `AchievementEvaluator.unlocked(in:for:)` was fully tested — and
+**nothing in the app ever submitted a `GKAchievement`**. `GameKit` was imported
+by exactly one file, `GameCenterTransport`, which nothing referenced;
+`GameCenterAuthentication` was referenced by nothing at all. A player could have
+earned every one of them and been told about none.
+
+`AchievementReportingTests` now pins the rule, and the gap it was written for:
+`AchievementTests` could never have caught this, because the evaluator was
+right the whole time. What was missing was anything that called it.
+
+Reported only for a table with **one** person at it. In pass & play several
+people share the device and one of them owns the Game Center account, so
+crediting the first seat would attribute somebody else's win to the owner.
+
+**GAME CENTER E2E = NOT VERIFIED.** Metadata existing is not the same as a
+signed-in account on a real device seeing a banner, and that has not happened
+yet. The reporting path is covered by tests that use a spy, not by Apple.
+
+---
+
+## There is no online play in 1.0.0
+
+`GameCenterTransport` implements turn-based play over `GKTurnBasedMatch` and is
+tested against `InMemoryTransport`. **Nothing in the interface reaches it.** It
+compiles into the binary and is unreachable.
+
+That is a perfectly reasonable thing to ship — an unclaimed feature harms
+nobody. What was not reasonable is that the website promised it, on the home
+page, in the FAQ and on all three privacy pages, in all three languages. Those
+are corrected. If online play is wanted in 1.0.0 it is a product decision and a
+user interface, not a fix, and it is the owner's call.
+
+---
+
+## Review Information — ASC VERIFIED
+
+| | |
+|---|---|
+| Contact | Rene Süß · support@gcng.de · +4915155386821 |
+| Demo account | Not required, and that is now stated rather than left blank |
+| Notes | 1819 characters, read back from Apple after writing |
+
+The notes tell a reviewer there is no sign-in, name every main-menu button
+exactly as the app spells it, and explain that the pass & play cover is
+deliberate rather than a loading screen — the one thing about Keezly a reviewer
+could reasonably mistake for a bug.
+
+Three screen names in the first draft were invented (`Play`, `Statistics`, "I
+have the device"). The app says `Start game`, `Matches` and `I have it`. Checked
+against `Localizable.xcstrings` and corrected before they reached Apple.
+
+---
+
+## Age rating — ANSWERED, NOT AUDITED BY THE OWNER
+
+The declaration exists and reads as all-`NONE` except one line:
+
+```
+contests: INFREQUENT_OR_MILD
+```
+
+Everything else — violence, gambling, simulated gambling, profanity, horror,
+drugs, weapons, sexual content, unrestricted web access, user-generated
+content, messaging, advertising, loot boxes — is `NONE` or `false`, which
+matches the app.
+
+`contests` does not. Apple's question is about contests and sweepstakes run
+**through the app**; a competitive board game is not one, and Keezly offers no
+prize, entry or draw of any kind. It looks like it should be `NONE`.
+
+**Not changed.** An age rating is a declaration in the owner's name, and this
+one is his to make. It is one field in the web form, or one PATCH.
 
 ---
 
@@ -199,6 +272,7 @@ device and locale selected — Apple allows ten, the pipeline produces fourteen.
 |---|---|
 | Website URLs live | Owner upload to `gcng.de/KEEZLY/`, then HTTP check |
 | App Privacy declaration | Owner, in the web form |
+| Content rights declaration | Owner — `contentRightsDeclaration` is still null, and it is a rights statement in his name |
 | Age rating questionnaire | Owner, in the web form |
 | DSA trader status | Owner — a legal self-declaration |
 | Screenshots | Fresh matrix, then upload |
