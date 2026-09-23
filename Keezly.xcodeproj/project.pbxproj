@@ -97,6 +97,7 @@
 		C81C75C86DE8EE820FA7F95F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBA6935ADB38B3CD93E2D93 /* SettingsView.swift */; };
 		CA91E83F0BEFC4381F66886A /* DesignReviewScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5983C639D9EC2271A596DDFB /* DesignReviewScreenshots.swift */; };
 		CBA6DA54C8B5C81FC8363A8F /* ActionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040212E38AB305A286845007 /* ActionList.swift */; };
+		CF0085147B09B96B0B2F104E /* OnlineSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480C5F8E3DA83579EC2B9343 /* OnlineSessionTests.swift */; };
 		D35246345638FDDFD091502A /* select.caf in Resources */ = {isa = PBXBuildFile; fileRef = 15315B6C46F8DE44B11EF573 /* select.caf */; };
 		D8F593780828DF706C48E176 /* AppIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89977E9E9BC53E55811B932A /* AppIconTests.swift */; };
 		DE704BCD2D005E5E4345B4BD /* ActionListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC69C3AE4E8D6DCED88A698 /* ActionListTests.swift */; };
@@ -157,6 +158,7 @@
 		40E814C79BC8A969E82B7D48 /* GrayscaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrayscaleTests.swift; sourceTree = "<group>"; };
 		41AD74967519D049BB59C5FA /* BoardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLayout.swift; sourceTree = "<group>"; };
 		462E6E6659DFE1B4E4611356 /* LessonBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonBanner.swift; sourceTree = "<group>"; };
+		480C5F8E3DA83579EC2B9343 /* OnlineSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineSessionTests.swift; sourceTree = "<group>"; };
 		4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardSurface.swift; sourceTree = "<group>"; };
 		4EAEE9A96EF84F43F5C06DE8 /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		4F0F80DAAFFF9A71C6AC7E01 /* TableConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableConfiguration.swift; sourceTree = "<group>"; };
@@ -543,6 +545,7 @@
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
 				317A24C86F2312B7C966802F /* MoveNarratorTests.swift */,
+				480C5F8E3DA83579EC2B9343 /* OnlineSessionTests.swift */,
 				8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */,
 				76701703452F573EE999F56F /* PlayLayoutTests.swift */,
 				F37914BB0BDF5A835BB7FABE /* ReplayTests.swift */,
@@ -705,6 +708,7 @@
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
 				4C65E6C87C4DC459E6205D37 /* MoveNarratorTests.swift in Sources */,
+				CF0085147B09B96B0B2F104E /* OnlineSessionTests.swift in Sources */,
 				5843618018A82726BBC6F5FC /* PlayFocusTests.swift in Sources */,
 				BE8D28189EE7D3062AAF189B /* PlayLayoutTests.swift in Sources */,
 				B6C8943E27C19AA33EDE733D /* ReplayTests.swift in Sources */,
