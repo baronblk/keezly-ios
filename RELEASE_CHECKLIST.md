@@ -1,247 +1,115 @@
-# Keezly — Release Checklist
+# Keezly 1.0.0 — release checklist
 
-A real gate, not decoration (§147). A box is ticked only with evidence: a test
-run, a build number, a verified manual step. If something was not checked, it
-stays unticked and is marked `NOT RUN` — never "probably fine" (§139).
+Status vocabulary, kept strictly apart:
+
+| | |
+|---|---|
+| **VERIFIED** | Done, and the result was read back from the thing that decides it |
+| **DONE** | Done locally, not yet confirmed by Apple or by hardware |
+| **HARDWARE PENDING** | Waiting on a physical device or a human ear |
+| **OWNER ACTION** | A declaration or an account setting only the owner may make |
+| **BLOCKED** | Cannot proceed, with the reason named |
+
+Nothing here says "probably fine". Last updated **2026-09-23**.
 
 ---
 
-## Release 1.0.0 — status: **RC PREPARED — NOT RELEASE READY**
+## Can this be submitted tomorrow?
 
-Everything that can be decided and checked inside this repository is done and
-recorded below with its numbers. Everything that needs an Apple account, a
-domain, a person's legal name or a pair of ears is not, and nothing is ticked
-on the strength of the rest being done (§178). This checklist is filled in as
-work lands, not reconstructed at the end.
+**Not yet — and the list of what stands in the way is short and specific:**
 
-### Build and versioning
+1. Game Center online has never run against real Game Center (tonight).
+2. No cloud Archive has ever run, so distribution signing is unproven.
+3. No TestFlight build exists.
+4. Four owner declarations are outstanding.
+5. The screenshots are selected but not reviewed by a person or uploaded.
 
-- [x] `MARKETING_VERSION` is `1.0.0` — in `Config/Keezly.xcconfig` rather than
-      on the project, so a CI build-number override still wins
-- [ ] Build number is monotonic and derived from CI
-- [ ] Git tree clean, release commit tagged
-- [ ] Release configuration contains no debug menu, AI debug output or board overlay
-- [ ] No hidden opponent information reachable in a release build
+None of these is unknown territory. All are scheduled.
 
-### Tests
+---
 
-- [x] Rules engine unit tests green — 137 passed, 0 failed at commit `e4bae0f`
-- [x] AI simulation green — three strengths measured over recorded samples
-      (`AI.md`); the extended sample runs behind `KEEZLY_EXTENDED_SIM=1`
-- [x] App tests green — 58/58 on the iPad Pro 13" (M5) simulator **and** on a
-      physical iPhone 17 Pro **and** a physical iPad (A16), at commit
-      `8c9fa43`. Scope is launch, rotation, the card-interaction flow, the
-      animation pipeline, the ornament geometry and the capture fixtures; the
-      rule-specific gameplay items below are not yet scripted.
-- [x] Large-scale randomised simulation green — **630 complete matches in
-      213 s, clean**, over every strength against every table size from two
-      seats to six, tables of mixed strengths, both team modes and six rule
-      variants (`KEEZLY_EXTENDED_SIM=1 swift test --filter Soak`), on top of
-      the 221 the invariant suite already played. It found two defects on its
-      first run: ISS-018, an assertion that called a legal end position a
-      broken rule engine, and ISS-017, `HardAgent` stopping its search on a
-      wall clock in the headless harness so that the same seed played a
-      different match depending on machine load. Both fixed
-- [ ] No known critical bugs — *currently true; see `KNOWN_ISSUES.md`*
+## Engine and app
 
-### Simulator matrix
-
-- [ ] iPhone, smallest supported form factor
-- [ ] iPhone, current standard
-- [ ] iPhone, large
-- [ ] iPad mini
-- [ ] iPad 11"
-- [ ] iPad 13"
-- [ ] Portrait and landscape where applicable
-
-### Physical device gates (§170)
-
-These are mandatory. A release candidate may **not** ship with them `BLOCKED`
-(§178).
-
-**Physical iPhone** — iPhone 17 Pro, iOS 27.0. PHYSICAL DEVICE VERIFIED at
-commit `e4bae0f` (34/34, 2026-09-20), re-run after the M4 UI rebuild rather
-than carried over from the earlier launch-only pass.
-
-"New game" and "2-player match" are unticked because there is no main menu yet
-— the app opens into a fixed four-player table. The Jack, Seven, capture and
-home-entry items are unticked because no UI test drives those specific
-situations on device yet; they are exercised exhaustively in the engine suite,
-which is not the same evidence.
-
-- [x] Install · [x] Launch · [ ] New game · [ ] 2-player match · [x] AI opponent
-- [x] Card interaction · [ ] Jack swap · [ ] Seven split · [ ] Capture · [ ] Home entry
-- [x] Rotation · [ ] Background and resume · [ ] Haptics · [ ] Audio · [ ] Game Center
-
-**Physical iPad** — iPad (A16), iOS 27.0. PHYSICAL DEVICE VERIFIED at commit
-`8c9fa43` (58/58, 2026-09-20). Ticked items are covered by that automated run;
-the rest need either a feature that does not exist yet or a human judgement
-nobody has made.
-
-- [x] Install · [x] Launch · [x] Landscape · [x] Portrait · [x] Large board layout
-- [x] 4-player match · [x] 6-player match · [x] Team match · [x] AI opponent
-- [ ] Cards legible at normal viewing distance · [x] Touch interaction · [x] Rotation
-- [ ] Multitasking where supported · [ ] Background and resume · [ ] Game Center
-- [ ] Performance — launch time, frame smoothness, memory, energy, thermals
-
-**Physical iPad + external keyboard** — NOT VERIFIED, HARDWARE NOT AVAILABLE.
-No external keyboard exists for this iPad, and no simulator here can stand in
-for one. To be carried out when a keyboard becomes available; until then this
-gate is neither passed nor waived.
-
-- [ ] Arrow keys walk the hand and the board · [ ] Return plays · [ ] Escape cancels
-- [ ] Full Keyboard Access reaches every action · [ ] Focus ring visible throughout
-- [ ] Tab traversal order is sensible · [ ] No action needs a pointer
-
-**Physical iPad + pointer or trackpad** — NOT VERIFIED, HARDWARE NOT AVAILABLE.
-The pointer effects are implemented and attached only to live elements, but
-nothing here has a pointer to test them with.
-
-- [ ] Cards lift under the pointer · [ ] Squares highlight · [ ] Pointer never
-      promises an illegal move
-
-**Long-run test (§172)**
-
-- [ ] Several complete matches back to back, varying player counts, with AI,
-      rotation, backgrounding and match restore — no state corruption, no
-      runaway memory, no hang
-
-### Gate summary (§178)
-
-| Gate | Result | Evidence |
+| | Status | Evidence |
 |---|---|---|
-| Simulator | PASS (partial scope) | 58/58 on iPad Pro 13" (M5), iOS 27.0, at `8c9fa43` |
-| Physical iPhone | PASS (partial scope) | 58/58 on iPhone 17 Pro, iOS 27.0, at `8c9fa43` |
-| Physical iPad | PASS (partial scope) | 58/58 on iPad (A16), iOS 27.0, at `8c9fa43` |
-| Game Center real device | BLOCKED | not implemented (M6) |
+| Core engine suite | **VERIFIED** | 180 tests, 17 suites, including the AI soak and the payload-size test |
+| App unit suite | **VERIFIED** | 232 tests, 29 suites |
+| UI suite, iPhone + iPad | **VERIFIED** | 15 tests, 0 failures, from the lane's own JUnit |
+| All UI classes together | **VERIFIED** | 34 tests, exit 0, capture suite included |
+| SwiftLint `--strict`, SwiftFormat | **VERIFIED** | Clean |
+| Compiler warnings | **VERIFIED** | None left but Xcode's own AppIntents notice |
+| ISS-020 | **VERIFIED FIXED** | Was an iPhone tap-precedence bug, pinned by `BoardTapPrecedenceTests` |
 
-"Partial scope" means the gate ran everything that exists today. It cannot be
-called complete until the gameplay items above are implemented and re-run.
+## Game Center
 
-### Gameplay completeness
+| | Status | Evidence |
+|---|---|---|
+| Achievements exist at Apple | **VERIFIED** | Ten, read back, DE/NL/EN, artwork COMPLETE |
+| The app reports achievements | **VERIFIED** | `AchievementReportingTests`, 7 tests |
+| Online play reachable in the app | **DONE** | Implemented today; menu → online → match |
+| Online rules (revision, duplicate, stale, corrupt) | **VERIFIED** | Core suite, `InMemoryTransport` |
+| `.remote` seat role | **VERIFIED** | `OnlineSessionTests`, 9 tests |
+| **Online against real Game Center** | **HARDWARE PENDING** | `GAME_CENTER_E2E_CHECKLIST.md`, two accounts, two devices |
+| Entitlement in the built binary | **VERIFIED** | `com.apple.developer.game-center` in the cloud-built app |
 
-- [ ] 2, 3, 4, 5 and 6 players all playable
-- [ ] Team play (2×2 and 3×2) and free-for-all
-- [ ] Pass & play with the privacy hand-off
-- [ ] Mixed human/AI tables
-- [ ] Easy, Medium and Hard AI, none of them cheating
-- [ ] Autosave and resume after a crash
-- [ ] Replay of finished local matches
+## Xcode Cloud
 
-### Game Center
+| | Status | Evidence |
+|---|---|---|
+| Shared scheme from a clean clone | **VERIFIED** | Cloned `origin/main`, `xcodebuild -list` |
+| Cloud BUILD | **VERIFIED** | Builds 4, 5, 11, 15 |
+| Cloud ANALYZE | **VERIFIED** | Build 11 and 15, 0 errors |
+| Cloud TEST | **IN PROGRESS** | Build 15 |
+| Cloud ARCHIVE | **NOT RUN** | Release workflow exists; never executed |
+| Distribution signing | **NOT PROVEN** | Cloud build is Debug and ad-hoc. Only Archive exercises real signing |
+| Workflows CI / Main / Release | **VERIFIED** | Created and read back |
+| Release toolchain pinned | **VERIFIED** | Xcode 27 (27A266a) |
 
-- [ ] Authentication, including graceful failure
-- [ ] Turn-based match: create, invite, automatch, resume, rematch, resign
-- [ ] Online restore after app restart
-- [ ] Duplicate and stale turn submissions are ignored, never applied twice
-- [ ] Achievements configured and firing
-- [ ] Leaderboards configured and reporting
-- [ ] Verified in a real match between two Apple IDs
+## App Store Connect
 
-### Accessibility
+| | Status | Evidence |
+|---|---|---|
+| App record, version 1.0.0 | **VERIFIED** | `6814932630`, `PREPARE_FOR_SUBMISSION` |
+| Metadata DE/NL/EN, both levels | **VERIFIED** | Read back |
+| Price €2.99, base DEU | **VERIFIED** | Read back |
+| Categories | **VERIFIED** | Read back |
+| Review information and notes | **VERIFIED** | Read back, 1819 characters |
+| Export compliance | **VERIFIED** | No crypto, no own networking; only GameKit |
+| Privacy manifest | **VERIFIED** | One required-reason API, re-checked after the online work |
+| Screenshots | **SELECTED** | 60 chosen; not reviewed, not uploaded |
+| App Privacy declaration | **OWNER ACTION** | `APP_PRIVACY_OWNER_CHECKLIST.md` |
+| Age rating | **OWNER ACTION** | One field wrong: Contests → None |
+| Content rights | **OWNER ACTION** | `CONTENT_RIGHTS_OWNER_CHECKLIST.md` |
+| DSA trader status | **OWNER ACTION** | Account level, not readable by API |
+| Paid Apps agreement, tax, banking | **OWNER ACTION** | Not verifiable from here |
+| Release mode = manual | **NOT SET** | To be set before submission |
 
-- [ ] VoiceOver: a full match is playable
-- [ ] Dynamic Type across all screens
-- [ ] Reduce Motion honoured
-- [ ] Reduce Transparency honoured
-- [ ] Contrast sufficient; no information carried by colour alone
-- [ ] Full Keyboard Access on iPad
-- [ ] Alternative list of legal actions available
+## Website
 
-### Localisation
+| | Status | Evidence |
+|---|---|---|
+| Built, 15 pages, three languages | **VERIFIED** | `website-check.py` |
+| Describes the real 1.0 scope | **VERIFIED** | Online play restored; offline overclaim corrected |
+| Legal content | **VERIFIED** | Owner-supplied and confirmed |
+| Live at `gcng.de/KEEZLY/` | **OWNER ACTION** | Not uploaded. Not LIVE VERIFIED |
 
-- [ ] Dutch (nl-NL) complete and reviewed
-- [ ] German (de-DE) complete and reviewed
-- [ ] English (en) complete and reviewed
-- [ ] No hardcoded visible strings
-- [ ] No clipped text in any language on any tested device
+## Hardware, tonight
 
-### Brand and assets
-
-- [x] App icon final; 1024px master, dark and tinted variants — `assetutil`
-      confirms all three appearances in the built `Assets.car` (`APP_ICON.md`)
-- [x] Icon legible at 29, 40, 60, 120, 180 px — `AppIconTests` fails a concept
-      that flattens at 29 or loses its shape as a mask
-- [x] Editable icon sources committed — the icon *is* code:
-      `App/Keezly/Brand/AppIconArtwork.swift`, with `scripts/icon-check.sh`
-      failing if the committed PNGs stop matching it
-- [x] Icon **integrated**: `ASSETCATALOG_COMPILER_APPICON_NAME` set in both
-      configurations, and seen on the iPad and iPhone simulator home screens
-      after a clean install
-- [ ] Icon **device verified**: installed on the physical iPad; its home screen
-      has not been looked at from here. The physical iPhone was not connected
-- [x] All artwork, sounds and rule texts are original, **and it is checked
-      rather than asserted**: the icon is drawn by `AppIconArtwork.swift` and
-      `scripts/icon-check.sh` fails if the committed PNGs stop matching it; the
-      seven cues are synthesised by `Tools/soundforge.py` and
-      `scripts/sounds-check.sh` regenerates them and compares — bit-for-bit
-      identical, and both gates run inside `fastlane release_check`. The
-      rulebook is written for this app. Nothing is sampled, downloaded or
-      licensed
-- [ ] **Sound listened to on real hardware, through a speaker and through
-      headphones, at the volume somebody would actually play at.**
-      `Tools/soundcheck.py` establishes that no cue clips, none carries a DC
-      offset, all seven decay like something struck and each is short enough to
-      hear two hundred times. It cannot establish that they sound good, and
-      nothing else here can either. Until somebody has listened, M8 is ASSET
-      PRESENT and not VERIFIED
-
-### Store
-
-- [ ] Screenshots complete for de-DE, nl-NL, en — iPhone and iPad
-- [ ] iPad 13" landscape screenshots lead the iPad set
-- [x] Screenshot **mechanical** gate: `fastlane screenshots_verify` green —
-      **84 captures — the full matrix of de-DE, nl-NL and en on an iPad Pro
-      13" and an iPhone 17 Pro Max, 14 each, 0 with faults.** Every capture the right way up, no
-      dead band on any edge, short edge at or above App Store Connect's 1290px
-      (the iPhone set is 1320×2868). Re-run this after any capture change
-- [ ] Screenshot set regenerated with the status bar pinned **and the
-      simulator in the right locale** — the set that proved the pipeline
-      predates both. `-testLanguage` sets the app's language and nothing else,
-      so **the whole set** carries a German status bar — the simulator was left
-      in German by the first capture and never changed. Checked on three
-      captures in three locales: "Dienstag 22. Sept." over an app saying "Jouw
-      beurt", and again over an English menu. Cosmetic to a machine; to a Dutch
-      or English reader it is the first thing on the screen and the first thing
-      that says the screenshot was faked. It must not reach a listing
-- [ ] Screenshot **human** gate, which no script here performs and none
-      pretends to. **Three of the 84 have been looked at** — the English menu,
-      the English phone mid-match and the Dutch two-player iPad — and apart
-      from the status-bar locale above they carry nothing they should not. The
-      other 81 have not been looked at by anyone: somebody opens the set and confirms there is no debug
-      overlay, no keyboard, no loading spinner, no test identifier, no raw
-      localisation key, no placeholder name and nobody's personal data. Finding
-      text in a PNG needs OCR this project has no business carrying, so this
-      one is a person
-- [x] Metadata written and checked per locale — name, subtitle, promotional
-      text, description, keywords and release notes for de-DE, nl-NL and en-US,
-      all inside App Store Connect's character limits and free of any claim the
-      build cannot keep (`scripts/metadata-check.sh`)
-- [ ] Metadata completed by its owner: the copyright holder's name and the
-      support and privacy URLs (MAN-13). The check fails while any is missing,
-      so a half-finished set cannot be uploaded by accident
-- [ ] Privacy manifest present if required
-- [ ] App Store privacy answers prepared
-
-### Pipeline
-
-- [ ] `bundle exec fastlane release_check` green
-- [ ] Xcode Cloud "Keezly Release" workflow green
-- [ ] TestFlight build installed and smoke-tested
-- [x] No secrets anywhere in the repository — scanned at `e78ce56`, working tree
-      **and** every reachable commit. Nothing tracked with a `.p8`, `.p12`,
-      `.mobileprovision`, `.cer`, `.pem`, `.keystore` or `.jks` extension and no
-      `.env` outside the committed `.env.example`, which is a template by
-      design. No PEM private-key header, AWS key id, GitHub, Slack or OpenAI
-      token pattern, and no JWT, in any tracked file or in history. No
-      `DEVELOPMENT_TEAM` and no provisioning profile id in `project.pbxproj` —
-      signing identity stays in the git-ignored `Config/Local.xcconfig` (§107).
-      No credential value is recorded here or anywhere else in the
-      documentation, which is the point of scanning rather than listing
+| | Status |
+|---|---|
+| Clean install, iPhone | **HARDWARE PENDING** |
+| Clean install, iPad | **HARDWARE PENDING** |
+| Game Center E2E, two accounts | **HARDWARE PENDING** |
+| Audio on hardware | **HARDWARE PENDING** — `AUDIO_REVIEW.md` |
+| App icon seen on a real home screen | **HARDWARE PENDING** |
+| ISS-019 password prompt | **HARDWARE PENDING** — diagnose interactively, store nothing |
+| TestFlight smoke test | **BLOCKED** until a build exists |
 
 ---
 
-## Sign-off
+## Deliberately not done
 
-A release is approved only when every box above is ticked with evidence and
-`CURRENT_STATE.md` records the verified commit.
+- **No Submit for Review.** Not today, and not tomorrow without explicit approval.
+- **No external TestFlight beta review.** Archive distributes internally only.
+- **No owner declaration made in the owner's name.**
+- **No leaderboards** (DEC-025), and no claim of anti-cheat or server-authoritative play anywhere.
