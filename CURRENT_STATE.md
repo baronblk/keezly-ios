@@ -425,7 +425,9 @@ Nothing is mid-edit. The working tree is clean at the commit above.
 - Reporting achievements to Game Center (M9.4) — blocked on MAN-02.
 - Bespoke dealing, Seven-leg and Jack-swap choreography; the generic move and
   swap animations exist.
-- Xcode Cloud workflows (M11.1–M11.3) — blocked on MAN-02 and MAN-04.
+- Xcode Cloud workflows (M11.1–M11.3) — MAN-02 and MAN-04 are now done. The
+  default workflow exists; the three intended workflows and a green cloud build
+  do not (`XCODE_CLOUD.md`).
 - The copyright holder and the support and privacy URLs for the store listing
   (MAN-13). Everything else about the listing is written and checked.
 
@@ -545,7 +547,7 @@ Recorded per environment; never merged (§167, §175).
 | Physical iPhone — re-run on the polish | **BLOCKED** — device left the wired connection mid-run (ISS-014) | 2026-09-21 | — |
 | Physical iPad (A16), iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
 | Physical iPad — re-run on the polish | **BLOCKED** — the test runner will not start (ISS-014) | 2026-09-21 | — |
-| Xcode Cloud | **PREPARED, not CONFIGURED, not VERIFIED** | — | — |
+| Xcode Cloud | **PREPARED and CONFIGURED, not VERIFIED** — owner initialised it; no cloud build has run | 2026-09-23 | `c975d51` |
 | Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
 
 Device availability is re-checked with `./scripts/devices.sh` before every
@@ -630,11 +632,11 @@ in a document.
 | # | Action | Status |
 |---|---|---|
 | MAN-01 | Bundle identifier | **DONE** — `de.gcng.keezly` (DEC-011) |
-| MAN-02 | App Store Connect app record for `de.gcng.keezly` | **OPEN — top blocker.** Confirmed empirically: the API lists 14 records and this bundle id is not among them |
+| MAN-02 | App Store Connect app record for `de.gcng.keezly` | **DONE** — created by the owner. ASC App ID `6814932630`, SKU `KEEZLY-IOS-001`, version 1.0.0 in `PREPARE_FOR_SUBMISSION`. Metadata, pricing and Game Center pushed and read back (`APP_STORE.md`) |
 | MAN-03 | Apple Developer signing team | **DONE** — in the git-ignored `Config/Local.xcconfig`, device build verified |
-| MAN-04 | Authorise GitHub ↔ Xcode Cloud, enable Xcode Cloud | OPEN — depends on MAN-02 |
-| MAN-05 | Enable Game Center for the bundle id | OPEN — depends on MAN-02 |
-| MAN-06 | Create Game Center leaderboards and achievements | OPEN |
+| MAN-04 | Authorise GitHub ↔ Xcode Cloud, enable Xcode Cloud | **DONE** — initialised 2026-09-23. The shared scheme was already in the repository and is proven from a clean clone (`XCODE_CLOUD.md`). No cloud build has run yet |
+| MAN-05 | Enable Game Center for the bundle id | **DONE** — enabled on the App ID; `App/Keezly/Keezly.entitlements` carries the capability |
+| MAN-06 | Create Game Center achievements | **DONE** — all ten created through the REST API and read back (`APP_STORE.md`). **No leaderboards, ever** (DEC-025). The app now reports them, which it did not until 2026-09-22 |
 | MAN-07 | Configure TestFlight testers | OPEN |
 | MAN-08 | App Store Connect API key | **DONE & VERIFIED** — outside the repo; `fastlane asc_check` authenticates |
 | MAN-09 | Pair a physical iPhone | **DONE** — iPhone 17 Pro, Developer Mode on |

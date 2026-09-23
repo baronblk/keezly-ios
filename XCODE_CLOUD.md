@@ -1,33 +1,102 @@
 # Keezly — Xcode Cloud
 
-**Status: NOT PREPARED, NOT CONFIGURED, NOT VERIFIED.**
+**Status: PREPARED and CONFIGURED. NOT VERIFIED.**
 
 The three states are kept strictly apart (§117):
 
 | State | Meaning | Keezly |
 |---|---|---|
-| PREPARED | `ci_scripts/`, shared scheme and a buildable project exist in the repo | **No** |
-| CONFIGURED | The workflow exists in Xcode / App Store Connect | **No** |
+| PREPARED | `ci_scripts/`, shared scheme and a buildable project exist in the repo | **Yes** |
+| CONFIGURED | The workflow exists in Xcode / App Store Connect | **Yes** — owner initialised it 2026-09-23 |
 | VERIFIED | A real Xcode Cloud build has run and passed | **No** |
 
-No claim of "Xcode Cloud is set up" will be made on the basis of local files
-alone. Manual steps are listed in `docs/XCODE_CLOUD_SETUP_CHECKLIST.md` (to be
-written with M0.4) and tracked in `CURRENT_STATE.md` → Manual Actions.
-
-Tracked as M11.1–M11.3 in `ROADMAP.md`.
+No claim of "Xcode Cloud is set up" is made on the basis of local files alone,
+and none is made on the basis of a workflow existing either. VERIFIED means a
+cloud build ran and passed, and that has not happened.
 
 ---
 
-## Prerequisites still missing
+## The shared scheme — VERIFIED FROM A CLEAN CLONE
 
-1. An Xcode project with a **shared** `Keezly` scheme (M0.2 — does not exist).
-2. `ci_scripts/` (M0.4 — does not exist).
-3. GitHub ↔ Xcode Cloud authorisation (MAN-04 — manual, OPEN).
-4. An App Store Connect app record (MAN-02 — manual, OPEN).
+Xcode Cloud warned:
 
-Until 1 and 2 exist there is nothing for Xcode Cloud to build, so the §119 goal
-of a green cloud build right after M1 cannot be met yet. That is stated rather
-than worked around.
+> The scheme 'Keezly' may only exist locally. To use it in this workflow, it
+> must be pushed to your repository.
+
+**The repository does not have that problem, and did not have it.** Checked
+rather than assumed, by cloning `origin/main` into an empty directory and asking
+`xcodebuild` what it could see there:
+
+```
+Keezly.xcodeproj/xcshareddata/xcschemes/Keezly.xcscheme    tracked
+xcuserdata                                                  absent, everywhere
+xcodebuild -project Keezly.xcodeproj -list  ->  Schemes: Keezly, KeezlyCore
+```
+
+The scheme has been at that path since `711cb93`, the commit that first added
+the project. It has never lived under `xcuserdata`; `.gitignore` excludes
+`xcuserdata/` and `*.xcuserdatad/` and nothing else near it.
+
+### What was actually wrong locally
+
+One thing, and it was not the scheme. Opening the project in Xcode rewrote
+`project.pbxproj` — adding `lastKnownFileType` to nineteen file references —
+so the working tree's project file no longer matched the pushed one. Xcode
+compares the project on disk against the repository, and a project file that
+differs from what was pushed is a reason for it to be unsure about what the
+remote contains.
+
+That is repaired the only correct way for this project: **regenerate from the
+canonical definition**. `project.yml` is the source of truth; the `.xcodeproj`
+is an output that happens to be committed. After `xcodegen generate` the
+`.pbxproj` and the scheme are byte-identical to what is already on `main`.
+
+**Never hand-edit the generated project to satisfy a warning.** The next
+regeneration discards it and the warning returns with no record of why.
+
+### The scheme's four actions
+
+Declared in `project.yml` → `schemes.Keezly`, so they survive regeneration:
+
+| Action | Configuration | Targets |
+|---|---|---|
+| Build | — | `Keezly` (all), `KeezlyTests` (test), `KeezlyUITests` (test) |
+| Test | Debug | `KeezlyTests`, `KeezlyUITests`, coverage on `Keezly` |
+| Analyze | Debug | `Keezly` |
+| Archive | **Release** | `Keezly`, reveals in Organizer |
+
+### Archive works — proven, not assumed
+
+Run from the clean clone, not from this working copy:
+
+```bash
+xcodebuild -project Keezly.xcodeproj -scheme Keezly \
+  -configuration Release -destination 'generic/platform=iOS' \
+  -archivePath /tmp/Keezly.xcarchive archive
+```
+
+```
+** ARCHIVE SUCCEEDED **
+Products/Applications/Keezly.app
+  CFBundleIdentifier         de.gcng.keezly
+  CFBundleShortVersionString 1.0.0
+  CFBundleVersion            1
+  CFBundleSupportedPlatforms iPhoneOS
+  UIDeviceFamily             1, 2        (iPhone and iPad)
+```
+
+Signing was disabled for the proof, because `DEVELOPMENT_TEAM` is deliberately
+absent from `project.yml` — it is developer-specific and does not belong in the
+repository. Xcode Cloud supplies signing itself. What this proves is that the
+scheme's archive action is correctly wired to the app target in Release; it does
+not prove a signed build, and is not offered as proof of one.
+
+### The product manifest
+
+`Keezly.xcodeproj/xcshareddata/xcodecloud/manifest.json` is written by Xcode
+Cloud and is now tracked: a product id, a target id and a target name. No
+credential, no team id. XcodeGen leaves it alone on regenerate, which was
+checked rather than assumed.
 
 ---
 
