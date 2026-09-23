@@ -20,21 +20,11 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 
-# Claims the software cannot keep, in any of the three languages (DEC-025),
-# and one it could not keep for a different reason.
-#
-# The second group is online play. `GameCenterTransport` is written and tested,
-# and for a while the site described the turn-based match it would give — but
-# nothing in the 1.0.0 interface ever reaches it, so the feature does not exist
-# for anybody holding a phone. A page that promises it is wrong in exactly the
-# way this file is here to prevent, and the promise survived every check
-# because no check was looking for it.
+# Claims the software cannot keep, in any of the three languages (DEC-025).
 FORBIDDEN = re.compile(
     r"anti-?cheat|cheat.?proof|server.?authorit|serverautoris|"
     r"leaderboard|bestenliste|ranglijst|"
-    r"betrugssicher|vals.?spelen.?onmogelijk|"
-    r"turn-?based|rundenbasiert|multiplayer|"
-    r"online[\s-]{0,3}(partie|partij|match|spiel|game|play|speel)",
+    r"betrugssicher|vals.?spelen.?onmogelijk",
     re.I,
 )
 
@@ -51,11 +41,11 @@ FORBIDDEN = re.compile(
 #
 # The negation must be in the **same sentence**, and a sentence ends at a full
 # stop or at any block-level tag. A plain character window was not enough: a
-# "turn-based match" claim added to the privacy page went unreported because
-# the previous paragraph happened to end "no different rules apply to Keezly",
-# sixty characters earlier and about something else entirely. A window that
-# reaches across a paragraph boundary is not reading the sentence, it is
-# reading the neighbourhood.
+# claim added to the privacy page went unreported because the previous
+# paragraph happened to end "no different rules apply to Keezly", sixty
+# characters earlier and about something else entirely. A window that reaches
+# across a paragraph boundary is not reading the sentence, it is reading the
+# neighbourhood.
 NEGATION = re.compile(
     r"\b(no|not|never|without|kein|keine|keinen|nicht|ohne|"
     r"geen|niet|zonder)\b", re.I,

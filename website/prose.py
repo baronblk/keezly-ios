@@ -69,14 +69,13 @@ PRIVACY_BODY["de"] = """
     geregelt; für Keezly gelten keine abweichenden Regeln.</p>
 
     <h2>Game Center</h2>
-    <p>Keezly kennt zehn Erfolge und meldet sie an Apples Game Center. Das ist
-    freiwillig: ohne Anmeldung ist das gesamte Spiel unverändert nutzbar, nur
-    werden die Erfolge dann nicht festgehalten.</p>
+    <p>Keezly kann eine rundenbasierte Partie über Apples Game Center spielen.
+    Das ist freiwillig: ohne Anmeldung sind alle lokalen Modi vollständig
+    nutzbar.</p>
     <p>Game Center ist ein Dienst von Apple. Wenn Sie ihn nutzen, verarbeitet
     Apple die dafür nötigen Daten nach Apples eigener Datenschutzerklärung.
-    Keezly übermittelt dabei ausschließlich, welcher Erfolg erreicht wurde —
-    keine Partie, kein Spielstand, keine Karten. Es gibt <strong>keine</strong>
-    Bestenlisten: Ergebnisse aus dem Netz
+    Keezly überträgt dabei den Spielstand der laufenden Partie und sonst
+    nichts. Es gibt <strong>keine</strong> Bestenlisten: Ergebnisse aus dem Netz
     lassen sich nicht ehrlich vergleichen, solange ein verändertes Gerät jedes
     Blatt mitlesen kann, und eine solche Liste würde eine Fairness
     behaupten, die diese Software nicht einlösen kann.</p>
@@ -187,13 +186,12 @@ PRIVACY_BODY["nl"] = """
     voor Keezly gelden geen afwijkende regels.</p>
 
     <h2>Game Center</h2>
-    <p>Keezly kent tien prestaties en meldt die aan Apple Game Center. Dat is
-    vrijwillig: zonder aanmelding werkt het hele spel ongewijzigd, alleen worden
-    de prestaties dan niet vastgelegd.</p>
+    <p>Keezly kan een partij om de beurt spelen via Apple Game Center. Dat is
+    vrijwillig: zonder aanmelding zijn alle lokale modi volledig bruikbaar.</p>
     <p>Game Center is een dienst van Apple. Gebruikt u hem, dan verwerkt Apple
     de daarvoor benodigde gegevens volgens Apples eigen privacyverklaring.
-    Keezly stuurt daarbij uitsluitend welke prestatie is behaald — geen partij,
-    geen stand, geen kaarten. Er zijn <strong>geen</strong> ranglijsten: resultaten uit het net laten zich
+    Keezly stuurt daarbij de stand van de lopende partij en verder niets. Er
+    zijn <strong>geen</strong> ranglijsten: resultaten uit het net laten zich
     niet eerlijk vergelijken zolang een aangepast apparaat elke hand kan
     meelezen, en een ranglijst zou een eerlijkheid beweren die deze software
     niet kan waarmaken.</p>
@@ -301,13 +299,11 @@ PRIVACY_BODY["en"] = """
     no different rules apply to Keezly.</p>
 
     <h2>Game Center</h2>
-    <p>Keezly has ten achievements and reports them to Apple's Game Center. That
-    is voluntary: without signing in the whole game is unchanged, the
-    achievements simply are not recorded.</p>
+    <p>Keezly can play a turn-based match through Apple's Game Center. That is
+    voluntary: every local mode works fully without signing in.</p>
     <p>Game Center is Apple's service. If you use it, Apple processes the data it
-    needs under Apple's own privacy policy. Keezly sends which achievement was
-    earned and nothing else — no match, no position, no cards. There are
-    <strong>no</strong> leaderboards:
+    needs under Apple's own privacy policy. Keezly sends the state of the match
+    in progress and nothing else. There are <strong>no</strong> leaderboards:
     online results cannot be ranked honestly while a modified client can read
     every hand, and such a list would claim a fairness this software cannot
     keep.</p>

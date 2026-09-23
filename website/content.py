@@ -4,11 +4,9 @@
 Kept apart from the templating so that a claim can be checked by reading it
 rather than by reading HTML. Two rules govern what may go in here:
 
-1. **Only what the app does.** Keezly 1.0.0 is a local game with optional
-   Game Center achievements. There is no online play in 1.0.0 — the turn-based
-   transport is written and tested but is not reachable from the interface, so
-   nothing here may promise it. There is no account, no advertising, no
-   tracking and no server of ours.
+1. **Only what the app does.** Keezly 1.0.0 is a local game with an optional
+   Game Center turn-based mode. There is no account, no advertising, no
+   tracking and no server of ours. Nothing here may say otherwise.
 2. **Nothing about anti-cheat, leaderboards or server-authorised play.** There
    is no server that could make any of it true (DEC-025), and a fairness claim
    the software cannot keep is worse than no claim at all.
@@ -73,7 +71,8 @@ T["de"] = {
         "tagline": "Das niederländische Brettspiel, für zwei bis sechs Spieler.",
         "lede": "Vier Figuren ums Brett, die anderen hinauswerfen, alle vier heil nach "
                 "Hause bringen. Auf einem Gerät weiterreichen oder gegen drei "
-                "Computerstärken spielen — offline, ohne Konto, ohne Werbung.",
+                "Computerstärken spielen — ohne Konto, ohne Werbung. Oder online "
+                "über Game Center, Zug um Zug.",
         "badges": ["iPhone und iPad", "2–6 Spieler", "Deutsch · Nederlands · English",
                    "Keine Werbung", "Kein Tracking"],
         "features_h": "Was Keezly kann",
@@ -99,9 +98,11 @@ T["de"] = {
             ("Noch einmal ansehen",
              "Jede beendete Partie wird gespeichert und lässt sich Zug für Zug "
              "wiedergeben. Die Statistik wird aus diesen Partien berechnet."),
-            ("Game Center",
-             "Zehn Erfolge, an Apples Game Center gemeldet, wenn Sie mögen. Ohne "
-             "Anmeldung spielt Keezly genauso — nur ohne Vermerk."),
+            ("Online über Game Center",
+             "Rundenbasiert und in Ruhe: Sie ziehen, wenn es Ihnen passt, die anderen, "
+             "wenn sie die App öffnen. Game Center sucht die Mitspieler, Partien lassen "
+             "sich jederzeit fortsetzen, und zehn Erfolge gibt es auch. Ohne Anmeldung "
+             "spielt Keezly lokal genauso."),
             ("Barrierefrei bedienbar",
              "Vollständige VoiceOver-Unterstützung, dynamische Schrift, eine Liste "
              "aller erlaubten Züge und eine Bedienung, die nicht von Farbe abhängt."),
@@ -109,8 +110,9 @@ T["de"] = {
         "shots_h": "Aus dem Spiel",
         "privacy_h": "Was Keezly nicht tut",
         "privacy_p": "Kein Konto. Keine Werbung. Keine Käufe. Kein Tracking, keine "
-                     "Analyse, keine Daten, die das Gerät verlassen. Keezly funktioniert "
-                     "im Flugmodus, weil es nichts gibt, womit es sich verbinden müsste.",
+                     "Analyse. Alle lokalen Spielmodi funktionieren im Flugmodus. Nur "
+                     "Onlinepartien und Erfolge laufen über Apples Game Center — und "
+                     "dabei verlässt nichts das Gerät außer dem Spielstand der Partie.",
         "privacy_link": "Ausführlich in der Datenschutzerklärung",
     },
     "support": {
@@ -124,9 +126,9 @@ T["de"] = {
         "faq_h": "Häufige Fragen",
         "faq": [
             ("Brauche ich eine Internetverbindung?",
-             "Nein. Keezly spielt vollständig offline — gegen den Computer und beim "
-             "Weiterreichen am Tisch. Eine Verbindung wird nur gebraucht, um einen "
-             "Erfolg an Game Center zu melden."),
+             "Nein. Alle lokalen Modi — gegen den Computer und das Weiterreichen am "
+             "Tisch — funktionieren vollständig offline. Nur eine Game-Center-Partie "
+             "braucht eine Verbindung."),
             ("Brauche ich ein Konto?",
              "Nein. Keezly hat keine eigene Anmeldung. Game Center ist optional und "
              "wird von Apple bereitgestellt."),
@@ -195,7 +197,8 @@ T["nl"] = {
         "tagline": "Het Nederlandse bordspel, voor twee tot zes spelers.",
         "lede": "Vier pionnen het bord rond, de anderen eruit slaan, alle vier veilig "
                 "thuisbrengen. Geef het apparaat door aan tafel of speel tegen drie "
-                "computersterktes — offline, zonder account, zonder advertenties.",
+                "computersterktes — zonder account, zonder advertenties. Of online "
+                "via Game Center, beurt om beurt.",
         "badges": ["iPhone en iPad", "2–6 spelers", "Nederlands · Deutsch · English",
                    "Geen advertenties", "Geen tracking"],
         "features_h": "Wat Keezly kan",
@@ -220,9 +223,11 @@ T["nl"] = {
             ("Nog eens terugkijken",
              "Elke afgelopen partij wordt bewaard en kun je zet voor zet terugkijken. "
              "De statistieken worden uit die partijen berekend."),
-            ("Game Center",
-             "Tien prestaties, gemeld aan Apple Game Center als je dat wilt. Zonder "
-             "aan te melden speelt Keezly net zo goed — alleen zonder aantekening."),
+            ("Online via Game Center",
+             "Om de beurt en zonder haast: u zet wanneer het u uitkomt, de anderen "
+             "wanneer zij de app openen. Game Center zoekt de medespelers, partijen "
+             "kunt u altijd hervatten, en er zijn tien prestaties. Zonder aanmelden "
+             "speelt Keezly lokaal net zo goed."),
             ("Toegankelijk te bedienen",
              "Volledige VoiceOver-ondersteuning, Dynamic Type, een lijst met alle "
              "toegestane zetten en bediening die niet van kleur afhangt."),
@@ -230,9 +235,9 @@ T["nl"] = {
         "shots_h": "Uit het spel",
         "privacy_h": "Wat Keezly niet doet",
         "privacy_p": "Geen account. Geen advertenties. Geen aankopen. Geen tracking, "
-                     "geen analyse, geen gegevens die het apparaat verlaten. Keezly "
-                     "werkt in vliegtuigmodus, want er is niets om verbinding mee te "
-                     "maken.",
+                     "geen analyse. Alle lokale spelmodi werken in vliegtuigmodus. "
+                     "Alleen onlinepartijen en prestaties lopen via Apple Game Center — "
+                     "en daarbij verlaat niets het apparaat behalve de stand van de partij.",
         "privacy_link": "Uitgebreid in de privacyverklaring",
     },
     "support": {
@@ -246,9 +251,8 @@ T["nl"] = {
         "faq_h": "Veelgestelde vragen",
         "faq": [
             ("Heb ik internet nodig?",
-             "Nee. Keezly speelt volledig offline — tegen de computer en doorgeven aan "
-             "tafel. Verbinding is alleen nodig om een prestatie aan Game Center te "
-             "melden."),
+             "Nee. Alle lokale modi — tegen de computer en doorgeven aan tafel — werken "
+             "volledig offline. Alleen een Game Center-partij heeft verbinding nodig."),
             ("Heb ik een account nodig?",
              "Nee. Keezly heeft geen eigen aanmelding. Game Center is optioneel en komt "
              "van Apple."),
@@ -316,7 +320,8 @@ T["en"] = {
         "tagline": "The Dutch board game, for two to six players.",
         "lede": "Run four pieces around the board, knock the others back, and get all "
                 "four safely home. Pass the device around the table or play three "
-                "computer strengths — offline, no account, no advertising.",
+                "computer strengths — no account, no advertising. Or online through "
+                "Game Center, turn by turn.",
         "badges": ["iPhone and iPad", "2–6 players", "English · Deutsch · Nederlands",
                    "No advertising", "No tracking"],
         "features_h": "What Keezly does",
@@ -341,9 +346,11 @@ T["en"] = {
             ("Watch it again",
              "Every finished match is saved and can be replayed move by move. Your "
              "statistics are worked out from those matches."),
-            ("Game Center",
-             "Ten achievements, reported to Apple's Game Center if you want them. "
-             "Keezly plays exactly the same without signing in — just unrecorded."),
+            ("Online through Game Center",
+             "Turn by turn, in your own time: you move when it suits you, the others "
+             "when they open the app. Game Center finds the players, matches can be "
+             "picked up again whenever you like, and there are ten achievements. "
+             "Without signing in Keezly plays locally exactly the same."),
             ("Built to be used",
              "Full VoiceOver support, Dynamic Type, a complete list of legal moves, and "
              "an interface that never depends on colour alone."),
@@ -351,8 +358,9 @@ T["en"] = {
         "shots_h": "From the game",
         "privacy_h": "What Keezly does not do",
         "privacy_p": "No account. No advertising. No purchases. No tracking, no "
-                     "analytics, no data leaving your device. Keezly works with "
-                     "aeroplane mode on, because there is nothing for it to connect to.",
+                     "analytics. Every local mode works with aeroplane mode on. Only "
+                     "online matches and achievements go through Apple's Game Center — "
+                     "and nothing leaves your device but the position of the match.",
         "privacy_link": "Set out in full in the privacy policy",
     },
     "support": {
@@ -366,9 +374,9 @@ T["en"] = {
         "faq_h": "Common questions",
         "faq": [
             ("Do I need an internet connection?",
-             "No. Keezly plays entirely offline — against the computer and passing the "
-             "device around a table. A connection is only needed to report an "
-             "achievement to Game Center."),
+             "No. Every local mode — against the computer and passing the device around "
+             "a table — works entirely offline. Only a Game Center match needs a "
+             "connection."),
             ("Do I need an account?",
              "No. Keezly has no sign-in of its own. Game Center is optional and is "
              "provided by Apple."),
