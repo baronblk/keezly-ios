@@ -100,63 +100,75 @@ checked rather than assumed.
 
 ---
 
-## Archive — why build 33 failed, and the one thing it needs
+## Archive — verified. Upload — not.
 
-**Status: ARCHIVE NOT VERIFIED.** Release build 33 ran Test ✅, Analyze ✅ and
-Archive ❌.
+Three states, kept strictly apart because they are not the same thing:
 
-The chain, read from Apple's own distribution logs rather than guessed:
+| | |
+|---|---|
+| **CLOUD ARCHIVE** | **VERIFIED** — build 37 |
+| **DISTRIBUTION SIGNING** | **VERIFIED** — build 37 |
+| **TESTFLIGHT UPLOAD** | **NOT VERIFIED** — no build has ever reached App Store Connect |
+
+### What was verified, from the artefact rather than the status
+
+The App Store export was downloaded from Apple and the `.ipa` opened:
 
 ```
-1. Archive built:  CONFIGURATION Release          ← correct
-2. CodeSign:       Signing Identity "Sign to Run Locally"
-                   codesign --force --sign -      ← ad-hoc, no team
-3. Analyze:        isAdHocSigned='1', teamID='(null)',
-                   no embedded.mobileprovision
-4. Export:         "Xcode couldn't find any iOS App Store provisioning
-                   profiles matching 'de.gcng.keezly'"
-5. Repair:         Xcode tries to mint one, which needs an authenticated
-                   App Store Connect session
-6. Failure:        "Unable to authenticate with App Store Connect
-                   (Session Proxy Provider)"
+CONFIGURATION Release
+CFBundleIdentifier          de.gcng.keezly
+CFBundleShortVersionString  1.0.0
+CFBundleVersion             37          ← from CI_BUILD_NUMBER, monotonic
+CFBundleSupportedPlatforms  iPhoneOS
+UIDeviceFamily              1, 2        ← iPhone and iPad
+PrivacyInfo.xcprivacy       present
+
+Authority       Apple Distribution: RENÉ SUESS (KZFCCDV6A8)
+TeamIdentifier  KZFCCDV6A8
+CodeDirectory   flags=0x0(none)         ← not 0x2(adhoc)
+Profile         iOS Team Store Provisioning Profile: de.gcng.keezly
+                get-task-allow = false
+Entitlements    application-identifier      KZFCCDV6A8.de.gcng.keezly
+                com.apple.developer.team-identifier KZFCCDV6A8
+                com.apple.developer.game-center
+
+** EXPORT SUCCEEDED **   app-store, development and ad-hoc
 ```
 
-**Step 6 is a symptom, not the cause.** It is worth saying plainly because the
-message invites the wrong fix: it looks like an account or agreements problem,
-and it is not. Nothing was wrong with the account — the entitlement resolved,
-`GAME_CENTER` was present in the app ID features, the team `KZFCCDV6A8` was
-found, and a profile was issued at 07:19:31 with `errors: (null)`.
+### The one thing that fails, and two wrong diagnoses before it
 
-**The cause is step 2.** `DEVELOPMENT_TEAM` lives in `Config/Local.xcconfig`,
-which is git-ignored and exists only on a developer's Mac. Xcode Cloud has no
-such file, automatic signing had no team to resolve, and the archive came out
-ad-hoc. Everything after that is Xcode trying to rescue an archive that was
-never signed for distribution.
+```
+App Store Connect request for store configuration failed for account
+Session Proxy Provider: Unable to authenticate with App Store Connect
+```
 
-### The fix, and the single owner action
+Identical in builds 33 and 37. The archive is built, signed for distribution and
+exported; Xcode Cloud cannot authenticate to hand it over.
 
-`ci_post_clone.sh` now writes `Config/Local.xcconfig` from
-`KEEZLY_DEVELOPMENT_TEAM`. The repository still contains no team id (§106,
-§158) — a team id is not a credential, it is in every shipped app, but the rule
-stands and an environment variable costs one setting.
+**Two diagnoses of this were wrong and are written down so they are not made
+again.**
 
-**OWNER ACTION:** App Store Connect → Xcode Cloud → *Keezly Release* → Environment
-→ add `KEEZLY_DEVELOPMENT_TEAM = KZFCCDV6A8`.
+1. *"Agreements are probably the cause."* Offered before reading the logs.
+2. *"No — the missing DEVELOPMENT_TEAM is the cause, agreements are fine."*
+   Offered after reading them, and also wrong. `Sign to Run Locally` at archive
+   time is not a fault: Xcode Cloud archives unsigned and signs at **export**.
+   Build 37 had the team and signed identically at archive time, and exported
+   perfectly.
 
-That value is Apple's own, taken from the export log of build 33. Add it to CI
-and Main too if those should ever archive; they currently do not.
+The environment variable mechanism was built on the second wrong diagnosis. It
+is harmless and arguably correct anyway — a project that can be archived on a
+developer's Mac should be archivable in the cloud — but it did not fix this, and
+it should not be recorded as having done so.
 
-Without the variable nothing breaks: a simulator build and a test run need no
-team, so it is absent by design and the script says so on an archive instead of
-failing silently.
+**What is actually left is account-level**: the Xcode Cloud ↔ App Store Connect
+authorisation, or the agreements that gate it (Paid Applications, for a paid
+app). Neither is readable through the API with the key this project holds, and
+neither is a thing to change on suspicion.
 
-### What is still unknown
-
-Whether the upload succeeds once the archive is properly signed. The
-authentication error should disappear with it, because Xcode will no longer be
-trying to repair provisioning — but that is a prediction, and it is not
-verified until a Release build reaches TestFlight. **Do not treat agreements as
-the problem until a properly signed archive has failed.**
+**OWNER ACTION:** App Store Connect → Business → Agreements, Tax and Banking.
+Confirm the Paid Applications agreement is active and nothing is awaiting
+acceptance. Then re-run *Keezly Release*; everything before the upload already
+works.
 
 ---
 

@@ -19,8 +19,8 @@ Nothing here says "probably fine". Last updated **2026-09-23**.
 **Not yet — and the list is shorter than it was this morning:**
 
 1. Game Center online has never run against real Game Center (tonight).
-2. Distribution signing is unproven until an Archive succeeds (running now).
-3. No TestFlight build exists (follows from 2).
+2. ~~Distribution signing~~ — **verified**, build 37.
+3. No TestFlight build: Xcode Cloud cannot authenticate to upload. **Owner action** — agreements.
 4. Four owner declarations are outstanding.
 5. The screenshots are uploaded but no person has looked at them.
 
@@ -63,7 +63,9 @@ None of these is unknown territory. All are scheduled.
 | Cloud BUILD | **VERIFIED** | Builds 4, 5, 11, 15 |
 | Cloud ANALYZE | **VERIFIED** | Build 32, 0 errors **and 0 warnings** |
 | Cloud TEST | **VERIFIED** | Build 32, 0 errors. Took four failures to get there, each a real defect |
-| Cloud ARCHIVE | **RUNNING** | Release build 33 — the first, and the only thing that exercises real signing |
+| Cloud ARCHIVE | **VERIFIED** | Build 37 — .ipa downloaded and inspected |
+| Distribution signing | **VERIFIED** | `Apple Distribution: RENÉ SUESS (KZFCCDV6A8)`, flags 0x0, real provisioning profile |
+| TestFlight upload | **BLOCKED** | Xcode Cloud cannot authenticate with App Store Connect. 0 builds at Apple |
 | Distribution signing | **NOT PROVEN** | Cloud build is Debug and ad-hoc. Only Archive exercises real signing |
 | Workflows CI / Main / Release | **VERIFIED** | Created and read back |
 | Release toolchain pinned | **VERIFIED** | Xcode 27 (27A266a) |
