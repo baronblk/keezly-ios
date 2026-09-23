@@ -217,10 +217,16 @@ final class MatchSession {
     /// somebody else is on turn, without a single `if online` anywhere in the
     /// view layer.
     ///
-    /// No store and no achievements: the match is kept by Game Center, and a
-    /// finished online match reports through `OnlineMatchRun`, which knows
-    /// whether *this* player won. Persisting it locally as well would give two
-    /// copies that can disagree.
+    /// No store: the match is kept by Game Center, and persisting it locally as
+    /// well would give two copies that can disagree.
+    ///
+    /// No achievements either — and that one is an **omission, not a rule**.
+    /// An online seat belongs to exactly one Game Center account, so the
+    /// attribution problem that stops pass & play from reporting does not
+    /// exist here: `mySeat` *is* `GKLocalPlayer.local`. Nothing reports it
+    /// because nothing was ever written to; `OnlineMatchRun` has no
+    /// achievement code in it. Whether 1.0.0 wires this up is the owner's
+    /// call — see `GAME_CENTER_ACHIEVEMENTS_ONLINE.md`.
     init(online match: OnlineMatch, mySeat: Seat) {
         state = match.state
         record = match.record
@@ -442,11 +448,16 @@ final class MatchSession {
     /// animated. Nothing is counted as it happens, so there is no running
     /// total that could disagree with the matches actually played.
     ///
-    /// **Only for a table with one person at it.** In pass & play several
-    /// people share the device and only one of them owns the Game Center
-    /// account; crediting whoever happens to sit in the first seat would
-    /// attribute somebody else's win to the device's owner. A table of people
-    /// earns nothing, which is the honest answer rather than a convenient one.
+    /// **Not for pass & play.** There several people share the device and only
+    /// one of them owns the Game Center account; crediting whoever happens to
+    /// sit in the first seat would attribute somebody else's win to the
+    /// device's owner. A table of people earns nothing, which is the honest
+    /// answer rather than a convenient one.
+    ///
+    /// That reasoning is about a *shared device*, and it does not carry over to
+    /// an online match, where the seat and the account are the same person.
+    /// Online earns nothing today only because `init(online:)` is handed no
+    /// reporter at all.
     /// The one place a match is noticed to be over.
     ///
     /// Both paths that can finish one go through here — an accepted action and
@@ -470,6 +481,10 @@ final class MatchSession {
     /// Empty until the match is over, and empty for a table of people — kept
     /// as a property rather than buried in the reporting call so the rule can
     /// be tested without a Game Center of any kind.
+    ///
+    /// It answers for an online match too, because `localSeat` is a real seat
+    /// there and `isPassAndPlay` is false. What is missing online is the
+    /// reporter, not the answer.
     var achievementsEarned: Set<Achievement> {
         guard result != nil, !isPassAndPlay, let seat = localSeat else { return [] }
         return AchievementEvaluator.unlocked(in: record, for: seat)
