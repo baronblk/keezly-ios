@@ -376,6 +376,30 @@ final class DesignReviewScreenshots: XCTestCase {
         attach(name, from: app, orientation: .landscapeLeft)
     }
 
+    /// The rulebook on a large display, for the iPad series.
+    ///
+    /// The phone gets its own portrait capture of the same screen. Both exist
+    /// because the two store series are one orientation each: a sequence that
+    /// flips halfway looks like a mistake even when every image in it is right.
+    @MainActor
+    func testRulebookLandscape() {
+        let name = "rulebook-landscape"
+        let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        XCUIDevice.shared.orientation = .landscapeLeft
+        app.launch()
+
+        let rules = app.descendants(matching: .any)["menu.rules"]
+        XCTAssertTrue(rules.waitForExistence(timeout: 20), "\(name): the menu never appeared")
+        rules.tap()
+
+        let sheet = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'rulebook'"))
+            .firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 15), "\(name): the rulebook never appeared")
+        attach(name, from: app, orientation: .landscapeLeft)
+    }
+
     // MARK: - Portrait, for the phone series
 
     /// Five scenes that only existed in landscape, captured again in portrait.

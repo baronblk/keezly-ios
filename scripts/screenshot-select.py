@@ -38,6 +38,9 @@ IPHONE = [
     ("phone-rulebook-portrait", "The rulebook — the answer to \"but how do you actually play it\", which sells a folk game."),
 ]
 
+# Landscape throughout, for the same reason the iPhone series is portrait
+# throughout: one orientation per series. The large display is the point of an
+# iPad, and these are the compositions a phone cannot show.
 IPAD = [
     ("four-players-landscape", "Hero. The full table on a large display, which is what an iPad is for."),
     ("six-players-landscape", "Six seats with room to breathe — the composition a phone cannot show."),
@@ -48,7 +51,7 @@ IPAD = [
     ("five-players-landscape", "An odd table, which the geometry handles rather than refusing."),
     ("online-menu", "Online play through Game Center."),
     ("four-players-free-for-all", "Free-for-all rather than teams."),
-    ("four-players-portrait", "Portrait on a tablet, which people genuinely use."),
+    ("rulebook-landscape", "The rulebook on a large display — the answer to \"but how do you actually play it\"."),
 ]
 
 LOCALES = ["de", "nl", "en"]
