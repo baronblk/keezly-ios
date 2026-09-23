@@ -149,9 +149,21 @@ final class OnlinePlay {
         isWorking = true
         defer { isWorking = false }
 
+        // Die Teamregel kommt aus `TableConfiguration` und wird hier nicht
+        // noch einmal formuliert. Eine zweite Fassung war genau der Defekt:
+        // der Online-Bildschirm prüfte `seats % 2 == 0`, behielt `teams = true`
+        // beim Wechsel auf drei oder fünf Sitze, und
+        // `GameConfiguration(seatCount: 3, teamMode: .teamsOfTwo)` brach mit
+        // einer precondition — die App stürzte beim Tippen auf „Neue
+        // Onlinepartie" ab, noch bevor GameKit gerufen wurde.
+        //
+        // `allowsTeams` ist ausserdem strenger als „gerade": bei zwei Sitzen
+        // stünden beide Spieler auf derselben Seite.
         let configuration = GameConfiguration(
             seatCount: seats,
-            teamMode: teams ? .teamsOfTwo : .freeForAll
+            teamMode: TableConfiguration.allowsTeams(seatCount: seats) && teams
+                ? .teamsOfTwo
+                : .freeForAll
         )
         let participants = try await transport.matchmake(seats: seats)
         let mapping = try ParticipantMapping(seatOrder: participants)

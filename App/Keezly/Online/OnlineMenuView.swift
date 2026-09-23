@@ -147,7 +147,8 @@ private struct TableSeatsRow: View {
         }
         .accessibilityIdentifier("online.seats")
 
-        if seats % 2 == 0 {
+        // Dieselbe Regel wie am lokalen Tisch, nicht eine zweite davon.
+        if TableConfiguration.allowsTeams(seatCount: seats) {
             Toggle(isOn: $teams) { Text("table.sides.teams") }
         }
     }
