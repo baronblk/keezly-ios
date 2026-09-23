@@ -92,6 +92,7 @@ run_capture() {
   xcodebuild test \
     -project Keezly.xcodeproj -scheme Keezly \
     -destination "id=$udid" \
+    -testPlan Keezly-Screenshots \
     -only-testing:"$SUITE" \
     -resultBundlePath "$bundle" \
     -testLanguage "$language" -testRegion "$region" \

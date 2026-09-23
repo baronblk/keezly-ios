@@ -141,6 +141,30 @@ schemes:
       gatherCoverageData: true
       coverageTargets:
         - Keezly
+      # A test plan rather than a bare target list, because Xcode Cloud runs
+      # the scheme's test action and would otherwise run the capture suite —
+      # fourteen launches per device of screenshot fixtures, on every merge.
+      # `DesignReviewScreenshots` is a capture suite, not a correctness suite;
+      # what it produces is checked far more strictly on the files themselves
+      # by `scripts/screenshots-verify.py`, and the `screenshots` lane runs it.
+      #
+      # The plan is also what makes the cloud and the desk run the same set.
+      # They did not before, which is how Keezly Main build 15 failed on a
+      # suite `fastlane ui_tests` never runs.
+      # Two plans, because the two runs want different things.
+      #
+      #   Keezly.xctestplan             correctness. The default, so Xcode
+      #                                 Cloud and `xcodebuild test` run it.
+      #   Keezly-Screenshots.xctestplan the capture suite, and only that.
+      #
+      # A single plan that skipped the captures silently broke the screenshots
+      # lane: `-only-testing` cannot re-enable something a plan has skipped, so
+      # the run reported "Executed 0 tests" and succeeded, which is the worst
+      # possible way to produce no screenshots.
+      testPlans:
+        - path: Keezly.xctestplan
+          defaultPlan: true
+        - path: Keezly-Screenshots.xctestplan
       targets:
         - KeezlyTests
         - KeezlyUITests

@@ -439,12 +439,16 @@ final class DesignReviewScreenshots: XCTestCase {
         let jack = elements(app, prefix: "hand.card.J.").first
         XCTAssertNotNil(jack, "\(name): the fixture did not produce a Jack in hand")
         jack?.tap()
-        XCTAssertTrue(
-            app.descendants(matching: .any)
-                .matching(NSPredicate(format: "identifier BEGINSWITH 'target.'"))
-                .firstMatch.waitForExistence(timeout: 10),
-            "\(name): the Jack offered no targets"
-        )
+
+        // A Jack needs its own pawn chosen before the swap targets appear —
+        // the same two-step the landscape capture does, and the same one
+        // ISS-020 turned on. Omitting it is why this failed the first time.
+        for pawn in elements(app, prefix: "pawn.") where pawn.isHittable {
+            pawn.tap()
+            if !elements(app, prefix: "target.").isEmpty { break }
+        }
+
+        XCTAssertFalse(elements(app, prefix: "target.").isEmpty, "\(name): no swap target was offered")
         attach(name, from: app, orientation: .portrait)
     }
 
@@ -458,10 +462,19 @@ final class DesignReviewScreenshots: XCTestCase {
         XCTAssertNotNil(seven, "\(name): the fixture did not produce a Seven in hand")
         seven?.tap()
 
-        let leg = app.descendants(matching: .any)
-            .matching(NSPredicate(format: "identifier BEGINSWITH 'target.leg.'"))
-            .firstMatch
-        if leg.waitForExistence(timeout: 10) { leg.tap() }
+        var legs = elements(app, prefix: "target.leg.")
+        if legs.isEmpty {
+            for pawn in elements(app, prefix: "pawn.") where pawn.isHittable {
+                pawn.tap()
+                legs = elements(app, prefix: "target.leg.")
+                if !legs.isEmpty { break }
+            }
+        }
+        XCTAssertFalse(legs.isEmpty, "\(name): no square offered to commit a leg")
+        legs.first?.tap()
+
+        let progress = app.descendants(matching: .any)["seven.progress"]
+        XCTAssertTrue(progress.waitForExistence(timeout: 10), "\(name): the split did not stay open")
         attach(name, from: app, orientation: .portrait)
     }
 

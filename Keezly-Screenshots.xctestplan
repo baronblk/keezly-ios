@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "5B1E1F2A-0000-4000-8000-000000000002",
+      "name" : "Configuration 1",
+      "options" : { }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "selectedTests" : [
+        "DesignReviewScreenshots"
+      ],
+      "target" : {
+        "containerPath" : "container:Keezly.xcodeproj",
+        "identifier" : "KeezlyUITests",
+        "name" : "KeezlyUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

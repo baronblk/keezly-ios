@@ -58,6 +58,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES"
       onlyGenerateCoverageForSpecifiedTargets = "YES">
+      <TestPlans>
+         <TestPlanReference
+            default = "YES"
+            reference = "container:Keezly.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Keezly-Screenshots.xctestplan">
+         </TestPlanReference>
+      </TestPlans>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"

@@ -1,3 +1,4 @@
+import Foundation
 @testable import Keezly
 import KeezlyCore
 import Testing
@@ -51,10 +52,18 @@ struct AchievementTests {
             #expect(achievement.points > 0 && achievement.points <= 100)
             #expect(!achievement.title.hasPrefix("achievement."), "\(achievement.rawValue) shows its key")
             #expect(!achievement.detail.hasPrefix("achievement."), "\(achievement.rawValue) shows its key")
-            // Low on purpose: "Gewinne eine Partie." is the whole of what
-            // winning a match takes, and padding it to reach a length would
-            // make the sentence worse.
-            #expect(achievement.detail.count > 15)
+            #expect(!achievement.detail.isEmpty)
+            // Deliberately **not** a length. The bound used to be fifteen
+            // characters and it made this test depend on the locale the
+            // simulator happened to be running in: "Gewinne eine Partie." is
+            // twenty characters and passed, "Win a match." is twelve and did
+            // not. It went green on a German desk for weeks and failed the
+            // first time Xcode Cloud ran it in English.
+            //
+            // The sentence is not worse for being short — padding it to reach
+            // a number would make it worse — so what is asserted now is that it
+            // is a sentence, which is true in every language.
+            #expect(achievement.detail.hasSuffix("."), "\(achievement.rawValue) detail is not a sentence")
         }
     }
 
@@ -167,6 +176,71 @@ struct AchievementTests {
         try #require(record.status == .completed)
         for seat in 0..<4 {
             #expect(!AchievementEvaluator.unlocked(in: record, for: Seat(seat)).contains(.partners))
+        }
+    }
+}
+
+/// Every achievement must be complete in every language Keezly ships.
+///
+/// Read from the string catalogue rather than through `String(localized:)`,
+/// because that resolves against whichever locale the simulator is running and
+/// a test that only checks the active one is not checking the other two. This
+/// is the invariant `scripts/asc_game_center.rb` relies on when it pushes the
+/// three localisations to App Store Connect.
+@Suite("Achievement text, in every language")
+struct AchievementCatalogueTests {
+
+    private func catalogue() throws -> [String: [String: String]] {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()      // KeezlyTests
+            .deletingLastPathComponent()      // App
+            .appendingPathComponent("Keezly/Localizable.xcstrings")
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let strings = root?["strings"] as? [String: Any] ?? [:]
+
+        var out: [String: [String: String]] = [:]
+        for (key, value) in strings {
+            guard let entry = value as? [String: Any],
+                  let locals = entry["localizations"] as? [String: Any] else { continue }
+            var byLanguage: [String: String] = [:]
+            for (language, unit) in locals {
+                if let u = unit as? [String: Any],
+                   let s = u["stringUnit"] as? [String: Any],
+                   let text = s["value"] as? String {
+                    byLanguage[language] = text
+                }
+            }
+            out[key] = byLanguage
+        }
+        return out
+    }
+
+    @Test("every achievement has a title and a detail in German, Dutch and English")
+    func everyLanguageIsComplete() throws {
+        let strings = try catalogue()
+        for achievement in Achievement.allCases {
+            for field in ["title", "detail"] {
+                let key = "achievement.\(achievement.rawValue).\(field)"
+                let translations = try #require(strings[key], "\(key) is not in the catalogue")
+                for language in ["de", "nl", "en"] {
+                    let text = try #require(translations[language], "\(key) has no \(language)")
+                    #expect(!text.isEmpty, "\(key) \(language) is empty")
+                    #expect(!text.hasPrefix("achievement."), "\(key) \(language) shows its key")
+                }
+            }
+        }
+    }
+
+    @Test("every achievement detail is a sentence in every language")
+    func everyDetailIsASentence() throws {
+        let strings = try catalogue()
+        for achievement in Achievement.allCases {
+            let key = "achievement.\(achievement.rawValue).detail"
+            let translations = try #require(strings[key])
+            for (language, text) in translations {
+                #expect(text.hasSuffix("."), "\(key) \(language) is not a sentence: \(text)")
+            }
         }
     }
 }
