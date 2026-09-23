@@ -66,4 +66,36 @@ else
 fi
 echo
 
+# ---------------------------------------------------------------- signing
+#
+# Xcode Cloud has no Config/Local.xcconfig — that file is git-ignored and lives
+# only on a developer's Mac. Without it there is no DEVELOPMENT_TEAM, automatic
+# signing has no team to resolve, and the archive is signed "Sign to Run
+# Locally" with no embedded provisioning profile. Release build 33 failed
+# exactly that way: Release configuration, correct bundle id, and an ad-hoc
+# signature that App Store Connect will not take.
+#
+# The team id is written here from an environment variable rather than
+# committed, because the repository must stay free of team ids and account
+# details (§106, §158). A team id is not a credential — it is in every shipped
+# app — but the rule is the rule, and an environment variable costs one setting.
+#
+# Set KEEZLY_DEVELOPMENT_TEAM in the Xcode Cloud workflow's environment.
+# Without it this says so and changes nothing: a simulator build and a test run
+# need no team, so a missing value must not fail them.
+if [ -n "${KEEZLY_DEVELOPMENT_TEAM:-}" ]; then
+    echo "── signing ──"
+    mkdir -p "$REPO/Config"
+    printf '// Written by ci_post_clone.sh. Not committed.\nDEVELOPMENT_TEAM = %s\n' \
+        "$KEEZLY_DEVELOPMENT_TEAM" > "$REPO/Config/Local.xcconfig"
+    echo "DEVELOPMENT_TEAM set from the environment"
+    echo
+elif [ "${CI_XCODEBUILD_ACTION:-}" = "archive" ]; then
+    echo "── signing ──"
+    echo "warning: KEEZLY_DEVELOPMENT_TEAM is not set and this is an archive."
+    echo "The archive will be signed to run locally and App Store Connect will"
+    echo "refuse it. Set it in the Xcode Cloud workflow environment."
+    echo
+fi
+
 echo "ci_post_clone finished"
