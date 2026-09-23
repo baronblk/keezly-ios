@@ -143,7 +143,9 @@ final class OnlinePlay {
     /// is the only order every device agrees on — deriving it from anything
     /// local would give two devices two different boards (§28).
     func startMatch(seats: Int, teams: Bool) async throws -> OnlineMatchRun {
-        guard let client else { throw MatchTransportError.unavailable(reason: "not signed in") }
+        guard Self.isEnabled, let client else {
+            throw MatchTransportError.unavailable(reason: "not signed in")
+        }
         isWorking = true
         defer { isWorking = false }
 
@@ -162,7 +164,9 @@ final class OnlinePlay {
     }
 
     func open(_ matchID: String) async throws -> OnlineMatchRun {
-        guard let client else { throw MatchTransportError.unavailable(reason: "not signed in") }
+        guard Self.isEnabled, let client else {
+            throw MatchTransportError.unavailable(reason: "not signed in")
+        }
         let match = try await client.load(matchID: matchID)
         return try OnlineMatchRun(match: match, client: client, me: client.participantID)
     }

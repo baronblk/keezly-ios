@@ -51,7 +51,12 @@ struct RootView: View {
         // not turn up in the list.
         store = ScreenshotMode.isActive ? nil : MatchStore()
         achievements = GameCenterAchievements.isEnabled ? GameCenterAchievements() : nil
-        _online = State(initialValue: OnlinePlay.isEnabled ? OnlinePlay() : nil)
+        // Always built, including in a deterministic run. `OnlinePlay` reaches
+        // Game Center only through `authenticate` and `refresh`, both of which
+        // decline in a test or screenshot run — but the *button* is part of the
+        // real menu, and a store screenshot that leaves it out would show a
+        // main menu the shipping app does not have.
+        _online = State(initialValue: OnlinePlay())
 
         if ScreenshotMode.isActive, ScreenshotMode.showsReplay {
             // A whole match, played out, then handed to the replay.

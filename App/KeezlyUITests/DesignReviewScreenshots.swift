@@ -344,6 +344,32 @@ final class DesignReviewScreenshots: XCTestCase {
         attach(name, from: app, orientation: .landscapeLeft)
     }
 
+    /// The online screen, which is a shipping feature and therefore reviewed.
+    ///
+    /// Captured in the signed-out state on purpose. A deterministic run never
+    /// authenticates — a Game Center sheet over the board would fail the run
+    /// and, worse, be shipped to the App Store — so what this shows is exactly
+    /// what a player sees before they sign in, which is a real screen and not
+    /// a mock-up. No invented match data, because there is none.
+    @MainActor
+    func testOnlineMenu() {
+        let name = "online-menu"
+        let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        XCUIDevice.shared.orientation = .landscapeLeft
+        app.launch()
+
+        let online = app.descendants(matching: .any)["menu.online"]
+        XCTAssertTrue(online.waitForExistence(timeout: 20), "\(name): the menu never appeared")
+        online.tap()
+
+        XCTAssertTrue(
+            app.descendants(matching: .any)["online.signIn"].waitForExistence(timeout: 15),
+            "\(name): the online screen never appeared"
+        )
+        attach(name, from: app, orientation: .landscapeLeft)
+    }
+
     // MARK: - Mid-match interfaces
 
     /// The Jack, with its swap targets showing.
