@@ -100,6 +100,66 @@ checked rather than assumed.
 
 ---
 
+## Archive — why build 33 failed, and the one thing it needs
+
+**Status: ARCHIVE NOT VERIFIED.** Release build 33 ran Test ✅, Analyze ✅ and
+Archive ❌.
+
+The chain, read from Apple's own distribution logs rather than guessed:
+
+```
+1. Archive built:  CONFIGURATION Release          ← correct
+2. CodeSign:       Signing Identity "Sign to Run Locally"
+                   codesign --force --sign -      ← ad-hoc, no team
+3. Analyze:        isAdHocSigned='1', teamID='(null)',
+                   no embedded.mobileprovision
+4. Export:         "Xcode couldn't find any iOS App Store provisioning
+                   profiles matching 'de.gcng.keezly'"
+5. Repair:         Xcode tries to mint one, which needs an authenticated
+                   App Store Connect session
+6. Failure:        "Unable to authenticate with App Store Connect
+                   (Session Proxy Provider)"
+```
+
+**Step 6 is a symptom, not the cause.** It is worth saying plainly because the
+message invites the wrong fix: it looks like an account or agreements problem,
+and it is not. Nothing was wrong with the account — the entitlement resolved,
+`GAME_CENTER` was present in the app ID features, the team `KZFCCDV6A8` was
+found, and a profile was issued at 07:19:31 with `errors: (null)`.
+
+**The cause is step 2.** `DEVELOPMENT_TEAM` lives in `Config/Local.xcconfig`,
+which is git-ignored and exists only on a developer's Mac. Xcode Cloud has no
+such file, automatic signing had no team to resolve, and the archive came out
+ad-hoc. Everything after that is Xcode trying to rescue an archive that was
+never signed for distribution.
+
+### The fix, and the single owner action
+
+`ci_post_clone.sh` now writes `Config/Local.xcconfig` from
+`KEEZLY_DEVELOPMENT_TEAM`. The repository still contains no team id (§106,
+§158) — a team id is not a credential, it is in every shipped app, but the rule
+stands and an environment variable costs one setting.
+
+**OWNER ACTION:** App Store Connect → Xcode Cloud → *Keezly Release* → Environment
+→ add `KEEZLY_DEVELOPMENT_TEAM = KZFCCDV6A8`.
+
+That value is Apple's own, taken from the export log of build 33. Add it to CI
+and Main too if those should ever archive; they currently do not.
+
+Without the variable nothing breaks: a simulator build and a test run need no
+team, so it is absent by design and the script says so on an archive instead of
+failing silently.
+
+### What is still unknown
+
+Whether the upload succeeds once the archive is properly signed. The
+authentication error should disappear with it, because Xcode will no longer be
+trying to repair provisioning — but that is a prediction, and it is not
+verified until a Release build reaches TestFlight. **Do not treat agreements as
+the problem until a properly signed archive has failed.**
+
+---
+
 ## Planned workflows
 
 ### Keezly CI — pull requests and development branches
