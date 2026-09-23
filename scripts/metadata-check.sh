@@ -62,7 +62,14 @@ done
 echo "Claims the app cannot keep:"
 # Matched case-insensitively across all three languages. Each term is here
 # because saying it would be untrue, not because it is a bad word.
-FORBIDDEN='anti-?cheat|cheat.?proof|server.?authorit|serverautoris|leaderboard|bestenliste|ranglijst|ranglist|game ?center|online.?(multiplayer|match|spiel|partij)|cloud ?(sync|save)'
+#
+# Game Center and online play were on this list while they were not reachable
+# from the interface. They are now — turn-based matches through Game Center are
+# part of 1.0.0 — so naming them is accurate and they have been removed. What
+# stays is what no amount of implementation can make true without a server of
+# ours: anti-cheat, server-authorised play, leaderboards and cloud saving
+# (DEC-025).
+FORBIDDEN='anti-?cheat|cheat.?proof|server.?authorit|serverautoris|leaderboard|bestenliste|ranglijst|ranglist|cloud ?(sync|save)'
 for locale in "${LOCALES[@]}"; do
   for file in "$ROOT/$locale"/*.txt; do
     [ -f "$file" ] || continue

@@ -1,1 +1,1 @@
-keezen,keezenspel,brettspiel,kartenspiel,gesellschaftsspiel,familie,mehrspieler,offline,zu zweit
+keezen,keezenspel,brettspiel,kartenspiel,gesellschaftsspiel,familie,mehrspieler,online,zu zweit

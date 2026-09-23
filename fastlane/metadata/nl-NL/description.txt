@@ -21,4 +21,4 @@ GEMAAKT OM TE GEBRUIKEN
 Volledige VoiceOver-ondersteuning: elk vakje, elke pion en elke zet is te horen en niet alleen te zien, plus een volledige lijst met toegestane zetten voor wie het bord te priegelig vindt. Dynamic Type overal. Toetsenbord en trackpad op de iPad. Nederlands, Duits en Engels.
 
 NIETS WAAR JE NIET OM VROEG
-Geen account. Geen advertenties. Geen aankopen. Geen tracking, geen analyse, geen gegevens die het apparaat verlaten. Keezly werkt in vliegtuigmodus, want er is niets om verbinding mee te maken.
+Geen account. Geen advertenties. Geen aankopen. Geen tracking, geen analyse. Alle lokale spelmodi werken in vliegtuigmodus. Alleen onlinepartijen en prestaties lopen via Apple Game Center — en daarbij wordt alleen de stand van de partij verstuurd.

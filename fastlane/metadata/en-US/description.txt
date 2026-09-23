@@ -21,4 +21,4 @@ BUILT TO BE USED
 Full VoiceOver support: every square, every piece and every move can be heard as well as seen, and there is a complete list of legal moves for anybody who finds a board fiddly. Dynamic Type throughout. Keyboard and trackpad on iPad. German, Dutch and English.
 
 NOTHING YOU DID NOT ASK FOR
-No account. No advertising. No purchases. No tracking, no analytics, no data leaving your device. Keezly works with the aeroplane mode on, because there is nothing for it to connect to.
+No account. No advertising. No purchases. No tracking, no analytics. Every local mode works with aeroplane mode on. Only online matches and achievements go through Apple's Game Center — and only the position of the match is sent.

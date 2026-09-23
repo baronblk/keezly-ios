@@ -21,4 +21,4 @@ ZUM BENUTZEN GEBAUT
 Vollständige VoiceOver-Unterstützung: jedes Feld, jede Figur und jeder Zug ist hörbar und nicht nur sichtbar, dazu eine vollständige Liste der erlaubten Züge für alle, denen das Brett zu fummelig ist. Dynamische Schrift überall. Tastatur und Trackpad auf dem iPad. Deutsch, Niederländisch und Englisch.
 
 NICHTS, WAS SIE NICHT WOLLTEN
-Kein Konto. Keine Werbung. Keine Käufe. Kein Tracking, keine Analyse, keine Daten, die das Gerät verlassen. Keezly funktioniert im Flugmodus, weil es nichts gibt, womit es sich verbinden müsste.
+Kein Konto. Keine Werbung. Keine Käufe. Kein Tracking, keine Analyse. Alle lokalen Spielmodi funktionieren im Flugmodus. Nur Onlinepartien und Erfolge laufen über Apples Game Center — und dabei wird nur der Spielstand der Partie übertragen.
