@@ -90,10 +90,13 @@ struct MoveDirectionTests {
                 // Mehrere Startpunkte, damit Wrap-around und Heimnähe mit
                 // abgedeckt sind statt nur der bequeme Fall.
                 for startProgress in [1, 5, 20, 40, 55] {
-                    for delta in progressDeltas(rank: rank, seatCount: seatCount, seat: seat, startProgress: startProgress) {
+                    let deltas = progressDeltas(
+                        rank: rank, seatCount: seatCount, seat: seat, startProgress: startProgress
+                    )
+                    for delta in deltas {
                         #expect(
                             delta > 0,
-                            "\(seatCount) Sitze, Sitz \(seat), \(rank) ab Fortschritt \(startProgress): Bewegung um \(delta)"
+                            "\(seatCount) Sitze, Sitz \(seat), \(rank) ab \(startProgress): \(delta)"
                         )
                     }
                 }
@@ -105,7 +108,10 @@ struct MoveDirectionTests {
     func theFourMovesExactlyFourBackward(seatCount: Int) {
         for seat in 0..<seatCount {
             for startProgress in [5, 20, 40, 55] {
-                for delta in progressDeltas(rank: .four, seatCount: seatCount, seat: seat, startProgress: startProgress) {
+                let deltas = progressDeltas(
+                    rank: .four, seatCount: seatCount, seat: seat, startProgress: startProgress
+                )
+                for delta in deltas {
                     #expect(
                         delta == -4,
                         "\(seatCount) Sitze, Sitz \(seat), Vier ab \(startProgress): Bewegung um \(delta) statt -4"
@@ -121,7 +127,10 @@ struct MoveDirectionTests {
             for rank in [CardRank.two, .three, .five, .six, .eight, .nine, .ten, .queen] {
                 guard let want = expectedSteps(rank) else { continue }
                 for startProgress in [1, 5, 20] {
-                    for delta in progressDeltas(rank: rank, seatCount: seatCount, seat: seat, startProgress: startProgress) {
+                    let deltas = progressDeltas(
+                        rank: rank, seatCount: seatCount, seat: seat, startProgress: startProgress
+                    )
+                    for delta in deltas {
                         #expect(
                             delta == want,
                             "\(seatCount) Sitze, Sitz \(seat), \(rank) ab \(startProgress): \(delta) statt \(want)"
@@ -154,10 +163,13 @@ struct MoveDirectionTests {
         for seat in 0..<seatCount {
             for rank in forwardRanks {
                 for startProgress in interesting {
-                    for delta in progressDeltas(rank: rank, seatCount: seatCount, seat: seat, startProgress: startProgress) {
+                    let deltas = progressDeltas(
+                        rank: rank, seatCount: seatCount, seat: seat, startProgress: startProgress
+                    )
+                    for delta in deltas {
                         #expect(
                             delta > 0,
-                            "\(seatCount) Sitze, Sitz \(seat), \(rank) ab Fortschritt \(startProgress) (lap=\(lap)): \(delta)"
+                            "\(seatCount) Sitze, Sitz \(seat), \(rank) ab \(startProgress), lap \(lap): \(delta)"
                         )
                     }
                 }
@@ -185,7 +197,8 @@ struct MoveDirectionTests {
                 card: Card(rank: .five, deckCopy: seat),
                 action: .moveBackward(pawn: Fixture.pawn(seat, 0), steps: 5)
             )
-            #expect(throws: (any Error).self, "\(seatCount) Sitze, Sitz \(seat): Rückwärtszug mit einer Fünf wurde angenommen") {
+            let why = "\(seatCount) Sitze, Sitz \(seat): Rückwärtszug mit einer Fünf angenommen"
+            #expect(throws: (any Error).self, Comment(rawValue: why)) {
                 try GameReducer.apply(.play(illegal), to: state)
             }
         }
@@ -240,7 +253,7 @@ struct MoveDirectionTests {
                     continue
                 }
                 for leg in steps {
-                    #expect(leg.steps > 0, "\(seatCount) Sitze, Sitz \(seat): Teilschritt \(leg.steps) ist nicht vorwärts")
+                    #expect(leg.steps > 0, "Sitz \(seat): Teilschritt \(leg.steps) nicht vorwärts")
                 }
                 #expect(
                     steps.reduce(0) { $0 + $1.steps } == 7,
