@@ -21,17 +21,21 @@ import sys
 from pathlib import Path
 
 # (file stem, why it is here). Order is the store order.
+# Every one of these is portrait. A phone is held upright, and a store series
+# that flips between portrait and landscape looks like a mistake even when each
+# image in it is right. The landscape captures of the same screens exist and are
+# used for the iPad series.
 IPHONE = [
-    ("phone-four-players-portrait", "Hero. A four-player table in the hand, portrait, the way most people will first see it."),
-    ("menu", "What the app is, and that it offers online play."),
+    ("phone-four-players-portrait", "Hero. A four-player table in the hand, the way most people will first see it."),
+    ("phone-menu-portrait", "What the app is, and that it offers online play."),
     ("two-players-portrait", "The smallest table, and proof the board reshapes rather than leaving gaps."),
     ("phone-six-players-portrait", "The largest table on a phone — the claim '2 to 6' made visible."),
     ("phone-mid-match-portrait", "A real position mid-match: a full hand, pieces out, something to decide."),
-    ("seven-mid-split", "The Seven split across two pieces — the rule that makes Keezen Keezen."),
-    ("jack-swap-targets", "The Jack's swap, with its targets showing. The second distinctive card."),
-    ("online-menu", "Online play through Game Center, which is a 1.0 feature and should be seen."),
-    ("four-players-free-for-all", "Free-for-all rather than teams — the house rules are configurable."),
-    ("phone-four-players-landscape", "Landscape, for players who hold the phone that way."),
+    ("phone-seven-split-portrait", "The Seven split across two pieces — the rule that makes Keezen Keezen."),
+    ("phone-jack-swap-portrait", "The Jack's swap, with its targets showing. The second distinctive card."),
+    ("phone-online-menu-portrait", "Online play through Game Center, which is a 1.0 feature and should be seen."),
+    ("phone-free-for-all-portrait", "Free-for-all rather than teams — the house rules are configurable."),
+    ("phone-rulebook-portrait", "The rulebook — the answer to \"but how do you actually play it\", which sells a folk game."),
 ]
 
 IPAD = [

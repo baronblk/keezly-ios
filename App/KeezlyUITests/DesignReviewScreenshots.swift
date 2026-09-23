@@ -376,6 +376,119 @@ final class DesignReviewScreenshots: XCTestCase {
         attach(name, from: app, orientation: .landscapeLeft)
     }
 
+    // MARK: - Portrait, for the phone series
+
+    /// Five scenes that only existed in landscape, captured again in portrait.
+    ///
+    /// The App Store series for a phone must be one orientation throughout. A
+    /// sequence that flips between portrait and landscape looks like a mistake
+    /// even when every image in it is right, and a phone is held upright — so
+    /// these five exist for the iPhone series, and the landscape originals stay
+    /// for the iPad one. Both are real captures of the same screens; neither is
+    /// a crop of the other.
+    @MainActor
+    func testMenuPortrait() {
+        let name = "phone-menu-portrait"
+        let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        XCUIDevice.shared.orientation = .portrait
+        app.launch()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),
+            "\(name): the menu never appeared"
+        )
+        attach(name, from: app, orientation: .portrait)
+    }
+
+    @MainActor
+    func testOnlineMenuPortrait() {
+        let name = "phone-online-menu-portrait"
+        let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        XCUIDevice.shared.orientation = .portrait
+        app.launch()
+
+        let online = app.descendants(matching: .any)["menu.online"]
+        XCTAssertTrue(online.waitForExistence(timeout: 20), "\(name): the menu never appeared")
+        online.tap()
+
+        let anything = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'online.'"))
+            .firstMatch
+        XCTAssertTrue(anything.waitForExistence(timeout: 15), "\(name): the online screen never appeared")
+        attach(name, from: app, orientation: .portrait)
+    }
+
+    @MainActor
+    func testFreeForAllPortrait() {
+        capture(
+            name: "phone-free-for-all-portrait",
+            seats: 4,
+            seed: 2026,
+            orientation: .portrait,
+            extra: ["-KEEZLY_TEAMS", "free"]
+        )
+    }
+
+    @MainActor
+    func testJackTargetsPortrait() {
+        let name = "phone-jack-swap-portrait"
+        let app = launch(seats: 4, seed: 2026, orientation: .portrait, extra: ["-KEEZLY_OPENING", "jack"])
+        waitForDeal(app, name)
+
+        let jack = elements(app, prefix: "hand.card.J.").first
+        XCTAssertNotNil(jack, "\(name): the fixture did not produce a Jack in hand")
+        jack?.tap()
+        XCTAssertTrue(
+            app.descendants(matching: .any)
+                .matching(NSPredicate(format: "identifier BEGINSWITH 'target.'"))
+                .firstMatch.waitForExistence(timeout: 10),
+            "\(name): the Jack offered no targets"
+        )
+        attach(name, from: app, orientation: .portrait)
+    }
+
+    @MainActor
+    func testSevenMidSplitPortrait() {
+        let name = "phone-seven-split-portrait"
+        let app = launch(seats: 4, seed: 2026, orientation: .portrait, extra: ["-KEEZLY_OPENING", "seven"])
+        waitForDeal(app, name)
+
+        let seven = elements(app, prefix: "hand.card.7.").first
+        XCTAssertNotNil(seven, "\(name): the fixture did not produce a Seven in hand")
+        seven?.tap()
+
+        let leg = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'target.leg.'"))
+            .firstMatch
+        if leg.waitForExistence(timeout: 10) { leg.tap() }
+        attach(name, from: app, orientation: .portrait)
+    }
+
+    /// The rulebook, which is half of why the app exists.
+    ///
+    /// Keezen is a game people learn from each other, and the argument usually
+    /// starts before the first card. A series that never shows the rules is
+    /// missing the answer to "but how do you actually play it".
+    @MainActor
+    func testRulebookPortrait() {
+        let name = "phone-rulebook-portrait"
+        let app = XCUIApplication()
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        XCUIDevice.shared.orientation = .portrait
+        app.launch()
+
+        let rules = app.descendants(matching: .any)["menu.rules"]
+        XCTAssertTrue(rules.waitForExistence(timeout: 20), "\(name): the menu never appeared")
+        rules.tap()
+
+        let sheet = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'rulebook'"))
+            .firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 15), "\(name): the rulebook never appeared")
+        attach(name, from: app, orientation: .portrait)
+    }
+
     // MARK: - Mid-match interfaces
 
     /// The Jack, with its swap targets showing.
