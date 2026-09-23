@@ -91,13 +91,15 @@ Apple, processed and attached to version 1.0.0.
 | Screenshots | **UPLOADED** | 60 images at Apple; count, order and COMPLETE read back per set. **Not APP STORE VERIFIED** — that needs the owner's sign-off on SCREENSHOT_REVIEW.html |
 | Screenshots still match build 42 | **VERIFIED, NOT REGENERATED** | The only files changed between 41 and 42 are `Online/OnlineMenuView.swift` and `Online/OnlinePlay.swift`. No uploaded screenshot shows either screen — the online captures were excluded before upload and stay excluded (`scripts/screenshot-select.py`), because in a simulator that screen can only show a Game Center authentication failure. A happy-path online shot needs a real account on real hardware |
 | App Privacy declaration | **OWNER ACTION** | `APP_PRIVACY_OWNER_CHECKLIST.md` |
-| Age rating | **OWNER ACTION** | One field wrong: Contests → None |
+| Age rating | **OWNER ACTION** | Reads back as `FOUR_PLUS`, which is right; one answer behind it is wrong — Contests → None. `AGE_RATING_OWNER_CHECKLIST.md` |
 | Content rights | **OWNER ACTION** | `CONTENT_RIGHTS_OWNER_CHECKLIST.md` |
 | DSA trader status | **OWNER ACTION** | Account level, not readable by API |
 | Paid Apps agreement, tax, banking | **OWNER ACTION** | Not verifiable from here |
 | Build attached to 1.0.0 | **VERIFIED** | Build 42, read back from ASC |
 | TestFlight availability | **VERIFIED** | `internalBuildState IN_BETA_TESTING`, `externalBuildState READY_FOR_BETA_SUBMISSION` — **not** Internal Only |
-| Release mode = manual | **NOT SET** | To be set before submission |
+| Release mode = manual | **VERIFIED** | `releaseType = MANUAL`, read back |
+| Ten achievements at Apple | **VERIFIED** | Read back by vendor identifier, none archived. `achievementReleases` is 0 and stays 0 until a version goes live — that is not a fault |
+| Leaderboards | **VERIFIED ABSENT** | 0, and DEC-025 says it stays 0 |
 
 ## Website
 

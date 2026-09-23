@@ -80,7 +80,9 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
 ### ISS-021 — Onlinepartie stürzte bei ungerader Sitzzahl ab — BEHOBEN
 
 - **Status:** GESCHLOSSEN, 2026-09-23. Ursache bewiesen, behoben, durch Tests
-  festgehalten
+  festgehalten. **Behoben ab Build 42**; in Build 41 noch enthalten
+- **Auf Hardware nachgespielt:** nein. Die Korrektur ist durch Tests belegt,
+  nicht durch ein zweites Gerätespiel — `PHYSICAL_DEVICE_CHECKLIST.md`
 - **Schwere:** war P0 / Release-Blocker. Von der Geräte-QA an Build 41 gefunden
 - **Komponente:** `App/Keezly/Online/OnlinePlay.swift`,
   `App/Keezly/Online/OnlineMenuView.swift` — nicht GameKit
@@ -122,7 +124,8 @@ dass lokaler Tisch und Online-Bildschirm nie auseinanderlaufen.
 
 ### ISS-022 — Gemeldete Rückwärtsbewegung: im Core nicht reproduzierbar
 
-- **Status:** OFFEN — **Ursache nicht gefunden**, Core nachweislich korrekt
+- **Status:** OFFEN — **Ursache nicht gefunden**, Core nachweislich korrekt.
+  Auch in Build 42 unverändert offen, weil es nichts zu beheben gab
 - **Schwere:** war als Release-Blocker gemeldet
 - **Komponente:** unbekannt
 

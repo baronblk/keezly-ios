@@ -1,4 +1,8 @@
-# Physical device tests — iPhone and iPad, tonight
+# Physical device tests — iPhone and iPad
+
+**Build to test: 1.0.0 (42).** Build 41 was rejected by this gate and is
+superseded; do not test it. Two things found there are the reason this run
+exists, and both have their own rows below.
 
 Run on the **TestFlight build**, after deleting any existing Keezly. An upgrade
 over a development build can carry state that hides a first-run fault, so the
@@ -67,6 +71,22 @@ Date:                    iPad model / iOS:
 | Exact count into home — refused when it overshoots | ☐ | ☐ |
 | King and Ace start a piece | ☐ | ☐ |
 | **Tapping a highlighted square next to a piece moves — it does not select the piece** (ISS-020) | ☐ | ☐ |
+| **Nothing ever moves backward except a Four** (ISS-022) | ☐ | ☐ |
+
+### If a piece does move backward
+
+This is the report from build 41 that could not be reproduced. The core has been
+shown across every rank and every table size not to produce it, and the UI holds
+no movement logic of its own — so a sighting here is new information and the
+only way forward. Do not summarise it; write down exactly:
+
+```
+Card played:            Table size:            Teams or free-for-all:
+Which seat was on turn:          Which seat owned the piece:
+Where the piece stood before:    Where it ended up:
+Was it a Seven split?  Which leg?
+Screen recording:  ☐ yes
+```
 
 ## Saving and coming back
 
@@ -115,8 +135,12 @@ Date:                    iPad model / iOS:
 | | iPhone | iPad |
 |---|---|---|
 | Signed in, and the online screen says so | ☐ | ☐ |
+| **Online with 2, 3, 4, 5 and 6 seats — each one starts** (ISS-021) | ☐ | ☐ |
+| **Switch the seat count back and forth before starting — still no crash** (ISS-021) | ☐ | ☐ |
+| Teams are offered at 4 and 6 seats, and nowhere else | ☐ | ☐ |
 | The full online run — see `GAME_CENTER_E2E_CHECKLIST.md` | ☐ | ☐ |
 | Achievements appear in Game Center after a solo match | ☐ | ☐ |
+| An online match awards **no** achievement — expected today, and an open owner decision (`GAME_CENTER_ACHIEVEMENTS_ONLINE.md`) | ☐ | ☐ |
 | Declining sign-in leaves the rest of the app working | ☐ | ☐ |
 
 ---

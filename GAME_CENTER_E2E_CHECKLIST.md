@@ -16,6 +16,7 @@ A single FAIL here is a release blocker, not a note.
 
 | | |
 |---|---|
+| Build | **1.0.0 (42)** — not 41, which this gate's sibling rejected |
 | Device A | Physical iPhone, Keezly from TestFlight, **deleted and reinstalled** |
 | Device B | Physical iPad, Keezly from TestFlight, **deleted and reinstalled** |
 | Account A | Apple Account signed in to Game Center on A |
@@ -27,6 +28,24 @@ state that hides a first-run fault.
 
 Check first, on each device: **Settings → Game Center → signed in**, and the
 two accounts are genuinely different people.
+
+---
+
+## Start here: the crash from build 41
+
+Before the twenty steps, the thing that made build 41 unusable. It happened on
+the way *into* an online match, before Game Center was ever called, so it costs
+a minute and it gates everything after it.
+
+| | A | B |
+|---|---|---|
+| Open online, choose **3** seats, start | ☐ | ☐ |
+| Open online, choose **5** seats, start | ☐ | ☐ |
+| Choose **4** seats, then change to **3**, then start | ☐ | ☐ |
+| Choose **6** seats, then change to **5**, then start | ☐ | ☐ |
+| Teams offered at 4 and 6 only, never at 2, 3 or 5 | ☐ | ☐ |
+
+Any crash here is the same defect returning (ISS-021) and stops the run.
 
 ---
 
