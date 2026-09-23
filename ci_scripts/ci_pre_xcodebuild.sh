@@ -16,10 +16,26 @@ REPO="${CI_PRIMARY_REPOSITORY_PATH:-$(cd "$(dirname "$0")/.." && pwd)}"
 TARGET="$REPO/Config/BuildNumber.xcconfig"
 
 echo "── Keezly: ci_pre_xcodebuild ──"
+echo "action : ${CI_XCODEBUILD_ACTION:-<not set>}"
 
 if [ -z "${CI_BUILD_NUMBER:-}" ]; then
     echo "CI_BUILD_NUMBER is not set — leaving the committed build number in place."
     echo "(This is expected outside Xcode Cloud.)"
+    exit 0
+fi
+
+# Xcode Cloud splits a test action in two: it builds for testing on one runner
+# and then runs `test-without-building` on the test runners. Those runners get
+# the built products and **no source tree**, so $REPO/Config does not exist and
+# writing into it failed the whole action — which is how Keezly Main build 11
+# came back red with a green build and a green analyze beside it.
+#
+# There is nothing to configure on a runner that is not going to compile: the
+# build number is already inside the product it was given. Saying so and
+# stopping is correct; creating the directory would write a file nothing reads.
+if [ ! -d "$REPO/Config" ]; then
+    echo "no source tree here — nothing to configure."
+    echo "(Expected on a test-without-building runner, which is handed the built product.)"
     exit 0
 fi
 
