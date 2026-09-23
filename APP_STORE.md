@@ -258,11 +258,38 @@ one is his to make. It is one field in the web form, or one PATCH.
 
 ---
 
-## Screenshots — NOT YET UPLOADED
+## Screenshots — ASC UPLOADED, NOT YET REVIEWED BY A PERSON
 
-The existing 84-capture matrix predates the locale and status-bar fixes and
-**must not be used**. A fresh matrix is required, then the ten strongest per
-device and locale selected — Apple allows ten, the pipeline produces fourteen.
+60 images: ten per device size, per locale. Read back from Apple rather than
+inferred from a 201 — count, filename order and `assetDeliveryState COMPLETE`
+confirmed for every one of the six sets.
+
+| Locale | iPhone 6.9″ | iPad 13″ |
+|---|---|---|
+| de-DE | 10, order ok, COMPLETE | 10, order ok, COMPLETE |
+| nl-NL | 10, order ok, COMPLETE | 10, order ok, COMPLETE |
+| en-US | 10, order ok, COMPLETE | 10, order ok, COMPLETE |
+
+Captured from a 132-image matrix — 22 scenes across two devices and three
+locales — generated after every fix of the last two days, including the board
+tap-precedence repair. Nothing older is in the release path; the superseded set
+is archived under `artifacts/screenshots-superseded-*`.
+
+**One orientation per series.** The iPhone set is portrait throughout and the
+iPad set landscape throughout: a store sequence that flips halfway looks like a
+mistake even when every image in it is right. That cost six new portrait
+captures and one new landscape one, and it is the difference between a set of
+images and a series.
+
+The selection is a judgement and is written down as one — an ordered list with
+a reason against every slot in `scripts/screenshot-select.py`, so any single
+choice can be overruled without re-deriving the rest.
+
+**Not APP STORE VERIFIED.** That needs a person to open
+`SCREENSHOT_REVIEW.html` and answer the ten questions per image that no script
+can: whether the language is right, whether the board is worth showing, whether
+the feature shown genuinely exists in this build, whether it is good enough to
+sell the app. Nothing in that sheet is pre-ticked.
 
 ---
 

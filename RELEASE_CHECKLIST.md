@@ -16,13 +16,16 @@ Nothing here says "probably fine". Last updated **2026-09-23**.
 
 ## Can this be submitted tomorrow?
 
-**Not yet — and the list of what stands in the way is short and specific:**
+**Not yet — and the list is shorter than it was this morning:**
 
 1. Game Center online has never run against real Game Center (tonight).
-2. No cloud Archive has ever run, so distribution signing is unproven.
-3. No TestFlight build exists.
+2. Distribution signing is unproven until an Archive succeeds (running now).
+3. No TestFlight build exists (follows from 2).
 4. Four owner declarations are outstanding.
-5. The screenshots are selected but not reviewed by a person or uploaded.
+5. The screenshots are uploaded but no person has looked at them.
+
+Items 1 and 5 need a human being, not more automation. Item 4 is the owner's by
+definition. Items 2 and 3 are the same run and are in flight.
 
 None of these is unknown territory. All are scheduled.
 
@@ -58,9 +61,9 @@ None of these is unknown territory. All are scheduled.
 |---|---|---|
 | Shared scheme from a clean clone | **VERIFIED** | Cloned `origin/main`, `xcodebuild -list` |
 | Cloud BUILD | **VERIFIED** | Builds 4, 5, 11, 15 |
-| Cloud ANALYZE | **VERIFIED** | Build 11 and 15, 0 errors |
-| Cloud TEST | **IN PROGRESS** | Build 15 |
-| Cloud ARCHIVE | **NOT RUN** | Release workflow exists; never executed |
+| Cloud ANALYZE | **VERIFIED** | Build 32, 0 errors **and 0 warnings** |
+| Cloud TEST | **VERIFIED** | Build 32, 0 errors. Took four failures to get there, each a real defect |
+| Cloud ARCHIVE | **RUNNING** | Release build 33 — the first, and the only thing that exercises real signing |
 | Distribution signing | **NOT PROVEN** | Cloud build is Debug and ad-hoc. Only Archive exercises real signing |
 | Workflows CI / Main / Release | **VERIFIED** | Created and read back |
 | Release toolchain pinned | **VERIFIED** | Xcode 27 (27A266a) |
@@ -76,7 +79,7 @@ None of these is unknown territory. All are scheduled.
 | Review information and notes | **VERIFIED** | Read back, 1819 characters |
 | Export compliance | **VERIFIED** | No crypto, no own networking; only GameKit |
 | Privacy manifest | **VERIFIED** | One required-reason API, re-checked after the online work |
-| Screenshots | **SELECTED** | 60 chosen; not reviewed, not uploaded |
+| Screenshots | **UPLOADED** | 60 images at Apple; count, order and COMPLETE read back per set. **Not APP STORE VERIFIED** — that needs the owner's sign-off on SCREENSHOT_REVIEW.html |
 | App Privacy declaration | **OWNER ACTION** | `APP_PRIVACY_OWNER_CHECKLIST.md` |
 | Age rating | **OWNER ACTION** | One field wrong: Contests → None |
 | Content rights | **OWNER ACTION** | `CONTENT_RIGHTS_OWNER_CHECKLIST.md` |
