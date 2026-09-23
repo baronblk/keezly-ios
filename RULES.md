@@ -63,6 +63,27 @@ A pawn moves forward around the track and, on reaching its own home entry,
 turns into its home lane. A pawn in the waiting area can only be brought out by
 an Ace or a King.
 
+### Direction — the canonical statement
+
+**The Four is the only card in the game that moves a pawn backward.** Every
+other rank that moves a pawn moves it forward, and the Seven moves it forward on
+every one of its partial legs, never only in the total. The Jack does not move
+pawns at all; it exchanges two of them, so neither one travels.
+
+"Forward" is measured as the pawn's own **progress**: how far it has come along
+its route from its start square towards its home. It is deliberately not the
+global track index, because the track is a ring — a smaller index is not
+"behind" a pawn once it has wrapped, and a pawn entering its home lane leaves
+the track's numbering entirely.
+
+This is one rule in one place. `MoveGenerator` is the sole authority on what is
+legal (DEC-004); the UI filters `observation.legalMoves` and takes its target
+squares from `observation.preview(move)`, so it cannot construct a move the core
+did not offer. There is no second movement calculation anywhere in the app, and
+`MoveDirectionTests` holds the statement above to the code for every rank at
+every table size from two to six seats, including the wrap-around and the home
+entry.
+
 ### Blockades
 
 A pawn standing on **its own start square is protected**. It cannot be captured,

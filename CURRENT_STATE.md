@@ -8,13 +8,15 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-36446af  fix(screenshots): put the orientation in the pixels, not in a tag
+20f6225  docs(issues): record the online crash as fixed and the movement report as unreproduced
 ```
 
-Verified on **2026-09-22** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64):
-`KeezlyCore` 176 tests in 16 suites green in 145 s, the soak 630 complete
-matches green in 213 s, `fastlane lint` green, and the screenshot set measured
-on disk rather than in memory.
+Verified on **2026-09-23** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64):
+`KeezlyCore` 187 tests in 18 suites green, the app target 239 tests in 31
+suites green, 15 UI tests green, SwiftLint `--strict` and SwiftFormat clean.
+
+This is also the commit that produced **1.0.0 (42)**, the current release
+candidate (`RELEASE_CANDIDATE.md`). Build 41 was rejected by device QA.
 
 ---
 
@@ -33,7 +35,8 @@ on disk rather than in memory.
 | M8 — Brand / App Icon / Audio / Haptics | **IMPLEMENTATION COMPLETE** — audio present and measured, **not listening-verified**; icon not **DEVICE VERIFIED** |
 | M9 — Statistics / Replay / Game Center Meta | **DONE** — reporting **BLOCKED** (MAN-02) |
 | M10 — Localisation | **DONE** |
-| **M11 — CI / QA / Hardening** | **NOT STARTED** |
+| **M11 — CI / QA / Hardening** | **DONE** — CI/Main/Release workflows, pinned toolchain, cloud Build/Test/Analyze verified |
+| **M12 — Release preparation** | **IN PROGRESS** — 1.0.0 (42) on TestFlight, device QA outstanding |
 
 Everything up to and including M3 lives in `KeezlyCore`, which is testable with
 `swift test` alone. From M4 on the work is mostly app-layer.
@@ -45,8 +48,9 @@ and can be watched back afterwards. It teaches itself in ten lessons, answers a
 rule question without leaving the board, can be played entirely from a spoken
 list of moves, and speaks German, Dutch and English.
 
-What is left before a release is release work: CI, the device gates, and the
-App Store Connect record everything online depends on.
+What is left before a release is the part no machine here can do: somebody
+playing 1.0.0 (42) on real hardware, and a Game Center online match between two
+real devices. Everything that could be proved from this desk has been.
 
 ### Status vocabulary
 
@@ -547,8 +551,12 @@ Recorded per environment; never merged (§167, §175).
 | Physical iPhone — re-run on the polish | **BLOCKED** — device left the wired connection mid-run (ISS-014) | 2026-09-21 | — |
 | Physical iPad (A16), iOS 27.0 | **PASSED** (80 passed, 3 skipped) | 2026-09-20 | `9a2d4e3` |
 | Physical iPad — re-run on the polish | **BLOCKED** — the test runner will not start (ISS-014) | 2026-09-21 | — |
-| Xcode Cloud | **PREPARED and CONFIGURED, not VERIFIED** — owner initialised it; no cloud build has run | 2026-09-23 | `c975d51` |
-| Game Center multi-device | **BLOCKED** — not implemented (M6) | — | — |
+| Xcode Cloud — Build / Test / Analyze | **VERIFIED** | 2026-09-23 | `087d873` |
+| Xcode Cloud — Archive / distribution | **FAILED** — artefact is signed but invalid (90035, NFC/NFD); upload additionally blocked by a session proxy | 2026-09-23 | `087d873` |
+| Local distribution build 1.0.0 (42) | **VERIFIED** — `codesign --strict` and `altool --validate-app` both pass, ASC `processingState=VALID` | 2026-09-23 | `20f6225` |
+| Physical device — build 41 | **REJECTED** — online crash (ISS-021, fixed) and a reported backward move (ISS-022, unreproduced) | 2026-09-23 | `087d873` |
+| Physical device — build 42 | **OUTSTANDING** | — | — |
+| Game Center multi-device | **OUTSTANDING** — implemented, needs two real devices and two accounts | — | — |
 
 Device availability is re-checked with `./scripts/devices.sh` before every
 device run, never trusted from this file — it changed mid-session once already.
@@ -560,8 +568,20 @@ device run, never trusted from this file — it changed mid-session once already
 
 ## Known Problems
 
-`KNOWN_ISSUES.md` holds the detail. One new entry, accepted with its numbers
-rather than papered over:
+`KNOWN_ISSUES.md` holds the detail. Two entries from the device QA of build 41:
+
+- **ISS-021** — starting an online match with an odd number of seats crashed
+  the app before any GameKit call. **Fixed** in `c4a8278`: `OnlineMenuView`
+  carried its own `seats % 2 == 0` rule instead of asking
+  `TableConfiguration.allowsTeams`, so a stale `teams = true` survived a seat
+  change. The duplicated rule was removed, not the symptom.
+- **ISS-022** — pieces reported moving backward on ordinary moves. **Open and
+  unreproduced.** Seven semantic direction tests across 2–6 seats show the core
+  never produces it, and the UI holds no movement logic that could. It needs
+  the concrete observation — card, seat, table size, where the piece went — to
+  go further.
+
+And one older entry, accepted with its numbers rather than papered over:
 
 - **ISS-016** — a seat colour does not reach 3:1 against the board. Amber is
   the weakest at 1.23:1 and nothing in the palette reaches the bar without
@@ -618,6 +638,8 @@ ones it cannot are reported as what they are rather than folded in.
 | Simulator gate | PASS |
 | Physical iPhone gate | **BLOCKED** — no device fills the role |
 | Physical iPad gate | **ATTEMPTED, INCOMPLETE** — the app suite ran on the device and **27 suites passed**; the lane then stopped at a `Password:` prompt and waited on input (ISS-019). Not a pass |
+| Device QA of build 41 by a person | **REJECTED** — two P0 reports; see ISS-021 and ISS-022 |
+| Device QA of build 42 by a person | **OUTSTANDING** |
 | Game Center gate | **BLOCKED** — `docs/GAME_CENTER_DEVICE_TESTS.md` |
 
 The lane ends by saying so itself: *"Mandatory real-device gates are still
@@ -634,10 +656,10 @@ in a document.
 | MAN-01 | Bundle identifier | **DONE** — `de.gcng.keezly` (DEC-011) |
 | MAN-02 | App Store Connect app record for `de.gcng.keezly` | **DONE** — created by the owner. ASC App ID `6814932630`, SKU `KEEZLY-IOS-001`, version 1.0.0 in `PREPARE_FOR_SUBMISSION`. Metadata, pricing and Game Center pushed and read back (`APP_STORE.md`) |
 | MAN-03 | Apple Developer signing team | **DONE** — in the git-ignored `Config/Local.xcconfig`, device build verified |
-| MAN-04 | Authorise GitHub ↔ Xcode Cloud, enable Xcode Cloud | **DONE** — initialised 2026-09-23. The shared scheme was already in the repository and is proven from a clean clone (`XCODE_CLOUD.md`). No cloud build has run yet |
+| MAN-04 | Authorise GitHub ↔ Xcode Cloud, enable Xcode Cloud | **DONE** — initialised 2026-09-23. Build, Test and Analyze verified in the cloud; Archive produces an artefact Apple rejects (90035) and the cloud upload is blocked by a session proxy, so distribution is done locally (`XCODE_CLOUD.md`) |
 | MAN-05 | Enable Game Center for the bundle id | **DONE** — enabled on the App ID; `App/Keezly/Keezly.entitlements` carries the capability |
 | MAN-06 | Create Game Center achievements | **DONE** — all ten created through the REST API and read back (`APP_STORE.md`). **No leaderboards, ever** (DEC-025). The app now reports them, which it did not until 2026-09-22 |
-| MAN-07 | Configure TestFlight testers | OPEN |
+| MAN-07 | Configure TestFlight testers | OPEN — 1.0.0 (42) is processed and available; adding a tester sends them an invitation, so it stays the owner's action |
 | MAN-08 | App Store Connect API key | **DONE & VERIFIED** — outside the repo; `fastlane asc_check` authenticates |
 | MAN-09 | Pair a physical iPhone | **DONE** — iPhone 17 Pro, Developer Mode on |
 | MAN-10 | Pair a physical iPad | **DONE & VERIFIED** — iPad (A16), iOS 27.0, gate green 2026-09-20 |
@@ -645,8 +667,8 @@ in a document.
 | MAN-12 | Second physical device for Game Center tests | OPEN |
 | MAN-13 | Copyright holder's name, support URL and privacy URL for the store listing | OPEN — the text metadata is written and checked; these three are facts about a person and a domain, and `fastlane/metadata/BLOCKED.md` says why guessing one is worse than leaving it blank |
 
-MAN-02 blocks TestFlight, Game Center configuration and Xcode Cloud. It blocks
-none of the work queued next.
+MAN-02 is done and no longer blocks anything. What blocks a submission now is
+MAN-07, MAN-11, MAN-12 and MAN-13 — all of them owner actions.
 
 ---
 
@@ -672,20 +694,25 @@ play, no anti-cheat claim.
 
 ## Next Steps (concrete)
 
-M0 to M10 are done. What is left is release work.
+M0 to M11 are done. 1.0.0 (42) is on TestFlight. What is left needs a person
+and hardware, not another commit.
 
-1. **M11 — CI / QA / Hardening.** The Xcode Cloud workflows, the screenshot
-   harness, and ISS-012 fixed at the cause in the capture pipeline rather than
-   by cropping. The three simulator-free scripts above are ready to be gates.
-2. **Device gates.** Both physical devices are paired and both passed before
-   M7; ISS-014 has blocked re-running them since. They need re-running against
-   this work before anything is called verified on hardware.
-3. **M12 — Release candidate.** Blocked on MAN-02, which also blocks
-   TestFlight, Game Center configuration and Xcode Cloud.
+1. **Play 1.0.0 (42) on real hardware.** `PHYSICAL_DEVICE_CHECKLIST.md`. The
+   two things to attack on purpose are the online seat counts that crashed
+   build 41, and ISS-022 — if a piece moves backward, write down the card, the
+   seat, the table size and where it went. Without that the report cannot be
+   taken further; the core has been shown not to produce it.
+2. **Game Center online, end to end.** `GAME_CENTER_E2E_CHECKLIST.md`. Two real
+   devices, two accounts. Nothing here can stand in for it.
+3. **Owner decisions.** Achievements in online matches (A or B,
+   `GAME_CENTER_ACHIEVEMENTS_ONLINE.md`), the four owner declarations, MAN-13,
+   and the human sign-off on the store screenshots.
+4. **Submit for review.** Only on the owner's explicit word.
 
-Two things will stay honestly incomplete until somebody unblocks them:
+Three things stay honestly incomplete until somebody unblocks them:
 
 | | Why |
 |---|---|
 | Sound | **ASSET PRESENT, NOT LISTENING-VERIFIED.** Synthesised from source in this repository (§77) |
-| Game Center, end to end | **BLOCKED** on MAN-02. Implemented and tested against a mock two-client harness; never run against a real match |
+| Game Center, end to end | **OUTSTANDING.** Implemented and tested against a mock two-client harness; never run against a real match |
+| Store screenshots | **ASC UPLOADED, NOT HUMAN REVIEWED.** Technical verification is not a marketing sign-off (`SCREENSHOT_REVIEW.html`) |

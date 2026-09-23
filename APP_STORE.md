@@ -193,9 +193,17 @@ earned every one of them and been told about none.
 `AchievementTests` could never have caught this, because the evaluator was
 right the whole time. What was missing was anything that called it.
 
-Reported only for a table with **one** person at it. In pass & play several
-people share the device and one of them owns the Game Center account, so
-crediting the first seat would attribute somebody else's win to the owner.
+Reported for a solo table. **Not** for pass & play: several people share the
+device and one of them owns the Game Center account, so crediting the first seat
+would attribute somebody else's win to the owner.
+
+**Not for an online match either — and that one is an omission, not a rule.** An
+online seat belongs to exactly one Game Center account, so the attribution
+problem above does not arise there; nothing reports it because
+`MatchSession.init(online:)` is handed no reporter at all. Whether 1.0.0 wires
+this up is an owner decision with two clean answers, written out in
+`GAME_CENTER_ACHIEVEMENTS_ONLINE.md`. Until it is taken, the store listing and
+the TestFlight notes say online earns nothing, which is true.
 
 **GAME CENTER E2E = NOT VERIFIED.** Metadata existing is not the same as a
 signed-in account on a real device seeing a banner, and that has not happened
@@ -203,17 +211,21 @@ yet. The reporting path is covered by tests that use a spy, not by Apple.
 
 ---
 
-## There is no online play in 1.0.0
+## Online play in 1.0.0
 
-`GameCenterTransport` implements turn-based play over `GKTurnBasedMatch` and is
-tested against `InMemoryTransport`. **Nothing in the interface reaches it.** It
-compiles into the binary and is unreachable.
+`GameCenterTransport` implements turn-based play over `GKTurnBasedMatch`, and
+1.0.0 reaches it: menu → online → match, with `OnlineMenuView`,
+`OnlineMatchRun` and `OnlineGameScreen` in front of it. It ships.
 
-That is a perfectly reasonable thing to ship — an unclaimed feature harms
-nobody. What was not reasonable is that the website promised it, on the home
-page, in the FAQ and on all three privacy pages, in all three languages. Those
-are corrected. If online play is wanted in 1.0.0 it is a product decision and a
-user interface, not a fix, and it is the owner's call.
+This section previously said the opposite, and that was true when it was
+written: the transport compiled into the binary and nothing in the interface
+reached it, while the website promised online play on the home page, in the FAQ
+and on all three privacy pages. The interface was built rather than the promise
+withdrawn — online play is 1.0.0 scope by the owner's decision.
+
+What is *not* claimed anywhere: friend invitations by name (matchmaking is
+`GKTurnBasedMatch.find`), leaderboards (DEC-025, never), and any form of
+anti-cheat or server-authoritative play. There is no server.
 
 ---
 

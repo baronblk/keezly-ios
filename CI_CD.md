@@ -1,13 +1,22 @@
 # Keezly — CI/CD
 
-**Status: NOT STARTED.** No CI exists. The only reproducible command today is:
+**Status: IN PLACE.** Three Xcode Cloud workflows exist and have run — CI,
+Main and Release — on a pinned Xcode 27 (27A266a). Build, Test and Analyze are
+**VERIFIED** in the cloud. Archive produces an artefact Apple rejects and the
+cloud upload is blocked, so distribution is done locally; both failures are
+Apple-side and are written up in `XCODE_CLOUD.md`.
+
+Everything is still reproducible from a developer's Mac without the cloud
+(§124):
 
 ```bash
-cd Packages/KeezlyCore && swift test
+cd Packages/KeezlyCore && swift test        # the engine alone
+bundle exec fastlane tests                  # app + UI suites
+bundle exec fastlane release_check          # the gate
 ```
 
-Tracked as M0.3/M0.4 and M11 in `ROADMAP.md`. Companion documents:
-`FASTLANE.md`, `XCODE_CLOUD.md`, `docs/SCREENSHOTS.md`.
+Companion documents: `FASTLANE.md`, `XCODE_CLOUD.md`, `docs/SCREENSHOTS.md`,
+`RELEASE_CANDIDATE.md`.
 
 ---
 
@@ -25,6 +34,12 @@ Two systems, clearly divided (DEC-008):
 
 They must not duplicate each other. fastlane does **not** produce a second
 archive or a parallel TestFlight upload of a build Xcode Cloud already made.
+
+**One exception, and it is an exception.** 1.0.0 (42) was archived, exported,
+validated and uploaded from a Mac, because the cloud's own archive is rejected
+by Apple's validator (90035) and its upload is blocked by a session proxy. That
+is a workaround for two Apple-side faults, not a second pipeline: when either is
+fixed, the cloud path resumes and the local one stops.
 
 No GitHub Actions workflow will be added for the same Apple builds unless a
 concrete technical reason appears (§82).

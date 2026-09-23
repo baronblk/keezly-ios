@@ -1,6 +1,6 @@
 # Keezly — Xcode Cloud
 
-**Status: PREPARED and CONFIGURED. NOT VERIFIED.**
+**Status: VERIFIED for Build, Test and Analyze. FAILED for distribution.**
 
 The three states are kept strictly apart (§117):
 
@@ -8,11 +8,15 @@ The three states are kept strictly apart (§117):
 |---|---|---|
 | PREPARED | `ci_scripts/`, shared scheme and a buildable project exist in the repo | **Yes** |
 | CONFIGURED | The workflow exists in Xcode / App Store Connect | **Yes** — owner initialised it 2026-09-23 |
-| VERIFIED | A real Xcode Cloud build has run and passed | **No** |
+| VERIFIED | A real Xcode Cloud build has run and passed | **Yes, for Build / Test / Analyze** |
 
 No claim of "Xcode Cloud is set up" is made on the basis of local files alone,
 and none is made on the basis of a workflow existing either. VERIFIED means a
-cloud build ran and passed, and that has not happened.
+cloud build ran and passed.
+
+Archive is a separate answer and a worse one: the cloud produces an artefact
+Apple rejects, and the cloud's own upload is blocked. 1.0.0 (42) therefore went
+to App Store Connect from this Mac. See below and `RELEASE_CANDIDATE.md`.
 
 ---
 
@@ -100,17 +104,39 @@ checked rather than assumed.
 
 ---
 
-## Archive — verified. Upload — not.
+## Archive — an artefact, not a distributable one
 
-Three states, kept strictly apart because they are not the same thing:
+Four states, kept strictly apart because they are not the same thing:
 
 | | |
 |---|---|
-| **CLOUD ARCHIVE** | **VERIFIED** — build 37 |
-| **DISTRIBUTION SIGNING** | **VERIFIED** — build 37 |
-| **TESTFLIGHT UPLOAD** | **NOT VERIFIED** — no build has ever reached App Store Connect |
+| **CLOUD ARCHIVE** | **technisch erzeugt** — an .ipa exists and exports |
+| **CLOUD DISTRIBUTION SIGNING** | **FAILED** — `codesign --strict` and Apple's validator both reject it (90035) |
+| **CLOUD TESTFLIGHT UPLOAD** | **BLOCKED** — Session Proxy Provider |
+| **LOCAL DISTRIBUTION + UPLOAD** | **VERIFIED** — 1.0.0 (42), `processingState VALID` |
 
-### What was verified, from the artefact rather than the status
+### Correction of an earlier entry
+
+This section previously read **CLOUD ARCHIVE = VERIFIED** and **DISTRIBUTION
+SIGNING = VERIFIED** for build 37. **Both were wrong.** What had been checked
+was the authority line, the flags and the entitlements — a plausible partial
+check taken as proof. A strict verification and Apple's own validator were never
+run against that artefact; both reject it:
+
+```
+codesign --verify --strict   ...: does not satisfy its Designated Requirement
+altool --validate-app        ERROR ITMS-90035: Invalid Signature
+```
+
+The cause is Apple's, not this project's: the cloud-managed certificate writes
+the Common Name into the Designated Requirement in **NFD** while the certificate
+itself carries **NFC**. Same letters, different bytes, and the `subject.CN`
+clause fails. Every other clause — `anchor apple generic`, `identifier`,
+`subject.OU`, the marker field — passes. A locally issued Apple Distribution
+certificate, with the same team, the same entitlements and the same source, is
+NFC on both sides and passes.
+
+### What the cloud artefact did contain, from the artefact rather than the status
 
 The App Store export was downloaded from Apple and the `.ipa` opened:
 
@@ -165,10 +191,15 @@ authorisation, or the agreements that gate it (Paid Applications, for a paid
 app). Neither is readable through the API with the key this project holds, and
 neither is a thing to change on suspicion.
 
-**OWNER ACTION:** App Store Connect → Business → Agreements, Tax and Banking.
-Confirm the Paid Applications agreement is active and nothing is awaiting
-acceptance. Then re-run *Keezly Release*; everything before the upload already
-works.
+**OWNER ACTION (still open, but no longer on the critical path):** App Store
+Connect → Business → Agreements, Tax and Banking. Confirm the Paid Applications
+agreement is active and nothing is awaiting acceptance.
+
+It is no longer on the critical path because 1.0.0 (42) reached App Store
+Connect another way — archived, exported, validated and uploaded from this Mac
+with `altool` and the ASC API key. Even with the upload unblocked, the cloud
+archive would still be rejected for its signature, so the cloud path needs both
+things fixed before it can distribute.
 
 ---
 

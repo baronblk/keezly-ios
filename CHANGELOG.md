@@ -158,6 +158,14 @@ Versioning.
 
 ### Fixed
 
+- **Starting an online match with an odd number of seats crashed the app**
+  (ISS-021, reported by device QA of build 41). `OnlineMenuView` decided for
+  itself whether to offer teams with `seats % 2 == 0` instead of asking
+  `TableConfiguration.allowsTeams`, so a `teams = true` set at four seats
+  survived a change to three and `GameConfiguration` was handed a combination
+  that does not exist. The crash happened before any GameKit call — Game Center
+  was never involved. The duplicated rule was removed rather than the symptom
+  patched, and a regression test now builds every offerable seat/teams pair.
 - A two-player board had no room in the middle for the draw pile and the played
   card, which were drawn across the home lanes. Two players now have the cards
   beside the board instead.

@@ -1,30 +1,52 @@
 # TestFlight — internal testing
 
-**Status: NO BUILD YET.** The Release workflow exists and will archive to
-TestFlight internal testers; nothing has been archived, uploaded or processed.
-This describes what happens when it does, and what to test.
+**Status: Build 42 ist auf TestFlight.** 1.0.0 (42), lokal archiviert und
+signiert, von Apple validiert, `processingState = VALID`, der Version 1.0.0
+zugeordnet. Build 41 wurde von der Geräte-QA abgelehnt und ist überholt
+(`RELEASE_CANDIDATE.md`).
 
-**No external beta review.** The archive action distributes `INTERNAL_ONLY`,
-which reaches internal testers on the team and starts no Apple beta review. That
-is deliberate and is not to be widened without the owner asking.
+**Der Build ist nicht Internal Only.** `externalBuildState` ist
+`READY_FOR_BETA_SUBMISSION`, der Export lief mit
+`testFlightInternalTestingOnly=false`. Er ist damit auch für eine externe
+Beta und für die Prüfung brauchbar. Eine externe Beta zu *starten* ist eine
+Eigentümerentscheidung und wird nicht im Vorbeigehen getroffen.
 
 ---
 
 ## How a build gets there
+
+Für 1.0.0 (42) **nicht** über Xcode Cloud, sondern lokal:
+
+```
+xcodebuild archive      Release, generic/platform=iOS
+xcodebuild -exportArchive   app-store-connect, signingStyle=automatic
+altool --validate-app   VERIFY SUCCEEDED with no errors
+altool --upload-app     Delivery UUID 890a4995-…
+App Store Connect       processingState VALID, an Version 1.0.0 gehängt
+```
+
+Der Cloud-Weg endet weiterhin an einem Apple-seitigen Signaturfehler (90035,
+NFC/NFD im Zertifikatsnamen) und an einem blockierten Session-Proxy beim
+Upload. Beides ist in `RELEASE_CANDIDATE.md` und `XCODE_CLOUD.md` belegt. Der
+Cloud-Weg für Build, Test und Analyze bleibt gültig und wird weiter benutzt.
+
+Der ursprünglich geplante Weg, sobald Apple den Signaturfehler behebt:
 
 ```
 Keezly Release   (manual trigger)
   → Test      the correctness plan, iPhone 17 + iPad Pro 13-inch
   → Analyze
   → Archive   Release configuration, distribution signing by Xcode Cloud
-  → TestFlight, internal testers
+  → TestFlight
 ```
 
 Build numbers come from `CI_BUILD_NUMBER` via `ci_scripts/ci_pre_xcodebuild.sh`,
 written into `Config/BuildNumber.xcconfig` as `CURRENT_PROJECT_VERSION`. They are
 monotonic because Xcode Cloud's own counter is, and they never collide with a
 number already used — which is the whole reason the local clock is not used
-(§105). Marketing version stays `1.0.0`.
+(§105). Marketing version stays `1.0.0`. Ein lokaler Archive-Lauf setzt die
+Nummer von Hand auf die nächste freie und muss dieselbe Monotonie einhalten;
+42 folgt auf 41.
 
 ---
 
@@ -35,7 +57,7 @@ Written for whoever installs it, in the two languages the testers read.
 ### English
 
 ```
-Keezly 1.0.0 — first internal build.
+Keezly 1.0.0 (42).
 
 Please try, on both iPhone and iPad:
 
@@ -55,17 +77,21 @@ Please try, on both iPhone and iPad:
 • Sound and haptics, and the switches that turn them off.
 • VoiceOver, and the largest Dynamic Type size.
 
-Known and expected:
-• An online match earns no achievements. That is deliberate — achievements are
-  reported only for a table with one person at it, because a Game Center
-  account belongs to one person and a shared device does not.
+Fixed since build 41, and worth attacking on purpose:
+• Starting an online match with 3 or 5 seats crashed the app. Try every seat
+  count, and switch between them before you start.
+
+Known:
+• An online match earns no achievements. Not because it cannot — an online
+  seat belongs to exactly one Game Center account — but because the reporting
+  was never wired up for online matches. See GAME_CENTER_ACHIEVEMENTS_ONLINE.md.
 • There are no leaderboards, and there will not be.
 ```
 
 ### Deutsch
 
 ```
-Keezly 1.0.0 — erster interner Build.
+Keezly 1.0.0 (42).
 
 Bitte auf iPhone und iPad ausprobieren:
 
@@ -86,10 +112,15 @@ Bitte auf iPhone und iPad ausprobieren:
 • Ton und Haptik, und die Schalter, die beides abschalten.
 • VoiceOver und die größte Schriftgröße.
 
-Bekannt und beabsichtigt:
-• Eine Onlinepartie bringt keine Erfolge. Das ist Absicht — Erfolge werden nur
-  für einen Tisch mit einer Person gemeldet, weil ein Game-Center-Konto einer
-  Person gehört und ein geteiltes Gerät nicht.
+Seit Build 41 behoben, bitte gezielt angreifen:
+• Eine Onlinepartie mit 3 oder 5 Sitzen ließ die App abstürzen. Bitte jede
+  Sitzzahl probieren und vor dem Start zwischen ihnen hin- und herschalten.
+
+Bekannt:
+• Eine Onlinepartie bringt keine Erfolge. Nicht, weil sie es nicht könnte —
+  ein Onlinesitz gehört genau einem Game-Center-Konto — sondern weil die
+  Meldung für Onlinepartien nie verdrahtet wurde. Siehe
+  GAME_CENTER_ACHIEVEMENTS_ONLINE.md.
 • Es gibt keine Bestenlisten, und es wird keine geben.
 ```
 

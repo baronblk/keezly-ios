@@ -1,8 +1,11 @@
 # Keezly — Game Center
 
 **Implementation status: see the table at the end of this file.** The online model, the turn envelope and the transport boundary exist and are tested against a mock; the GameKit adapter is written but has never run against Game Center.
-**Configuration status: NOT CONFIGURED.** Nothing has been set up in App Store
-Connect. See `CURRENT_STATE.md` → Manual Actions (MAN-02, MAN-05, MAN-06).
+**Configuration status: CONFIGURED and ASC VERIFIED.** Game Center is enabled on
+the App ID, the entitlement is in the shipped binary, and all ten achievements
+exist at Apple in DE/NL/EN with artwork COMPLETE — each read back out of App
+Store Connect (`APP_STORE.md`). No leaderboards, ever (DEC-025). What has never
+happened is a real match between two accounts.
 
 The three states are kept distinct throughout this project (§117, §138):
 
@@ -185,7 +188,10 @@ Kept apart on purpose, because they are different claims (§167):
 | Payload size against the 64 KiB limit | **MOCK VERIFIED** — measured, 4,173 bytes for 400 moves |
 | Authentication state machine | **TESTED** — as a pure function, without GameKit |
 | `GameCenterTransport` (the GameKit adapter) | **IMPLEMENTED, NOT VERIFIED** — never run against Game Center |
-| A real match between two Apple Accounts | **BLOCKED** — MAN-02, MAN-05, MAN-11, MAN-12 |
+| Online play reachable from the menu | **IMPLEMENTED** — `OnlineMenuView` → `OnlineMatchRun` → `OnlineGameScreen`, shipping in 1.0.0 (42) |
+| Seat/teams configuration for an online table | **VERIFIED** — one rule, `TableConfiguration.allowsTeams`; `OnlineConfigurationTests` builds every offerable pair. An odd seat count used to crash the app here (ISS-021) |
+| Achievements in an online match | **NOT IMPLEMENTED** — absent by omission, not by rule; `GAME_CENTER_ACHIEVEMENTS_ONLINE.md` |
+| A real match between two Apple Accounts | **OUTSTANDING** — MAN-11, MAN-12: needs two accounts and two devices. `GAME_CENTER_E2E_CHECKLIST.md` |
 | Hidden information against a modified client | **NOT PROTECTED** — by design, see DEC-025 |
 
 ## How a turn travels

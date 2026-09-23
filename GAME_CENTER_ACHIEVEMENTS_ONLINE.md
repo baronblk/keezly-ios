@@ -81,8 +81,11 @@ falsch** und muss so nicht stehen bleiben.
 
 ## Entscheidung liegt beim Owner
 
-Build 41 ist eingefroren; ohne konkreten Defekt wird nicht neu gebaut. Ob dies
-ein Defekt ist, ist eine Produktentscheidung:
+Build 41 wurde inzwischen von der Geräte-QA abgelehnt und durch **Build 42**
+ersetzt (`RELEASE_CANDIDATE.md`). Das ändert an dieser Entscheidung nichts: Der
+neue Build behebt ISS-021 und enthält **kein** Online-Achievement-Reporting, weil
+das eine Produktentscheidung ist und keine Fehlerbehebung. Ob dies ein Defekt
+ist, entscheidet der Owner:
 
 **A — als bewusste 1.0-Grenze dokumentieren.**
 Erfolge werden nur in lokalen Partien gegen den Computer vergeben. Nichts im
@@ -94,7 +97,12 @@ Ein Online-Spieler kann die zehn beworbenen Erfolge nicht erreichen, obwohl die
 Zuordnung eindeutig ist. Dann: Reporting ergänzen, neuer Build, erneute QA.
 
 **Unabhängig von A oder B zu korrigieren:** die TestFlight-Notiz und der
-Code-Kommentar behaupten eine Begründung, die für Online nicht zutrifft.
+Code-Kommentar behaupteten eine Begründung, die für Online nicht zutrifft.
+**Erledigt am 2026-09-23.** `TESTFLIGHT.md`, `APP_STORE.md` und die
+Dokumentationskommentare in `MatchSession.swift` sagen jetzt, was zutrifft: die
+Meldung fehlt, weil sie nie verdrahtet wurde, nicht weil die Zuordnung unklar
+wäre. Die Kommentare bei `init(online:)`, `noteResult` und `achievementsEarned`
+sagen das jeweils an ihrer eigenen Stelle.
 
 ```
 ENTSCHEIDUNG:  ☐ A — dokumentierte 1.0-Grenze   ☐ B — Defekt, neuer Build

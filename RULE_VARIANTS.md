@@ -136,7 +136,15 @@ Noted here so the choice stays visible.
 | **Tournament** | Same |
 | **House rule options** | none |
 | **Engine** | `MoveResolver.resolveBackward` — backward is computed on raw track indices, so a home lane is unreachable by construction |
-| **Tests** | `CardRuleTests.fourMovesBackward`, `.fourCannotLeaveHome`, `.fourCannotEnterHome`, `.fourIsStoppedByABlockade` |
+| **Tests** | `CardRuleTests.fourMovesBackward`, `.fourCannotLeaveHome`, `.fourCannotEnterHome`, `.fourIsStoppedByABlockade`, and `MoveDirectionTests` for the exclusivity below |
+
+**The Four is the only backward card.** That is not a variant and there is no
+option that changes it. Every other rank that moves a pawn moves it forward, and
+a Seven's every partial leg is forward too. `MoveDirectionTests` measures this
+as the pawn's own progress rather than as a track index — on a ring a smaller
+index is not "behind" — across every rank at every table size from two to six
+seats, including the wrap-around and the home entry. See `RULES.md`, *Direction
+— the canonical statement*.
 
 ---
 
