@@ -363,8 +363,14 @@ final class DesignReviewScreenshots: XCTestCase {
         XCTAssertTrue(online.waitForExistence(timeout: 20), "\(name): the menu never appeared")
         online.tap()
 
+        // Any of the screen's own controls will do. Which one is on screen
+        // depends on what Game Center says, and a deterministic run must not
+        // depend on that answer — it only has to be the online screen.
+        let anything = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'online.'"))
+            .firstMatch
         XCTAssertTrue(
-            app.descendants(matching: .any)["online.signIn"].waitForExistence(timeout: 15),
+            anything.waitForExistence(timeout: 15),
             "\(name): the online screen never appeared"
         )
         attach(name, from: app, orientation: .landscapeLeft)

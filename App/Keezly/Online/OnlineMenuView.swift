@@ -32,6 +32,7 @@ struct OnlineMenuView: View {
                     Failed(reason: reason, retry: online.authenticate)
                 }
             }
+            .accessibilityIdentifier("online.screen")
             .navigationTitle(Text("online.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
