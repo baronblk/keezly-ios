@@ -22,20 +22,50 @@ struct GameCenterTransport: MatchTransport {
     /// over a fortnight is a normal thing, not a stalled one.
     var turnTimeout: TimeInterval = 7 * 24 * 60 * 60
 
+    /// Asks Game Center for a match and returns its players, in seat order.
+    ///
+    /// The order is Game Center's own `participants` order, which is the only
+    /// order every device can agree on without talking to each other first.
+    /// Deriving it locally — by name, by id, by who asked — would give two
+    /// devices two different boards from the same payload (§28).
+    ///
+    /// A turn-based match can exist before it is full: Game Center creates it
+    /// and fills the empty seats later, and until then those participants have
+    /// no player. Keezly will not deal into a match like that, because a seat
+    /// with nobody in it cannot be mapped and a board dealt now would have to
+    /// be re-dealt. The wait is reported as itself rather than hidden.
+    func matchmake(seats: Int) async throws -> [String] {
+        let request = GKMatchRequest()
+        request.minPlayers = seats
+        request.maxPlayers = seats
+        request.defaultNumberOfPlayers = seats
+
+        let match = try await GKTurnBasedMatch.find(for: request)
+        let players = match.participants.compactMap { $0.player?.gamePlayerID }
+        guard players.count == seats else {
+            throw MatchTransportError.unavailable(
+                reason: String(localized: "online.error.waitingForPlayers")
+            )
+        }
+        return players
+    }
+
     func create(
         _ data: Data,
         matchID: String,
         participants: [String],
         firstParticipant: String
     ) async throws {
-        // Game Center creates the match and assigns its own identifier; the
-        // Keezly match id travels *inside* the payload. Matching them up is
-        // the adapter's problem, not the engine's.
-        let request = GKMatchRequest()
-        request.minPlayers = participants.count
-        request.maxPlayers = participants.count
-
-        let match = try await GKTurnBasedMatch.find(for: request)
+        // Game Center assigns its own identifier; the Keezly match id travels
+        // *inside* the payload. Matching them up is the adapter's problem, not
+        // the engine's.
+        //
+        // The match has already been found by `matchmake`, so this looks it up
+        // by its participants rather than asking for a second one — calling
+        // find twice would create two matches and deal into the wrong one.
+        guard let match = try await mostRecentMatch(with: participants) else {
+            throw MatchTransportError.noSuchMatch(matchID)
+        }
         guard let next = participant(firstParticipant, in: match) else {
             throw MatchTransportError.notAParticipant(matchID)
         }
@@ -44,6 +74,18 @@ struct GameCenterTransport: MatchTransport {
             turnTimeout: turnTimeout,
             match: data
         )
+    }
+
+    /// The match Game Center just handed us: the one holding exactly these
+    /// players and no Keezly payload yet.
+    private func mostRecentMatch(with participants: [String]) async throws -> GKTurnBasedMatch? {
+        let wanted = Set(participants)
+        return try await GKTurnBasedMatch.loadMatches()
+            .filter { match in
+                let players = Set(match.participants.compactMap { $0.player?.gamePlayerID })
+                return players == wanted && (match.matchData?.isEmpty ?? true)
+            }
+            .max { ($0.creationDate ?? .distantPast) < ($1.creationDate ?? .distantPast) }
     }
 
     func load(matchID: String) async throws -> Data {

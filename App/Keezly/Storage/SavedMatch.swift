@@ -9,11 +9,20 @@ import KeezlyCore
 enum PersistedRole: Hashable, Sendable, Codable {
     case person
     case computer(strength: String)
+    /// A person at another device, over Game Center.
+    ///
+    /// Added with online play. Older saves cannot contain it, and a local
+    /// match never produces it: an online match's authoritative copy lives in
+    /// Game Center, and what `MatchStore` keeps is a local mirror for the
+    /// list. Written down all the same, because a file that describes a
+    /// six-seat match as six people would be a lie about the position.
+    case remote
 
     init(_ role: SeatRole) {
         switch role {
         case .human: self = .person
         case .computer(let difficulty): self = .computer(strength: difficulty.rawValue)
+        case .remote: self = .remote
         }
     }
 
@@ -24,6 +33,7 @@ enum PersistedRole: Hashable, Sendable, Codable {
         switch self {
         case .person: .human
         case .computer(let strength): AIDifficulty(rawValue: strength).map(SeatRole.computer)
+        case .remote: .remote
         }
     }
 }

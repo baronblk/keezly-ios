@@ -30,6 +30,9 @@ struct MainMenuView: View {
     var matches: [MatchSummary] = []
     var onWatch: (MatchSummary) -> Void = { _ in }
     var onOpen: (MatchSummary) -> Void = { _ in }
+    /// Opens the online screen. Absent in a deterministic run, which must
+    /// never reach Game Center.
+    var onOnline: (() -> Void)?
 
     @State private var showsRules = false
     @State private var showsSettings = false
@@ -301,6 +304,7 @@ struct MainMenuView: View {
             // Already offered loudly at the top for a newcomer; offering it
             // twice on one screen is how a menu starts to look like a form.
             if !isNewcomer { tutorialButton }
+            if onOnline != nil { onlineButton }
             rulesButton
             // Only once there is something to look at. A menu entry that opens
             // an empty screen is a menu entry that does nothing (§36).
@@ -367,6 +371,26 @@ struct MainMenuView: View {
                 onResume: onOpen
             )
         }
+    }
+
+    /// Online play, through Game Center.
+    ///
+    /// Sits with the other ways of playing rather than in Settings: it is a
+    /// kind of match, not a preference. Hidden entirely when Game Center is
+    /// not something this build may reach, because a button that opens a
+    /// screen saying "not here" is a button that does nothing (§36).
+    private var onlineButton: some View {
+        Button {
+            onOnline?()
+        } label: {
+            Text("menu.online")
+                .font(.system(size: labelSize, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.72))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Keezly.Spacing.small)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("menu.online")
     }
 
     private var settingsButton: some View {

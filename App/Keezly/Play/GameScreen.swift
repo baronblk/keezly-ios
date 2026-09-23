@@ -28,6 +28,15 @@ struct GameScreen: View {
     var tutorial: TutorialRun?
     /// Sound and haptics, as the player has asked for them.
     var preferences: Preferences
+    /// Where a move goes when this device is not the authority.
+    ///
+    /// `nil` for a local match, where the engine here *is* the authority and
+    /// the move is applied immediately. Set for an online match, where the
+    /// position lives in Game Center: the move is handed over and the board
+    /// changes when the answer comes back. Applying locally *and* sending
+    /// would give two copies that can disagree, which is the one thing a
+    /// turn-based match must never allow (§28).
+    var onSubmitted: ((PlayerAction) async -> Void)?
 
     @State var session: MatchSession
     @State var presenter: BoardPresenter
@@ -66,11 +75,13 @@ struct GameScreen: View {
         session: MatchSession,
         onLeave: @escaping () -> Void = {},
         tutorial: TutorialRun? = nil,
-        preferences: Preferences = Preferences()
+        preferences: Preferences = Preferences(),
+        onSubmitted: ((PlayerAction) async -> Void)? = nil
     ) {
         self.onLeave = onLeave
         self.tutorial = tutorial
         self.preferences = preferences
+        self.onSubmitted = onSubmitted
         _session = State(initialValue: session)
         _presenter = State(initialValue: BoardPresenter(pawns: session.state.pawns))
     }
@@ -370,6 +381,14 @@ struct GameScreen: View {
 
     func submit(_ action: PlayerAction) {
         clearHint()
+
+        if let onSubmitted {
+            // Not applied here. The board updates when the authority answers.
+            clearSelection()
+            Task { await onSubmitted(action) }
+            return
+        }
+
         let before = session.state
         let outcome = session.submit(action, atRevision: session.state.revision)
         guard case .success = outcome else { return }

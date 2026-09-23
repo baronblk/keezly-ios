@@ -27,6 +27,11 @@ struct RootView: View {
     @State private var preferences = Preferences()
     /// A match being watched back, when one is.
     @State private var replay: ReplayRun?
+    /// Game Center, for online play. `nil` in a deterministic run.
+    @State private var online: OnlinePlay?
+    /// The online match on screen, when one is open.
+    @State private var onlineRun: OnlineMatchRun?
+    @State private var showsOnline = false
     /// Every match on the device, refreshed when the menu appears.
     @State private var matches: [MatchSummary] = []
 
@@ -46,6 +51,7 @@ struct RootView: View {
         // not turn up in the list.
         store = ScreenshotMode.isActive ? nil : MatchStore()
         achievements = GameCenterAchievements.isEnabled ? GameCenterAchievements() : nil
+        _online = State(initialValue: OnlinePlay.isEnabled ? OnlinePlay() : nil)
 
         if ScreenshotMode.isActive, ScreenshotMode.showsReplay {
             // A whole match, played out, then handed to the replay.
@@ -81,6 +87,14 @@ struct RootView: View {
                     preferences: preferences
                 )
                 .id(ObjectIdentifier(tutorial.session))
+            } else if let onlineRun {
+                // The ordinary playing screen. An online match differs only in
+                // who may move, and that is carried by the seat roles rather
+                // than by a second screen (§28).
+                OnlineGameScreen(run: onlineRun, preferences: preferences) {
+                    self.onlineRun = nil
+                }
+                .id(ObjectIdentifier(onlineRun))
             } else if let session {
                 GameScreen(session: session, onLeave: leaveMatch, preferences: preferences)
                     // Identity by the session, so starting a different table
@@ -103,8 +117,17 @@ struct RootView: View {
                     hasSound: Feedback(preferences: preferences).hasAnySound,
                     matches: matches,
                     onWatch: watch,
-                    onOpen: open
+                    onOpen: open,
+                    onOnline: online.map { _ in { showsOnline = true } }
                 )
+                .sheet(isPresented: $showsOnline) {
+                    if let online {
+                        OnlineMenuView(online: online) { run in
+                            showsOnline = false
+                            onlineRun = run
+                        }
+                    }
+                }
                 .task {
                     refreshResumable()
                     // Asked for once, when the menu appears rather than at
@@ -112,6 +135,7 @@ struct RootView: View {
                     // thing a new player would see, and Keezly has nothing
                     // that needs it.
                     achievements?.start()
+                    online?.authenticate()
                 }
             }
         }

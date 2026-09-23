@@ -49,10 +49,26 @@ enum MatchFixture: Hashable, Sendable {
 
 /// Who is sitting in a seat.
 enum SeatRole: Hashable, Sendable {
+    /// A person at this device.
     case human
     case computer(AIDifficulty)
+    /// A person at somebody else's device, over Game Center.
+    ///
+    /// Deliberately neither of the other two. It is not `human`, because this
+    /// device must not be able to move that seat's pieces; and it is not
+    /// `computer`, because no agent may think for it. Everything that follows
+    /// from those two facts — a read-only board while they are on turn, no
+    /// handover cover, no hint, no agent task — falls out of the role rather
+    /// than being special-cased at each site (§28).
+    case remote
+}
 
+extension SeatRole {
+    /// Whether the person holding *this* device plays this seat.
     var isHuman: Bool { self == .human }
+
+    /// Whether the seat is played by a person at all, here or elsewhere.
+    var isPerson: Bool { self == .human || self == .remote }
 }
 
 /// What a submitted action was refused for. Surfaced to developers and tests;
@@ -191,6 +207,44 @@ final class MatchSession {
                 budget: budget
             )
         }
+    }
+
+    /// A match whose authoritative copy lives in Game Center.
+    ///
+    /// Everything on screen still comes from the engine — the state, the legal
+    /// moves, the refusals — and this device plays exactly one seat. The rest
+    /// are `.remote`, which is what stops the board from being playable while
+    /// somebody else is on turn, without a single `if online` anywhere in the
+    /// view layer.
+    ///
+    /// No store and no achievements: the match is kept by Game Center, and a
+    /// finished online match reports through `OnlineMatchRun`, which knows
+    /// whether *this* player won. Persisting it locally as well would give two
+    /// copies that can disagree.
+    init(online match: OnlineMatch, mySeat: Seat) {
+        state = match.state
+        record = match.record
+        roles = (0..<match.state.configuration.seatCount).map {
+            Seat($0) == mySeat ? .human : .remote
+        }
+        budget = .interactive
+        store = nil
+        achievements = nil
+        result = match.state.result
+    }
+
+    /// Replaces the position with one that arrived from Game Center.
+    ///
+    /// The whole state is taken, never merged: a turn-based match's payload is
+    /// the position, and reconciling two of them here would be inventing an
+    /// authority this device does not have.
+    func adopt(_ match: OnlineMatch) {
+        search.cancel()
+        state = match.state
+        record = match.record
+        pendingEvents = []
+        isBusy = false
+        result = match.state.result
     }
 
     deinit {
