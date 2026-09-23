@@ -1,9 +1,26 @@
 #!/usr/bin/env python3
-"""Chooses the ten App Store screenshots per device and locale, and says why.
+"""Chooses the App Store screenshots per device and locale, and says why.
 
-Apple allows ten; the capture matrix produces fifteen. Which five to leave out
-is a judgement, so it is written down as an ordered list with a reason against
-each entry rather than made by a rule nobody can inspect.
+Apple allows up to ten. Which ones is a judgement, written down as an ordered
+list with a reason against each entry rather than made by a rule nobody can
+inspect.
+
+**Fewer, and all good, beats ten with a bad one.** Three were removed after a
+human looked at them, which no check here could have caught:
+
+  phone-online-menu-portrait   a real Game Center authentication failure —
+  online-menu (iPad)           a warning triangle, "the operation could not be
+                               completed", and a "try again" link. Shipped to
+                               App Store Connect in six languages before
+                               anybody opened the file.
+  phone-rulebook-portrait      the status bar overlapped the menu text behind
+                               the sheet and clipped the KEEZLY wordmark.
+  *-free-for-all               visually a duplicate of the hero. The only
+                               difference is a "Partner" tag two millimetres
+                               wide; a shopper sees the same picture twice.
+
+An online screenshot returns only when the 1.0 online interface can be shown in
+a real, finished state — a match list or a running match, never an error.
 
 The order is the order the App Store shows them, and it is meant to read as a
 sequence: what the game is, then how it scales, then what is interesting about
@@ -33,9 +50,6 @@ IPHONE = [
     ("phone-mid-match-portrait", "A real position mid-match: a full hand, pieces out, something to decide."),
     ("phone-seven-split-portrait", "The Seven split across two pieces — the rule that makes Keezen Keezen."),
     ("phone-jack-swap-portrait", "The Jack's swap, with its targets showing. The second distinctive card."),
-    ("phone-online-menu-portrait", "Online play through Game Center, which is a 1.0 feature and should be seen."),
-    ("phone-free-for-all-portrait", "Free-for-all rather than teams — the house rules are configurable."),
-    ("phone-rulebook-portrait", "The rulebook — the answer to \"but how do you actually play it\", which sells a folk game."),
 ]
 
 # Landscape throughout, for the same reason the iPhone series is portrait
@@ -49,8 +63,6 @@ IPAD = [
     ("seven-mid-split", "The Seven split across two pieces."),
     ("jack-swap-targets", "The Jack's swap and its targets."),
     ("five-players-landscape", "An odd table, which the geometry handles rather than refusing."),
-    ("online-menu", "Online play through Game Center."),
-    ("four-players-free-for-all", "Free-for-all rather than teams."),
     ("rulebook-landscape", "The rulebook on a large display — the answer to \"but how do you actually play it\"."),
 ]
 
@@ -82,8 +94,8 @@ def main(root: Path, out: Path) -> int:
                     "source": str(path),
                 })
 
-            if len(chosen) != 10:
-                problems.append(f"{device}-{locale}: {len(chosen)} chosen, Apple takes exactly 10")
+            if not 1 <= len(chosen) <= 10:
+                problems.append(f"{device}-{locale}: {len(chosen)} chosen, Apple takes 1 to 10")
 
             destination = out / f"{device}-{locale}"
             destination.mkdir(parents=True, exist_ok=True)
@@ -107,7 +119,7 @@ def main(root: Path, out: Path) -> int:
         for p in problems:
             print(f"  ✘ {p}")
         return 1
-    print("\n6 series x 10 = 60. Selection recorded in selection.json.")
+    print("\nSelection recorded in selection.json.")
     print("SELECTED — not reviewed by a person, and not uploaded.")
     return 0
 

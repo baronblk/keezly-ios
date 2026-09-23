@@ -47,7 +47,7 @@ final class DesignReviewScreenshots: XCTestCase {
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
-            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER",
             "-KEEZLY_UI_TESTING",
             "-KEEZLY_SEATS", String(seats),
             "-KEEZLY_SEED", String(seed),
@@ -334,7 +334,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testMenu() {
         let name = "menu"
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         XCUIDevice.shared.orientation = .landscapeLeft
         app.launch()
         XCTAssertTrue(
@@ -355,7 +355,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testOnlineMenu() {
         let name = "online-menu"
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         XCUIDevice.shared.orientation = .landscapeLeft
         app.launch()
 
@@ -385,7 +385,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testRulebookLandscape() {
         let name = "rulebook-landscape"
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         XCUIDevice.shared.orientation = .landscapeLeft
         app.launch()
 
@@ -414,7 +414,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testMenuPortrait() {
         let name = "phone-menu-portrait"
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         XCUIDevice.shared.orientation = .portrait
         app.launch()
         XCTAssertTrue(
@@ -428,7 +428,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testOnlineMenuPortrait() {
         let name = "phone-online-menu-portrait"
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         XCUIDevice.shared.orientation = .portrait
         app.launch()
 
@@ -511,7 +511,7 @@ final class DesignReviewScreenshots: XCTestCase {
     func testRulebookPortrait() {
         let name = "phone-rulebook-portrait"
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         XCUIDevice.shared.orientation = .portrait
         app.launch()
 

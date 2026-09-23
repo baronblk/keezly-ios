@@ -134,14 +134,18 @@ manifest.sort.each do |series, entries|
   states = have.map { |s| s.dig("attributes", "assetDeliveryState", "state") }
   order_ok = have.map { |s| s.dig("attributes", "fileName") } == entries.map { |e| e["file"] }
   complete = states.all? { |s| s == "COMPLETE" }
-  ok &&= have.size == 10 && order_ok && complete
+  # The count is whatever the selection says, not a fixed ten. Apple allows up
+  # to ten; a series is as long as it has good images for, and padding it to
+  # reach a number is how a bad screenshot gets shipped.
+  ok &&= have.size == entries.size && order_ok && complete
 
   puts format("  %-10s %-6s %-22s count=%2d order=%-3s states=%s",
               series, LOCALE[locale], display, have.size,
               order_ok ? "ok" : "BAD", states.uniq.join(","))
 end
 
-puts(ok ? "\nSCREENSHOTS = ASC UPLOADED AND VERIFIED (60 images, order and delivery state confirmed)"
+total = manifest.values.sum(&:size)
+puts(ok ? "\nSCREENSHOTS = ASC UPLOADED AND VERIFIED (#{total} images, order and delivery state confirmed)"
         : "\nNOT RIGHT — see above")
 puts "Human review is a separate gate: SCREENSHOT_REVIEW.html."
 exit(ok ? 0 : 1)

@@ -25,7 +25,7 @@ final class PassAndPlayTests: XCTestCase {
     private func launchedPassAndPlay(seats: Int = 3, seed: Int = 2026) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
-            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER",
             "-KEEZLY_UI_TESTING",
             "-KEEZLY_SEATS", String(seats),
             "-KEEZLY_HUMANS", String(seats),
@@ -128,7 +128,7 @@ final class PassAndPlayTests: XCTestCase {
     func testASoloTableNeverCoversTheBoard() {
         let app = XCUIApplication()
         app.launchArguments = [
-            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER",
             "-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026",
         ]
         app.launch()
@@ -167,7 +167,7 @@ final class PassAndPlayResumeTests: XCTestCase {
     @MainActor
     private func startAndAbandon() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER"]
         app.launch()
         XCTAssertTrue(
             app.descendants(matching: .any)["menu.start"].waitForExistence(timeout: 20),

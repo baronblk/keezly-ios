@@ -22,7 +22,21 @@ enum ScreenshotMode {
     /// environment variable in the host application it launches, and nothing
     /// else does.
     static var isRunningTests: Bool {
-        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        // Two conditions, because one of them does not work for UI tests.
+        //
+        // `XCTestConfigurationFilePath` is set in the process XCTest hosts. For
+        // a unit test that *is* the app, so it answers correctly. For a UI test
+        // the app under test is a separate process launched by the runner, and
+        // it never sees the variable — so this was false during every
+        // screenshot run, Game Center was left enabled, and the capture of the
+        // online screen came back showing a real authentication failure with a
+        // "try again" link. That image was uploaded to App Store Connect in six
+        // languages before anybody looked at it.
+        //
+        // The launch argument is the half that works for UI tests, and every
+        // harness that launches the app passes it.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return true }
+        return arguments.contains("-KEEZLY_NO_GAME_CENTER")
     }
 
     /// `-KEEZLY_UI_TEST_RESET_STATE YES` — forget everything this device has

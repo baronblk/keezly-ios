@@ -20,7 +20,7 @@ final class PlayFlowTests: XCTestCase {
     private func launched() -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
-            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER",
             "-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026",
         ]
         app.launch()
@@ -197,7 +197,7 @@ final class KeyboardPlayTests: XCTestCase {
     private func launched(focused: Bool = true) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = [
-            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES", "-KEEZLY_NO_GAME_CENTER",
             "-KEEZLY_UI_TESTING", "-KEEZLY_SEATS", "4", "-KEEZLY_SEED", "2026",
             "-KEEZLY_DEBUG_FOCUS",
         ] + (focused ? ["-KEEZLY_FOCUS", "first"] : [])
