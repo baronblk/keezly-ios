@@ -77,6 +77,96 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
 
+### ISS-021 — Onlinepartie stürzte bei ungerader Sitzzahl ab — BEHOBEN
+
+- **Status:** GESCHLOSSEN, 2026-09-23. Ursache bewiesen, behoben, durch Tests
+  festgehalten
+- **Schwere:** war P0 / Release-Blocker. Von der Geräte-QA an Build 41 gefunden
+- **Komponente:** `App/Keezly/Online/OnlinePlay.swift`,
+  `App/Keezly/Online/OnlineMenuView.swift` — nicht GameKit
+
+#### Was tatsächlich geschah
+
+Der Online-Bildschirm merkte sich „mit Partner" über einen Wechsel der
+Sitzzahl hinweg:
+
+```
+@State private var teams = true                  // Voreinstellung, bleibt stehen
+Toggle nur sichtbar wenn seats % 2 == 0          // verschwindet bei 3 und 5
+→ GameConfiguration(seatCount: 3, teamMode: .teamsOfTwo)
+→ precondition("Team play requires an even number of seats")
+→ Prozessende
+```
+
+Der Absturz geschah beim Tippen auf „Neue Onlinepartie" — **vor** jedem
+GameKit-Aufruf. Er sah nach einem Game-Center-Problem aus und war keines.
+
+#### Warum es passieren konnte
+
+Eine Regel, die es schon gab, wurde ein zweites Mal geschrieben — und dabei
+falscher. `TableConfiguration.allowsTeams(seatCount:)` verlangt
+`seatCount >= 4 && isMultiple(of: 2)`; die Online-Fassung prüfte nur `% 2 == 0`
+und hätte auch bei zwei Sitzen ein Teamspiel erzeugt, bei dem beide Spieler auf
+derselben Seite stünden.
+
+#### Die Korrektur
+
+Beide Stellen rufen jetzt dieselbe statische Regel. `OnlineConfigurationTests`
+baut **jede** Kombination, die der Bildschirm anbieten kann — eine verletzte
+precondition würde den Testlauf beenden, was genau der Befund wäre — und prüft,
+dass lokaler Tisch und Online-Bildschirm nie auseinanderlaufen.
+
+- **Verwandte Dateien:** `OnlinePlay.swift`, `OnlineMenuView.swift`,
+  `TableConfiguration.swift`
+- **Verwandte Tests:** `OnlineConfigurationTests` (5 Tests)
+
+### ISS-022 — Gemeldete Rückwärtsbewegung: im Core nicht reproduzierbar
+
+- **Status:** OFFEN — **Ursache nicht gefunden**, Core nachweislich korrekt
+- **Schwere:** war als Release-Blocker gemeldet
+- **Komponente:** unbekannt
+
+Die Geräte-QA an Build 41 beobachtete Figuren, die sich bei normalen Zügen
+rückwärts bewegen. Der Core erzeugt das nicht.
+
+#### Was geprüft wurde
+
+`MoveDirectionTests`, sieben Tests über 2 bis 6 Sitze, **semantisch** gemessen
+als Differenz im spielerrelativen `progress` — nicht im globalen Feldindex und
+nicht auf dem Bildschirm, weil auf einem Ring ein kleinerer Index nicht
+„hinter" einer Figur liegt:
+
+| | |
+|---|---|
+| Ass, 2, 3, 5, 6, 8, 9, 10, Dame | ausschließlich positive Differenzen |
+| Vier | ausschließlich −4 |
+| Bube | ausschließlich Tauschaktionen |
+| Sieben | jeder Teilschritt positiv, Summe exakt 7 |
+| von Hand gebauter Rückwärtszug mit einer Fünf | vom Core abgelehnt |
+
+Geprüft auch in der heiklen Zone: kurz vor dem eigenen Start, über den
+Wrap-around, unmittelbar vor der Heimeinfahrt und in der Zielgeraden.
+
+Ebenfalls geprüft: **die UI besitzt keine eigene Bewegungslogik.**
+`PlayPlanner` filtert nur `observation.legalMoves` und entnimmt die Zielfelder
+`observation.preview(move)`. Sie kann keinen Zug konstruieren, den der Core
+nicht geliefert hat.
+
+#### Was das bedeutet
+
+Ein Regelfehler im Core ist ausgeschlossen, solange diese Tests grün sind. Die
+Beobachtung bleibt unerklärt. Mögliche Erklärungen, **keine davon belegt**:
+
+- die gespielte Karte war eine Vier, deren Rückwärtszug regelkonform ist
+- ein Bube-Tausch, bei dem eine Figur sichtbar zurückspringt
+- eine Darstellung entlang des Rings, die vorwärts über den Wrap-Punkt wie
+  rückwärts aussieht
+- ein Fehler in der Animation statt in der Regel
+
+**Zum Abschluss fehlt die konkrete Beobachtung:** welche Karte, welcher Sitz,
+welche Tischgröße, und wohin die Figur sprang. Ohne das wäre jede Änderung
+geraten.
+
 ### ISS-020 — A tap on a highlighted square was swallowed by a piece — FIXED
 
 - **Status:** CLOSED, 2026-09-22. Cause proven, fixed, and pinned by a test
