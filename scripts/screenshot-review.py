@@ -9,7 +9,9 @@ as a sequence rather than one at a time.
 
 import base64
 import json
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 CHECKS = [
@@ -29,8 +31,28 @@ TITLES = {"de": "Deutsch", "nl": "Nederlands", "en": "English"}
 DEVICES = {"iphone": "iPhone 6.9″ (1320 × 2868)", "ipad": "iPad 13″ (2064 × 2752)"}
 
 
-def data_uri(path: Path, ) -> str:
-    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+# The review page embeds every image so it can be opened from anywhere — no
+# folder beside it, no broken links, nothing to lose. Full-resolution PNGs make
+# that 177 MB and unopenable, so each is scaled to a height a reviewer can
+# actually judge on screen. The originals are untouched: these are for looking
+# at, the files in the folder are what get uploaded.
+_CACHE: dict[tuple[str, int], str] = {}
+
+
+def data_uri(path: Path, height: int = 900) -> str:
+    key = (str(path), height)
+    if key in _CACHE:
+        return _CACHE[key]
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+        scaled = Path(tmp.name)
+    subprocess.run(
+        ["sips", "--resampleHeight", str(height), str(path), "--out", str(scaled)],
+        check=True, capture_output=True,
+    )
+    uri = "data:image/png;base64," + base64.b64encode(scaled.read_bytes()).decode("ascii")
+    scaled.unlink(missing_ok=True)
+    _CACHE[key] = uri
+    return uri
 
 
 def main(folder: Path, out: Path) -> int:
@@ -76,7 +98,7 @@ check below can be answered by a script, which is why they are here and not in
         for e in entries:
             path = folder / series / e["file"]
             parts.append(
-                f'<figure><img src="{data_uri(path)}" alt="{e["scene"]}">'
+                f'<figure><img src="{data_uri(path, 220)}" alt="{e["scene"]}">'
                 f'<figcaption>{e["position"]}. {e["scene"]}</figcaption></figure>'
             )
         parts.append("</div>")

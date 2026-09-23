@@ -182,51 +182,51 @@ struct AchievementTests {
 
 /// Every achievement must be complete in every language Keezly ships.
 ///
-/// Read from the string catalogue rather than through `String(localized:)`,
-/// because that resolves against whichever locale the simulator is running and
-/// a test that only checks the active one is not checking the other two. This
-/// is the invariant `scripts/asc_game_center.rb` relies on when it pushes the
-/// three localisations to App Store Connect.
+/// Read from the **built bundle**, not from the source catalogue and not
+/// through `String(localized:)`.
+///
+/// Not the source: a test that opens `Localizable.xcstrings` by `#filePath`
+/// needs a checkout, and a test runner does not have one — Xcode Cloud hands
+/// the test machines a built product and nothing else. That is the same
+/// assumption that failed `ci_pre_xcodebuild.sh` this morning, made again.
+///
+/// Not `String(localized:)`: it resolves against whichever locale the process
+/// is running in, so it checks one language and silently ignores the other two.
+/// That is exactly how `achievement.won.detail` stayed green on a German desk
+/// while being twelve characters in English.
+///
+/// Reading the shipped `.lproj` bundles tests what a player actually gets,
+/// which is stronger than either.
 @Suite("Achievement text, in every language")
 struct AchievementCatalogueTests {
 
-    private func catalogue() throws -> [String: [String: String]] {
-        let url = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()      // KeezlyTests
-            .deletingLastPathComponent()      // App
-            .appendingPathComponent("Keezly/Localizable.xcstrings")
-        let data = try Data(contentsOf: url)
-        let root = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let strings = root?["strings"] as? [String: Any] ?? [:]
-
-        var out: [String: [String: String]] = [:]
-        for (key, value) in strings {
-            guard let entry = value as? [String: Any],
-                  let locals = entry["localizations"] as? [String: Any] else { continue }
-            var byLanguage: [String: String] = [:]
-            for (language, unit) in locals {
-                if let u = unit as? [String: Any],
-                   let s = u["stringUnit"] as? [String: Any],
-                   let text = s["value"] as? String {
-                    byLanguage[language] = text
-                }
-            }
-            out[key] = byLanguage
+    /// The three languages Keezly ships, as the bundle holds them.
+    ///
+    /// `Bundle.main` rather than `Bundle(for:)`: this suite is hosted in the
+    /// app, so main *is* the app bundle, and `Bundle(for:)` would hand back the
+    /// test bundle — which has no localisations and would make the check pass
+    /// or fail for the wrong reason.
+    private func bundles() throws -> [(language: String, bundle: Bundle)] {
+        let app = Bundle.main
+        return try ["de", "nl", "en"].map { language in
+            let path = try #require(
+                app.path(forResource: language, ofType: "lproj"),
+                "the app bundle has no \(language).lproj — is that language still shipped?"
+            )
+            return (language, try #require(Bundle(path: path)))
         }
-        return out
     }
 
     @Test("every achievement has a title and a detail in German, Dutch and English")
     func everyLanguageIsComplete() throws {
-        let strings = try catalogue()
-        for achievement in Achievement.allCases {
-            for field in ["title", "detail"] {
-                let key = "achievement.\(achievement.rawValue).\(field)"
-                let translations = try #require(strings[key], "\(key) is not in the catalogue")
-                for language in ["de", "nl", "en"] {
-                    let text = try #require(translations[language], "\(key) has no \(language)")
-                    #expect(!text.isEmpty, "\(key) \(language) is empty")
-                    #expect(!text.hasPrefix("achievement."), "\(key) \(language) shows its key")
+        for (language, bundle) in try bundles() {
+            for achievement in Achievement.allCases {
+                for field in ["title", "detail"] {
+                    let key = "achievement.\(achievement.rawValue).\(field)"
+                    let text = bundle.localizedString(forKey: key, value: "\u{0}missing", table: nil)
+                    #expect(text != "\u{0}missing", "\(key) is missing from \(language)")
+                    #expect(!text.isEmpty, "\(key) is empty in \(language)")
+                    #expect(text != key, "\(key) shows its own key in \(language)")
                 }
             }
         }
@@ -234,12 +234,11 @@ struct AchievementCatalogueTests {
 
     @Test("every achievement detail is a sentence in every language")
     func everyDetailIsASentence() throws {
-        let strings = try catalogue()
-        for achievement in Achievement.allCases {
-            let key = "achievement.\(achievement.rawValue).detail"
-            let translations = try #require(strings[key])
-            for (language, text) in translations {
-                #expect(text.hasSuffix("."), "\(key) \(language) is not a sentence: \(text)")
+        for (language, bundle) in try bundles() {
+            for achievement in Achievement.allCases {
+                let key = "achievement.\(achievement.rawValue).detail"
+                let text = bundle.localizedString(forKey: key, value: "", table: nil)
+                #expect(text.hasSuffix("."), "\(key) is not a sentence in \(language): \(text)")
             }
         }
     }
