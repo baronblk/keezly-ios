@@ -8,15 +8,23 @@ is true right now, not what is planned. Plans live in `ROADMAP.md`.
 ## Last Verified Commit
 
 ```
-20f6225  docs(issues): record the online crash as fixed and the movement report as unreproduced
+96225ba  docs(qa): point the hardware gates at build 42 and at what the last run found
 ```
 
-Verified on **2026-09-23** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64):
-`KeezlyCore` 187 tests in 18 suites green, the app target 239 tests in 31
-suites green, 15 UI tests green, SwiftLint `--strict` and SwiftFormat clean.
+Verified on **2026-09-23** with Xcode 27.0 / Swift 6.4 on macOS 26 (arm64).
+Counts read out of the result bundles, not off the console summary:
 
-This is also the commit that produced **1.0.0 (42)**, the current release
-candidate (`RELEASE_CANDIDATE.md`). Build 41 was rejected by device QA.
+| | |
+|---|---|
+| `KeezlyCore` | 187 tests, 18 suites, passed in 141 s |
+| `KeezlyTests` | 239 passed, 0 failed, 0 skipped |
+| `KeezlyUITests` | 15 passed, 0 failed, 0 skipped |
+| SwiftLint `--strict`, SwiftFormat | clean |
+| `xcodebuild build` | exit 0 |
+
+**1.0.0 (42)** was built from `20f6225`, three commits back; everything since is
+documentation and doc comments. Build 41 was rejected by device QA
+(`RELEASE_CANDIDATE.md`).
 
 ---
 
