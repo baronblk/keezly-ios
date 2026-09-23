@@ -88,6 +88,11 @@ module ASC
       request(req)
     end
 
+    def delete(path)
+      uri = URI::HTTPS.build(host: HOST, path: normalise(path))
+      request(Net::HTTP::Delete.new(uri))
+    end
+
     # Apple's asset uploads are plain HTTP against a URL it hands back, with
     # headers it also hands back. Not a JSON API call.
     def upload(operation, bytes)
