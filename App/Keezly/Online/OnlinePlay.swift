@@ -14,7 +14,7 @@ struct OnlineMatchSummary: Identifiable, Sendable {
     let isOver: Bool
     /// The other players, by whatever name Game Center gives them.
     let opponents: [String]
-    let lastActivity: Date?
+    let lastActivity: Date
 
     var statusKey: String {
         if isOver { return "online.status.finished" }

@@ -68,20 +68,25 @@ struct BoardCentreView: View {
 
     /// The share of the board a four-player middle takes. The reference the
     /// rest is measured against, and never exceeded.
-    static let classicScale: CGFloat = 0.26
+    /// These five are `nonisolated` because `fitted` is: the geometry answer
+    /// must be available to a layout test and to a `nonisolated` caller, and a
+    /// constant `CGFloat` has nothing for an actor to protect. Without it Swift
+    /// 6 warns five times about main-actor isolation on values that cannot
+    /// change (seen in the Xcode Cloud analyze action, builds 11 and 15).
+    nonisolated static let classicScale: CGFloat = 0.26
     /// Below this the draw pile's count stops being readable, and an illegible
     /// count is worse than a crowded middle (ISS-013).
-    static let minimumScale: CGFloat = 0.19
+    nonisolated static let minimumScale: CGFloat = 0.19
     /// `TurnIndicator`'s designed size, as a fraction of the middle's width.
-    static let turnTextFraction: CGFloat = 0.07
+    nonisolated static let turnTextFraction: CGFloat = 0.07
     /// The size below which it stops shrinking, because nobody could read it.
-    static let legibleText: CGFloat = 11
+    nonisolated static let legibleText: CGFloat = 11
     /// The width the labels are drawn at once they have left the board.
     ///
     /// Chosen so the turn label lands exactly on its floor: off the board
     /// there is no reason to make it smaller, and none to make it larger than
     /// the middle would have.
-    static let detachedWidth: CGFloat = legibleText / turnTextFraction
+    nonisolated static let detachedWidth: CGFloat = legibleText / turnTextFraction
 
     /// What a board of this size can carry in its middle, and how wide.
     ///

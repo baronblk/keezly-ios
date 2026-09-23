@@ -85,7 +85,7 @@ struct GameCenterTransport: MatchTransport {
                 let players = Set(match.participants.compactMap { $0.player?.gamePlayerID })
                 return players == wanted && (match.matchData?.isEmpty ?? true)
             }
-            .max { ($0.creationDate ?? .distantPast) < ($1.creationDate ?? .distantPast) }
+            .max { $0.creationDate < $1.creationDate }
     }
 
     func load(matchID: String) async throws -> Data {
