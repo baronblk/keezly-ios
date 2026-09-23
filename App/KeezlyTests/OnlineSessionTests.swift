@@ -101,10 +101,8 @@ struct OnlineSessionTests {
 
         let legal = MoveGenerator.legalMoves(in: match.state, for: match.state.currentSeat)
         let action: PlayerAction = legal.first.map { .play($0) } ?? .foldHand(seat: match.state.currentSeat)
-        _ = match.apply(
-            OnlineMove(expectedRevision: match.revision, action: action),
-            from: match.participants.participant(at: mine)!
-        )
+        let mover = try #require(match.participants.participant(at: mine))
+        _ = match.apply(OnlineMove(expectedRevision: match.revision, action: action), from: mover)
 
         session.adopt(match)
         #expect(session.state.revision == match.revision)
@@ -122,13 +120,14 @@ struct OnlineSessionTests {
         var clients: [String: OnlineMatchClient] = [:]
         for id in ids { clients[id] = OnlineMatchClient(participantID: id, transport: transport) }
 
-        let match = try await clients[ids[0]]!.create(
+        let first = try #require(clients[ids[0]])
+        let match = try await first.create(
             configuration: configuration(seats),
             seed: 2026,
             participants: mapping(ids),
             matchID: "match-1"
         )
-        let run = try OnlineMatchRun(match: match, client: clients[ids[0]]!, me: ids[0])
+        let run = try OnlineMatchRun(match: match, client: first, me: ids[0])
         return (run, clients)
     }
 
