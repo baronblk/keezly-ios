@@ -117,8 +117,13 @@ final class GameCenterMatchmaker: NSObject {
         }
 
         presented = controller
-        top.present(controller, animated: true) {
-            OnlineLog.step(.matchmakerPresented)
+        top.present(controller, animated: true) { [weak controller] in
+            // Reported from the completion handler, so the log says the sheet
+            // is really on screen rather than that presenting was attempted.
+            OnlineLog.step(
+                .matchmakerPresented,
+                "onScreen=\(controller?.presentingViewController != nil)"
+            )
         }
     }
 
@@ -201,9 +206,22 @@ final class GameCenterMatchmaker: NSObject {
     }
 
     /// Closes the matchmaker if it is still up.
+    ///
+    /// **Only when it is genuinely on screen.** `dismiss(animated:)` sent to a
+    /// controller that is not presented does not do nothing: UIKit forwards it
+    /// to the nearest ancestor that *is* presenting something. Keezly shows the
+    /// online screen as a sheet, so that ancestor is the online screen — and
+    /// dismissing a matchmaker that never appeared closed the online screen
+    /// instead, dropping the player back on the main menu with no explanation.
     func dismiss() {
-        presented?.dismiss(animated: true)
+        Self.close(presented)
         presented = nil
+    }
+
+    /// Dismisses a controller only if it is actually presented.
+    private static func close(_ controller: UIViewController?) {
+        guard let controller, controller.presentingViewController != nil else { return }
+        controller.dismiss(animated: true)
     }
 
     /// Calls back once and then stops, so a late GameKit callback cannot
@@ -254,7 +272,7 @@ extension GameCenterMatchmaker: GKTurnBasedMatchmakerViewControllerDelegate {
         MainActor.assumeIsolated {
             OnlineLog.step(.matchmakerCancelled)
             presented = nil
-            viewController.dismiss(animated: true)
+            Self.close(viewController)
             deliver(.cancelled)
         }
     }
@@ -267,7 +285,7 @@ extension GameCenterMatchmaker: GKTurnBasedMatchmakerViewControllerDelegate {
             OnlineLog.failure("matchmaker", error)
             OnlineLog.step(.matchmakerFailed)
             presented = nil
-            viewController.dismiss(animated: true)
+            Self.close(viewController)
             deliver(.failed(error))
         }
     }
