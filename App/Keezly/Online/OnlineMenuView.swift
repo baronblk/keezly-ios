@@ -277,7 +277,7 @@ struct OnlineMenuView: View {
     private func open(_ summary: OnlineMatchSummary) {
         Task {
             do {
-                onOpen(try await online.open(summary.id))
+                onOpen(try await online.open(summary))
             } catch {
                 OnlineLog.failure("open", error)
                 online.noteOpenFailure(error)

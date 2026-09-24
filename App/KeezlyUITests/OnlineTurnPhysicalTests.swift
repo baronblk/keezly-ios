@@ -85,7 +85,14 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         }
 
         if let targetMatch {
-            let wanted = rows.allElementsBoundByIndex.first { $0.identifier.hasSuffix(targetMatch) }
+            // Matched on the **Game Center** id and nothing else. A row is
+            // identified by that from the moment the match exists, dealt or
+            // not, so there is no second spelling to fall back to — and
+            // accepting either identifier is how a test ends up bound to a
+            // different game than the one it names.
+            let wanted = rows.allElementsBoundByIndex.first {
+                $0.identifier == "online.match." + targetMatch
+            }
             guard let wanted else {
                 let found = rows.allElementsBoundByIndex.map(\.identifier).joined(separator: ", ")
                 XCTFail("the match under test is not here: " + targetMatch

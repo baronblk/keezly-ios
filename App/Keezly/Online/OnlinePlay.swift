@@ -186,9 +186,11 @@ final class OnlinePlay {
             let mine = gk.participants.first { $0.player?.gamePlayerID == me }
 
             return OnlineMatchSummary(
-                // Falls back to Game Center's own identifier only so the row
-                // has something to be identified *by*. It is never displayed.
-                id: payload?.matchID ?? gk.matchID ?? UUID().uuidString,
+                // Game Center's id, always. It exists from the moment the
+                // match is created and never changes, so a row keeps its
+                // identity when a board is dealt into it.
+                id: gk.matchID ?? UUID().uuidString,
+                keezlyGameID: payload?.matchID,
                 seatCount: payload?.participants.seatCount ?? gk.participants.count,
                 opponents: named
                     .filter { $0.gamePlayerID != me }
@@ -620,16 +622,28 @@ final class OnlinePlay {
     /// noticed at all. Without this they can never be opened — `load` wants a
     /// payload that was never written — so a match everybody joined stays
     /// unplayable for good.
-    func open(_ matchID: String) async throws -> OnlineMatchRun {
+    /// Takes the summary rather than a string, because the two identifiers it
+    /// carries are **not** interchangeable: Game Center's names the match,
+    /// Keezly's names the game inside it, and only the second can be loaded.
+    /// One string parameter invited exactly that confusion.
+    func open(_ summary: OnlineMatchSummary) async throws -> OnlineMatchRun {
         guard Self.isEnabled, let client else {
             throw MatchTransportError.unavailable(reason: "not signed in")
         }
 
-        if let undealt = try await fullButUndealtMatch(matchID) {
+        if let undealt = try await fullButUndealtMatch(summary.id) {
             return try await deal(undealt, client: client)
         }
+        guard let gameID = summary.keezlyGameID else {
+            throw MatchTransportError.unavailable(
+                reason: String(localized: "online.error.waitingForPlayers")
+            )
+        }
 
-        let match = try await client.load(matchID: matchID)
+        let match = try await client.load(matchID: gameID)
+        // The pairing, stated once and checkable on both devices: this Game
+        // Center match holds this Keezly game.
+        OnlineLog.step(.openRequested, "pairing gameCenter=" + summary.id + " keezly=" + gameID)
         Self.logBoard(role: "opened", match)
         return try run(match, client: client)
     }
@@ -671,6 +685,10 @@ final class OnlinePlay {
             participants: try ParticipantMapping(seatOrder: players)
         )
         OnlineLog.step(.matchCreated, "dealt on open, seats=\(configuration.seatCount)")
+        OnlineLog.step(
+            .openRequested,
+            "pairing gameCenter=" + (gkMatch.matchID ?? "-") + " keezly=" + match.matchID
+        )
         Self.logBoard(role: "dealt", match)
         return try run(match, client: client)
     }

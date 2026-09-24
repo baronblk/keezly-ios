@@ -11,8 +11,23 @@ import Foundation
 /// tell which is which. That name is GameKit's, it cannot usefully be changed,
 /// and it is not used here for anything.
 struct OnlineMatchSummary: Identifiable, Hashable, Sendable {
-    /// The Keezly match id, from inside the payload — never shown.
+    /// **Game Center's** identifier for this match, and the row's identity.
+    ///
+    /// The transport identity, which exists from the moment the match is
+    /// created and never changes. The Keezly game id does not exist until the
+    /// board is dealt, so using that here meant a row changed identity the
+    /// instant somebody dealt — SwiftUI then treated it as a different row,
+    /// and anything holding on to the old value was holding a stale handle.
+    ///
+    /// Never shown to anybody.
     let id: String
+    /// The Keezly game id, from inside the payload. `nil` until a board exists.
+    ///
+    /// Deliberately a **separate** field rather than an alternative spelling of
+    /// `id`. The two identify different things — a Game Center match and a
+    /// Keezly game — and treating them as interchangeable hides the moment one
+    /// acquires the other.
+    let keezlyGameID: String?
     let seatCount: Int
     /// Whoever else is at the table, by whatever name Game Center gives them.
     /// Empty while automatch is still looking.

@@ -31,6 +31,7 @@ struct OnlineLobbyTests {
     ) -> OnlineMatchSummary {
         OnlineMatchSummary(
             id: id,
+            keezlyGameID: hasBoard ? "keezly-" + id : nil,
             seatCount: seats,
             opponents: opponents,
             filledSeats: filled,
@@ -157,6 +158,22 @@ struct OnlineLobbyTests {
         let subtitle = summary(seats: 2, variant: nil, teams: false).subtitle
         #expect(!subtitle.hasSuffix("·"))
         #expect(!subtitle.contains("··"))
+    }
+
+    // MARK: - Two identifiers, never interchanged
+
+    /// Game Center names the match; Keezly names the game inside it. They are
+    /// different things, and a row that swapped from one to the other the
+    /// moment a board was dealt changed identity mid-life — SwiftUI then saw a
+    /// different row, and anything holding the old value held a stale handle.
+    @Test("a row keeps its identity when a board is dealt into it")
+    func identityIsStableAcrossTheDeal() {
+        let undealt = summary(id: "gc-1", hasBoard: false)
+        let dealt = summary(id: "gc-1", hasBoard: true)
+        #expect(undealt.id == dealt.id, "the row changed identity when it was dealt")
+        #expect(undealt.keezlyGameID == nil, "there is no game id before a board exists")
+        #expect(dealt.keezlyGameID != nil)
+        #expect(dealt.keezlyGameID != dealt.id, "the two identifiers must not be the same string")
     }
 
     // MARK: - The states the owner listed
