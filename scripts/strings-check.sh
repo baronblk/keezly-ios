@@ -133,6 +133,19 @@ def is_noise(text, match, line):
         return True
     if any(marker in line for marker in ("accessibilityIdentifier", "forResource", "forKey")):
         return True
+    # Inside a property or function that returns a symbol name. A `switch`
+    # picking an SF Symbol has no argument label to key off, so the enclosing
+    # declaration is what identifies it:
+    #
+    #     private var icon: String {
+    #         switch group { case .finished: "flag.checkered" ... }
+    #
+    # Matching on the declaration rather than listing symbol names, because a
+    # list of symbols would need extending every time a view gains an icon —
+    # and forgetting to extend it fails the build for a non-problem.
+    enclosing = re.findall(r"\b(?:var|func)\s+([A-Za-z_][A-Za-z0-9_]*)", before)
+    if enclosing and re.search(r"icon|symbol|image", enclosing[-1], re.IGNORECASE):
+        return True
     # UserDefaults keys, which share the shape and are never shown.
     return match.group(1).startswith("keezly.")
 
@@ -141,6 +154,17 @@ def is_noise(text, match, line):
 # exactly the shape of a localisation key and are read only by a developer
 # looking at a device log.
 NOT_USER_FACING = {"OnlineDiagnostics.swift"}
+
+# A dotted string is only a candidate key if its first segment is a namespace
+# the catalogue already uses. SF Symbols share the shape of a key exactly —
+# `flag.checkered`, `person.badge.clock`, `envelope.badge` — and no amount of
+# looking at the call site distinguishes them reliably.
+#
+# The trade-off is deliberate and narrow: a typo *within* a known namespace is
+# still caught, which is the mistake that actually happens
+# (`online.wonBaner`), while a whole new namespace shows up in the
+# "not referenced" list below rather than as a hard failure.
+NAMESPACES = {key.split(".")[0] for key in catalogue["strings"]}
 
 used = set()
 for source in pathlib.Path("App/Keezly").rglob("*.swift"):
@@ -155,6 +179,8 @@ for source in pathlib.Path("App/Keezly").rglob("*.swift"):
         # A key written with its format specifiers keeps them; one written
         # with an interpolation is matched by its stem, and the catalogue's
         # full key is found below.
+        if match.group(1).split(".")[0] not in NAMESPACES:
+            continue
         used.add(match.group(1) + (match.group(2) or ""))
 
 known = set(catalogue["strings"])
