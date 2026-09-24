@@ -14,12 +14,26 @@ import sys
 import tempfile
 from pathlib import Path
 
+# Ten judgements, none of which a script can make. The first block is the
+# owner's binding exclusion criteria: any one of them ticked means the image
+# does not ship, whatever the rest of the sheet says. They exist because an
+# image showing a Game Center authentication failure was uploaded to the App
+# Store — it passed every automatic check, because none of them could tell an
+# error state from a screen.
+REJECT_IF = [
+    "An error dialog, an alert or a failure message",
+    "A retry, a loading state or a disabled control",
+    "An empty online area, or an online screen that is not signed in",
+    "A test artefact, debug interface or anything a player cannot reach",
+    "A raw localization key",
+    "Text truncated, clipped or running off the edge",
+    "A washed-out, dim or half-drawn scene",
+    "Anything at all that could read as a defect",
+]
+
 CHECKS = [
     "Language is right for this locale",
     "Status bar correct (9:41, full signal)",
-    "No raw string keys",
-    "No debug or test-only interface",
-    "Nothing clipped or cut off",
     "No personal data",
     "Board composition is worth showing",
     "Cards legible and correct",
@@ -78,13 +92,26 @@ def main(folder: Path, out: Path) -> int:
  ul.checks { list-style: none; padding: 0; margin: 0; columns: 2; }
  ul.checks li { break-inside: avoid; margin: .25rem 0; }
  .verdict { margin-top: .8rem; font-weight: 600; }
+ .reject { border: 2px solid #c0392b; border-radius: 10px; padding: 12px 18px; margin: 1.5rem 0; }
+ .reject h3 { margin: .2rem 0 .6rem; color: #c0392b; }
+ .reject ul { margin: 0; padding-left: 1.2rem; }
  @media (max-width: 720px) { .shot { grid-template-columns: 1fr; } ul.checks { columns: 1; } }
 </style></head><body>
 <h1>Keezly 1.0.0 — screenshot review</h1>
-<p class="lede">Six series, ten images each, in the order the App Store will show them.
+<p class="lede">Six series, in the order the App Store will show them.
 Nothing here is ticked. A review that starts at PASS is not a review — and no
 check below can be answered by a script, which is why they are here and not in
 <code>screenshots-verify.py</code>.</p>
+<p class="lede"><strong>Automatic verification is not a marketing approval.</strong>
+Every image below is already at Apple and has passed the technical checks:
+right size, right order, delivery state COMPLETE. None of that says whether an
+image is worth showing, and one that was technically perfect showed a Game
+Center authentication failure.</p>
+<div class="reject">
+<h3>Reject on sight — any one of these</h3>
+<ul>REJECTLIST</ul>
+<p>These are not weighed against the rest. One of them is enough.</p>
+</div>
 """]
 
     for series in ["iphone-de", "ipad-de", "iphone-nl", "ipad-nl", "iphone-en", "ipad-en"]:
@@ -92,7 +119,8 @@ check below can be answered by a script, which is why they are here and not in
         if not entries:
             continue
         device, locale = series.split("-")
-        parts.append(f"<h2>{TITLES[locale]} — {DEVICES[device]}</h2>")
+        total = len(entries)
+        parts.append(f"<h2>{TITLES[locale]} — {DEVICES[device]} · {total} images</h2>")
 
         parts.append('<div class="contact">')
         for e in entries:
@@ -110,7 +138,7 @@ check below can be answered by a script, which is why they are here and not in
  <img src="{data_uri(path)}" alt="{e['scene']} in {locale}">
  <div>
   <h3>{e['position']}. {e['scene']}</h3>
-  <p class="meta">{e['file']} · {DEVICES[device]} · {TITLES[locale]} · position {e['position']} of 10</p>
+  <p class="meta">{e['file']} · {DEVICES[device]} · {TITLES[locale]} · position {e['position']} of {total}</p>
   <p class="why">Why it is in the series: {e['reason']}</p>
   <ul class="checks">{checks}</ul>
   <p class="verdict">☐ APPROVE &nbsp;&nbsp; ☐ REPLACE &nbsp;&nbsp; ☐ REORDER</p>
@@ -119,10 +147,14 @@ check below can be answered by a script, which is why they are here and not in
     parts.append("""<h2>Sign-off</h2>
 <p>☐ All six series approved &nbsp;&nbsp; ☐ Changes needed (listed below)</p>
 <p>Date: ______________  Reviewed by: ______________</p>
-<p class="lede">Until this is signed, the screenshots are SELECTED, not APP STORE VERIFIED.</p>
+<p class="lede">Until this is signed, the screenshots are ASC UPLOADED, not HUMAN REVIEWED.
+Record the verdict in <code>SCREENSHOT_SIGNOFF.md</code>.</p>
 </body></html>""")
 
-    out.write_text("\n".join(parts), encoding="utf-8")
+    html = "\n".join(parts).replace(
+        "REJECTLIST", "".join(f"<li>{r}</li>" for r in REJECT_IF)
+    )
+    out.write_text(html, encoding="utf-8")
     size = out.stat().st_size / 1_000_000
     print(f"{out} written ({size:.1f} MB, images embedded)")
     return 0

@@ -272,15 +272,23 @@ one is his to make. It is one field in the web form, or one PATCH.
 
 ## Screenshots — ASC UPLOADED, NOT YET REVIEWED BY A PERSON
 
-60 images: ten per device size, per locale. Read back from Apple rather than
-inferred from a 201 — count, filename order and `assetDeliveryState COMPLETE`
-confirmed for every one of the six sets.
+**45 images**: seven per iPhone series, eight per iPad series, three locales.
+Read back from Apple rather than inferred from a 201 — count, filename order
+and `assetDeliveryState COMPLETE` confirmed for every one of the six sets.
 
 | Locale | iPhone 6.9″ | iPad 13″ |
 |---|---|---|
-| de-DE | 10, order ok, COMPLETE | 10, order ok, COMPLETE |
-| nl-NL | 10, order ok, COMPLETE | 10, order ok, COMPLETE |
-| en-US | 10, order ok, COMPLETE | 10, order ok, COMPLETE |
+| de-DE | 7, order ok, COMPLETE | 8, order ok, COMPLETE |
+| nl-NL | 7, order ok, COMPLETE | 8, order ok, COMPLETE |
+| en-US | 7, order ok, COMPLETE | 8, order ok, COMPLETE |
+
+It was 60 for part of a day, ten per set. Fifteen were withdrawn after the
+owner spotted that the uploaded online screenshot showed a **Game Center
+authentication failure** — a warning triangle and a "Try again" button. Every
+automatic check had passed it, because none of them can tell an error state
+from a screen. The online captures have stayed out since, and cannot come back
+from this Mac: in a simulator there is no account to sign in with, so that
+screen has no happy path to capture. See `SCREENSHOT_SIGNOFF.md`.
 
 Captured from a 132-image matrix — 22 scenes across two devices and three
 locales — generated after every fix of the last two days, including the board

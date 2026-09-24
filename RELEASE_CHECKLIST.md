@@ -88,7 +88,7 @@ Apple, processed and attached to version 1.0.0.
 | Review information and notes | **VERIFIED** | Read back, 1819 characters |
 | Export compliance | **VERIFIED** | No crypto, no own networking; only GameKit |
 | Privacy manifest | **VERIFIED** | One required-reason API, re-checked after the online work |
-| Screenshots | **UPLOADED** | 60 images at Apple; count, order and COMPLETE read back per set. **Not APP STORE VERIFIED** — that needs the owner's sign-off on SCREENSHOT_REVIEW.html |
+| Screenshots | **ASC UPLOADED** | **45** images at Apple (7 per iPhone set, 8 per iPad set, 3 locales); count, order and COMPLETE read back per set. **Not HUMAN REVIEWED** — that needs the owner's sign-off in `SCREENSHOT_SIGNOFF.md` |
 | Screenshots still match build 42 | **VERIFIED, NOT REGENERATED** | The only files changed between 41 and 42 are `Online/OnlineMenuView.swift` and `Online/OnlinePlay.swift`. No uploaded screenshot shows either screen — the online captures were excluded before upload and stay excluded (`scripts/screenshot-select.py`), because in a simulator that screen can only show a Game Center authentication failure. A happy-path online shot needs a real account on real hardware |
 | App Privacy declaration | **OWNER ACTION** | `APP_PRIVACY_OWNER_CHECKLIST.md` |
 | Age rating | **OWNER ACTION** | Reads back as `FOUR_PLUS`, which is right; one answer behind it is wrong — Contests → None. `AGE_RATING_OWNER_CHECKLIST.md` |
