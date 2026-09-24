@@ -2,26 +2,6 @@ import Foundation
 import GameKit
 import KeezlyCore
 
-/// One entry in the list of online matches.
-///
-/// Built from what Game Center already holds, so the list can be drawn without
-/// opening a match. The Keezly identifier comes out of the payload, because
-/// Game Center's own identifier is not the one the engine knows (§28).
-struct OnlineMatchSummary: Identifiable, Sendable {
-    let id: String
-    let seatCount: Int
-    let isMyTurn: Bool
-    let isOver: Bool
-    /// The other players, by whatever name Game Center gives them.
-    let opponents: [String]
-    let lastActivity: Date
-
-    var statusKey: String {
-        if isOver { return "online.status.finished" }
-        return isMyTurn ? "online.status.yours" : "online.status.waiting"
-    }
-}
-
 /// Game Center, for the screens that offer online play.
 ///
 /// Owns three things and no more: whether the player is signed in, what
@@ -167,24 +147,58 @@ final class OnlinePlay {
         }
     }
 
+    /// Turns Game Center's matches into Keezly's own description of them.
+    ///
+    /// A match with no Keezly payload yet is **kept**, not dropped. Those are
+    /// the ones automatch created and has not filled, and dropping them is why
+    /// eleven of them could pile up invisibly while the player was told
+    /// nothing: they existed at Apple, they were this player's, and Keezly
+    /// pretended they were not there.
     private func loadSummaries() async throws -> [OnlineMatchSummary] {
         let me = GKLocalPlayer.local.gamePlayerID
-        return try await GKTurnBasedMatch.loadMatches().compactMap { gk in
-            guard let data = gk.matchData, !data.isEmpty,
-                  let match = try? OnlineMatchEnvelope.load(data)
-            else { return nil }
+        // Bound first: `loadMatches()` also has a completion-handler overload,
+        // and chaining straight onto it lets the compiler pick that one, whose
+        // result is Void.
+        let gkMatches: [GKTurnBasedMatch] = try await GKTurnBasedMatch.loadMatches()
+        return gkMatches.map { gk in
+            // Written out rather than with `flatMap`: `Data` is itself a
+            // Collection, so `Data?.flatMap` binds to the *sequence* overload
+            // and quietly maps over the bytes.
+            var payload: OnlineMatch?
+            if let data = gk.matchData, !data.isEmpty {
+                payload = try? OnlineMatchEnvelope.load(data)
+            }
+            let named = gk.participants.compactMap(\.player)
+            let mine = gk.participants.first { $0.player?.gamePlayerID == me }
+
             return OnlineMatchSummary(
-                id: match.matchID,
-                seatCount: match.participants.seatCount,
-                isMyTurn: gk.currentParticipant?.player?.gamePlayerID == me,
-                isOver: match.state.result != nil,
-                opponents: gk.participants
-                    .compactMap(\.player)
+                // Falls back to Game Center's own identifier only so the row
+                // has something to be identified *by*. It is never displayed.
+                id: payload?.matchID ?? gk.matchID ?? UUID().uuidString,
+                seatCount: payload?.participants.seatCount ?? gk.participants.count,
+                opponents: named
                     .filter { $0.gamePlayerID != me }
                     .map(\.displayName),
-                lastActivity: gk.creationDate
+                filledSeats: named.count,
+                isMyTurn: gk.currentParticipant?.player?.gamePlayerID == me,
+                isOver: gk.status == .ended || payload?.state.result != nil,
+                // Automatch has not finished filling the table. Not an error
+                // and not somebody's turn — its own thing, said as itself.
+                isWaitingForPlayers: gk.status == .matching || named.count < gk.participants.count,
+                isInvitation: mine?.status == .invited,
+                // The most recent turn anybody took, or the match's own age
+                // if nobody has moved yet. `GKTurnBasedMatch` has no
+                // last-activity of its own; its participants do.
+                lastActivity: gk.participants.compactMap(\.lastTurnDate).max() ?? gk.creationDate,
+                variantName: payload.flatMap { Self.variantName(for: $0) },
+                isTeamMatch: payload?.state.configuration.teamMode == .teamsOfTwo
             )
         }
+    }
+
+    /// The rule preset's name, for the second line of a row.
+    private static func variantName(for match: OnlineMatch) -> String? {
+        Rulebook.name(of: match.state.configuration.ruleSet.preset)
     }
 
     // MARK: - Starting and opening

@@ -114,21 +114,31 @@ struct OnlineMenuView: View {
         }
     }
 
+    /// Keezly's own list, grouped by what it wants from the player.
+    ///
+    /// Replaces showing Apple's raw matchmaker list as the online screen. That
+    /// list gave every automatch the same name — eleven rows of
+    /// "Auto-Match-Game", all saying "your turn" — with no way to tell one from
+    /// another and no sign of which table it belonged to.
     @ViewBuilder
     private var matchesSection: some View {
-        Section {
-            if online.matches.isEmpty {
+        if online.matches.isEmpty {
+            Section {
                 Text("online.empty")
                     .foregroundStyle(.secondary)
                     .accessibilityIdentifier("online.empty")
-            } else {
-                ForEach(online.matches) { match in
-                    Button { open(match) } label: { MatchRow(match: match) }
-                        .accessibilityIdentifier("online.match.\(match.id)")
+            }
+        } else {
+            ForEach(OnlineLobby.sections(for: online.matches)) { section in
+                Section {
+                    ForEach(section.matches) { match in
+                        Button { open(match) } label: { MatchRow(match: match) }
+                            .accessibilityIdentifier("online.match.\(match.id)")
+                    }
+                } header: {
+                    Text(LocalizedStringKey(section.group.titleKey))
                 }
             }
-        } header: {
-            Text("online.running")
         }
     }
 
@@ -176,21 +186,42 @@ private struct MatchRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: match.isOver ? "flag.checkered" : (match.isMyTurn ? "play.circle.fill" : "hourglass"))
-                .foregroundStyle(match.isMyTurn && !match.isOver ? Color.accentColor : .secondary)
+            Image(systemName: icon)
+                .foregroundStyle(tint)
+                .font(.title3)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
-                Text(match.opponents.isEmpty
-                     ? String(localized: "online.seats \(match.seatCount)")
-                     : match.opponents.formatted(.list(type: .and)))
-                    .font(.body)
-                Text(LocalizedStringKey(match.statusKey))
+                // Keezly's own title: who is at the table, not GameKit's
+                // "Auto-Match-Game", which is the same string for every match
+                // it ever creates.
+                Text(match.title).font(.body)
+                Text(match.subtitle)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                Text(match.lastActivity, format: .relative(presentation: .named))
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
             Spacer()
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var icon: String {
+        switch match.group {
+        case .invitations: "envelope.badge"
+        case .yourTurn: "play.circle.fill"
+        case .theirTurn: "hourglass"
+        case .waitingForPlayers: "person.badge.clock"
+        case .finished: "flag.checkered"
+        }
+    }
+
+    private var tint: Color {
+        switch match.group {
+        case .invitations, .yourTurn: Color.accentColor
+        case .theirTurn, .waitingForPlayers, .finished: .secondary
+        }
     }
 }
 

@@ -65,7 +65,17 @@ final class GameCenterMatchmaker: NSObject {
 
         let controller = GKTurnBasedMatchmakerViewController(matchRequest: request)
         controller.turnBasedMatchmakerDelegate = self
-        controller.showExistingMatches = true
+        // **false, deliberately.** With this on, Apple's own match list is what
+        // the player sees when they tap "New online match" — every automatch
+        // named "Auto-Match-Game", eleven identical rows, a `+` and an `i`.
+        // That is a system menu, not Keezly's online screen, and it told a
+        // player nothing about which table was which or who they were playing.
+        //
+        // Keezly draws its own list from `GKTurnBasedMatch.loadMatches()` and
+        // groups it by what each match wants (`OnlineLobby`). This controller
+        // is now what it should always have been: a step, for choosing or
+        // inviting somebody, that hands back and goes away.
+        controller.showExistingMatches = false
 
         guard let top = Self.topViewController() else {
             // Never silent. A presentation that cannot happen is a real fault
