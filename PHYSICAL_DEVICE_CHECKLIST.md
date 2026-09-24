@@ -73,20 +73,34 @@ Date:                    iPad model / iOS:
 | **Tapping a highlighted square next to a piece moves — it does not select the piece** (ISS-020) | ☐ | ☐ |
 | **Nothing ever moves backward except a Four** (ISS-022) | ☐ | ☐ |
 
-### If a piece does move backward
+### ISS-022 — if a piece does move backward
 
-This is the report from build 41 that could not be reproduced. The core has been
-shown across every rank and every table size not to produce it, and the UI holds
-no movement logic of its own — so a sighting here is new information and the
-only way forward. Do not summarise it; write down exactly:
+The report from build 41, which could not be reproduced. The core has been shown
+across every rank and every table size not to produce it, and the UI holds no
+movement logic of its own — so a sighting here is **new information and the only
+way forward**. Do not summarise it. Fill this in at the moment it happens:
 
 ```
-Card played:            Table size:            Teams or free-for-all:
-Which seat was on turn:          Which seat owned the piece:
-Where the piece stood before:    Where it ended up:
-Was it a Seven split?  Which leg?
-Screen recording:  ☐ yes
+Karte:
+Spieler/Sitz:
+Spielerzahl:
+Position vorher:
+Position nachher:
+erwartete Bewegung:
+beobachtete Bewegung:
+
+Teams oder jeder für sich:
+War es eine geteilte Sieben?  Welche Teilstrecke?
+Bildschirmaufnahme:  ☐ ja
 ```
+
+Fill one in per sighting; a second one is worth more than a longer description
+of the first.
+
+**If it does not happen on this build, ISS-022 stays OPEN / NOT REPRODUCED.** It
+is not closed because a test session did not see it — absence over one session
+is not evidence that it cannot occur, and recording it as fixed would be a
+false claim about a defect nobody has explained.
 
 ## Saving and coming back
 
@@ -108,6 +122,23 @@ Screen recording:  ☐ yes
 | Rotation, both orientations | ☐ | ☐ |
 | Split View | — | ☐ |
 | Stage Manager, if the device supports it | — | ☐ |
+
+## Look at it — the visual pass
+
+Not a functional check. Somebody looking at the thing and saying whether it is
+right, which no measurement here can do.
+
+| | iPhone | iPad |
+|---|---|---|
+| **The app icon on the real home screen** — at the size it actually appears, not in Xcode | ☐ | ☐ |
+| The icon in Settings, in Spotlight and in the app switcher | ☐ | ☐ |
+| **The board** — the wood, the ornament, the seat colours, in daylight and in a dark room | ☐ | ☐ |
+| **2 players** — the cards beside the board, nothing marooned in the middle | ☐ | ☐ |
+| **4 players** — the classic table, no gaps, no crowding | ☐ | ☐ |
+| **6 players** — still legible; pieces and home lanes still tellable apart | ☐ | ☐ |
+| **Rotation** — portrait and both landscapes, on both devices, mid-match | ☐ | ☐ |
+| Rotating while a piece is animating does not strand it | ☐ | ☐ |
+| Nothing is cut off at a rounded corner, a notch or the home indicator | ☐ | ☐ |
 
 ## Feel
 
@@ -140,17 +171,41 @@ Screen recording:  ☐ yes
 | Teams are offered at 4 and 6 seats, and nowhere else | ☐ | ☐ |
 | The full online run — see `GAME_CENTER_E2E_CHECKLIST.md` | ☐ | ☐ |
 | Achievements appear in Game Center after a solo match | ☐ | ☐ |
-| An online match awards **no** achievement — expected today, and an open owner decision (`GAME_CENTER_ACHIEVEMENTS_ONLINE.md`) | ☐ | ☐ |
+| **An online match now awards achievements too** — for your own seat only. New in this build; the full check is the E2E list, steps 27–32 | ☐ | ☐ |
+| Reopening a finished online match awards **nothing a second time** | ☐ | ☐ |
 | Declining sign-in leaves the rest of the app working | ☐ | ☐ |
 
 ---
 
 ## Result
 
+Everything the owner asked to be looked at, in one place, so nothing is passed
+by being forgotten:
+
+| | iPhone | iPad |
+|---|---|---|
+| Final app icon | ☐ | ☐ |
+| Board | ☐ | ☐ |
+| 2 / 4 / 6 players | ☐ | ☐ |
+| Sound | ☐ | ☐ |
+| Haptics | ☐ | ☐ |
+| Rotation | ☐ | ☐ |
+| Pass & play privacy | ☐ | ☐ |
+| Resume | ☐ | ☐ |
+| Replay | ☐ | ☐ |
+
 ```
+Build (version and number):
+Date:
+iPhone model / iOS:
+iPad model / iOS:
+
 PHYSICAL DEVICE GATE:  ☐ PASS   ☐ FAIL
 
 Anything that failed, and what it was:
+
+ISS-022 seen?   ☐ no, not on this build (stays OPEN / NOT REPRODUCED)
+                ☐ yes — form filled in above
 ```
 
 A FAIL here is a release blocker. Re-running until green is not a result.
