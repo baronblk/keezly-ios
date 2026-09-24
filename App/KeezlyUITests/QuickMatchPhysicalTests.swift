@@ -156,6 +156,38 @@ final class QuickMatchPhysicalTests: XCTestCase {
         XCTAssertTrue(option.isSelected, "the picker did not move to \(seats) seats")
     }
 
+    /// Clears this device's own abandoned searches.
+    ///
+    /// Run on purpose, never as a side effect of another test. Twenty-five
+    /// open searches per account is not a neutral background for a matchmaking
+    /// test — GameKit has its own limits, and testing against a pile of stale
+    /// matches measures the pile as much as the code.
+    ///
+    /// Only removes matches with nobody else in them and no board dealt, so
+    /// nothing anybody is playing can be lost.
+    @MainActor
+    func testCleanUpOwnAbandonedSearches() throws {
+        let app = launched()
+        guard openOnline(app) else { return }
+        report(app, "before-cleanup")
+
+        let cleanup = app.descendants(matching: .any)["online.cleanup"]
+        guard cleanup.waitForExistence(timeout: 10) else {
+            // Fewer than three: nothing to tidy, and the button is not shown.
+            report(app, "nothing-to-clean")
+            return
+        }
+        cleanup.tap()
+
+        // The list shrinks as they go. Waiting on the count rather than on a
+        // fixed delay, because how long it takes depends on how many there are.
+        let deadline = Date().addingTimeInterval(180)
+        while Date() < deadline, cleanup.exists {
+            usleep(500_000)
+        }
+        report(app, "after-cleanup")
+    }
+
     // MARK: - The path the owner reported as broken
 
     /// Two-player quick match, all the way to whatever it actually does.

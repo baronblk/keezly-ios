@@ -244,6 +244,45 @@ final class OnlinePlay {
         )
     }
 
+    /// Removes this device's own abandoned automatch attempts.
+    ///
+    /// Only matches that are **unambiguously nobody else's**: no second player
+    /// has joined, and no board was ever dealt. Those can only be attempts this
+    /// device made and walked away from — every one of them was created by a
+    /// tap that then threw the match away, before that defect was fixed.
+    ///
+    /// Nothing with another player in it is touched, whatever its state.
+    ///
+    /// Returns how many were removed, so a caller can say so rather than
+    /// guess.
+    @discardableResult
+    func removeOwnAbandonedMatches() async -> Int {
+        guard Self.isEnabled else { return 0 }
+        var removed = 0
+        do {
+            let all: [GKTurnBasedMatch] = try await GKTurnBasedMatch.loadMatches()
+            OnlineLog.step(.openRequested, "cleanup: \(all.count) match(es) to consider")
+            for gk in all {
+                let others = gk.participants.compactMap(\.player).count
+                let dealt = !(gk.matchData?.isEmpty ?? true)
+                guard others <= 1, !dealt else { continue }
+                do {
+                    try await gk.remove()
+                    removed += 1
+                } catch {
+                    // One that will not go is not worth stopping for; the rest
+                    // still should. Reported so it is not silent.
+                    OnlineLog.failure("cleanup.remove", error)
+                }
+            }
+            OnlineLog.step(.finished, "cleanup removed \(removed)")
+            await refresh()
+        } catch {
+            OnlineLog.failure("cleanup", error)
+        }
+        return removed
+    }
+
     /// Abandons a match this device is still waiting on.
     ///
     /// Exists because the old start path left orphaned matches at Apple with
@@ -387,6 +426,12 @@ final class OnlinePlay {
             case .couldNotPresent:
                 self.apply(.failed(.matchmakingFailed))
             case .matched(let gkMatch):
+                // Recorded the moment the match arrives, not only on a later
+                // turn event. Without this the probe never carries a match id
+                // and two devices cannot be told apart from one.
+                let filled = gkMatch.participants.compactMap(\.player).count
+                self.lastMatchFacts = "match=\(gkMatch.matchID ?? "-") "
+                    + "filled=\(filled)/\(gkMatch.participants.count)"
                 Task { await self.adopt(gkMatch, seats: seats, teams: teams, onOpen: onOpen) }
             }
         }

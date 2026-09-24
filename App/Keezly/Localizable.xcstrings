@@ -3061,6 +3061,52 @@
         }
       }
     },
+    "online.cleanup": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidy up abandoned searches"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgebrochene Suchen aufräumen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afgebroken zoekopdrachten opruimen"
+          }
+        }
+      }
+    },
+    "online.cleanup.explain": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removes searches that never found anybody and were never played. Matches with another player in them are left alone."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entfernt Suchen, die niemanden gefunden haben und nie gespielt wurden. Partien mit anderen Mitspielern bleiben unberührt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijdert zoekopdrachten die niemand hebben gevonden en nooit zijn gespeeld. Partijen met andere spelers blijven ongemoeid."
+          }
+        }
+      }
+    },
     "online.empty": {
       "extractionState": "manual",
       "localizations": {
