@@ -146,33 +146,33 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         let handBefore = cardIdentifiers(in: app)
         let pawnsBefore = pawnPositions(in: app)
 
-        var played = false
+        var didPlay = false
         let cards = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH 'hand.card.'"))
             .allElementsBoundByIndex
 
-        for card in cards where !played {
+        for card in cards where !didPlay {
             card.tap()
             let targets = app.descendants(matching: .any).matching(NSPredicate(
                 format: "identifier BEGINSWITH 'target.' AND NOT identifier BEGINSWITH 'target.leg.'"
             ))
             if let target = targets.allElementsBoundByIndex.first {
                 target.tap()
-                played = true
+                didPlay = true
                 break
             }
             for pawn in app.descendants(matching: .any)
                 .matching(NSPredicate(format: "identifier BEGINSWITH 'pawn.'"))
-                .allElementsBoundByIndex where pawn.isHittable && !played {
+                .allElementsBoundByIndex where pawn.isHittable && !didPlay {
                 pawn.tap()
                 if let target = targets.allElementsBoundByIndex.first {
                     target.tap()
-                    played = true
+                    didPlay = true
                 }
             }
         }
 
-        XCTAssertTrue(played, "this hand offered no move at all, which a forced-move rule forbids")
+        XCTAssertTrue(didPlay, "this hand offered no move at all, which a forced-move rule forbids")
 
         // The defect this run exists to disprove: the card leaves the hand and
         // the piece stays where it was. Both halves are checked, because only
@@ -187,7 +187,18 @@ final class OnlineTurnPhysicalTests: XCTestCase {
             pawnsAfter, pawnsBefore,
             "the card went but every piece stayed exactly where it was — the card/pawn desync"
         )
-        print("TURN PAWNS moved=\(pawnsAfter.filter { pawnsBefore[$0.key] != $0.value }.count)")
+        // Exactly which card, and exactly which piece. Reported rather than
+        // summarised, because coverage that is claimed instead of observed is
+        // worth nothing — an online deal cannot be contrived, so whatever this
+        // hand happened to hold is all that was really tested.
+        let played = Set(handBefore).subtracting(handAfter)
+        let moved = pawnsAfter.filter { pawnsBefore[$0.key] != $0.value }
+        print("TURN CARD \(played.sorted().joined(separator: ","))")
+        for (pawn, frame) in moved.sorted(by: { $0.key < $1.key }) {
+            let was = pawnsBefore[pawn].map { "\(Int($0.midX)),\(Int($0.midY))" } ?? "?"
+            print("TURN PAWN \(pawn) from=\(was) to=\(Int(frame.midX)),\(Int(frame.midY))")
+        }
+        print("TURN PAWNS moved=\(moved.count)")
         log(app, "played")
 
         // The move has to leave the device, not merely be accepted locally.
