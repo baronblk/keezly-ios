@@ -156,12 +156,7 @@ enum OnlineStartFlow {
             }
 
         case .matchArrived(let filled, let total):
-            // A turn-based match can arrive before it is full, and that is
-            // ordinary rather than wrong. It is reported as itself: the match
-            // exists, it is in the list, and it starts when somebody joins.
-            return filled >= total
-                ? .loadingMatch
-                : .waitingForPlayers(filled: filled, of: total)
+            return arrived(state, filled: filled, of: total)
 
         case .matchOpened:
             return .idle
@@ -171,6 +166,41 @@ enum OnlineStartFlow {
 
         case .dismissed:
             return .idle
+        }
+    }
+
+    /// A match turned up, with however many of its seats are taken.
+    ///
+    /// A turn-based match can arrive before it is full, and that is ordinary
+    /// rather than wrong: the match exists, it is in the list, and it starts
+    /// when somebody joins. Two cases where the count must **not** be taken at
+    /// face value, both of them real things GameKit does.
+    private static func arrived(
+        _ state: OnlineStartState,
+        filled: Int,
+        of total: Int
+    ) -> OnlineStartState {
+        switch state {
+        case .idle, .failed:
+            // No start flow is running. A turn event for some *other* match —
+            // an opponent moving in a game already on screen — must not put
+            // this screen into a loading state behind their back.
+            return state
+
+        case .loadingMatch:
+            // The table was full and the deal is under way. GameKit can
+            // re-deliver an older, emptier event afterwards, and taking that
+            // at face value would drag a match that is already opening back to
+            // "waiting for players".
+            //
+            // A player genuinely leaving mid-deal is not ignored: the deal
+            // itself then fails and arrives as `.failed`.
+            return .loadingMatch
+
+        default:
+            return filled >= total
+                ? .loadingMatch
+                : .waitingForPlayers(filled: filled, of: total)
         }
     }
 }

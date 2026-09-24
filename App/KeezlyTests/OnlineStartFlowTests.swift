@@ -185,6 +185,94 @@ struct OnlineStartFlowTests {
         }
     }
 
+    // MARK: - A second player joining
+
+    /// The transition the whole feature turns on, and the one that was broken
+    /// for a different reason: `waitingForPlayers` must be a step, not a dead
+    /// end. A match that fills up has to become a board.
+    @Test("a two-seat table that fills up moves on to loading")
+    func twoSeatTableFills() {
+        var state = next(.matchmaking, .matchArrived(filled: 1, of: 2))
+        #expect(state == .waitingForPlayers(filled: 1, of: 2))
+        state = next(state, .matchArrived(filled: 2, of: 2))
+        #expect(state == .loadingMatch, "the second player joined and nothing happened")
+    }
+
+    /// Three seats fill one at a time, and only the last one starts anything.
+    @Test("a three-seat table waits through the middle and moves on at the end")
+    func threeSeatTableFillsInSteps() {
+        var state = next(.matchmaking, .matchArrived(filled: 1, of: 3))
+        #expect(state == .waitingForPlayers(filled: 1, of: 3))
+
+        state = next(state, .matchArrived(filled: 2, of: 3))
+        #expect(state == .waitingForPlayers(filled: 2, of: 3), "two of three is still waiting")
+
+        state = next(state, .matchArrived(filled: 3, of: 3))
+        #expect(state == .loadingMatch)
+    }
+
+    @Test("every seat count fills the same way", arguments: [2, 3, 4, 5, 6])
+    func everySeatCountFills(seats: Int) {
+        var state = OnlineStartState.matchmaking
+        for filled in 1..<seats {
+            state = next(state, .matchArrived(filled: filled, of: seats))
+            #expect(state == .waitingForPlayers(filled: filled, of: seats))
+        }
+        state = next(state, .matchArrived(filled: seats, of: seats))
+        #expect(state == .loadingMatch)
+    }
+
+    /// GameKit re-delivers events. The same one twice must not undo anything.
+    @Test("a duplicate event changes nothing")
+    func duplicateEvent() {
+        var state = next(.matchmaking, .matchArrived(filled: 1, of: 2))
+        let afterFirst = state
+        state = next(state, .matchArrived(filled: 1, of: 2))
+        #expect(state == afterFirst)
+
+        state = next(state, .matchArrived(filled: 2, of: 2))
+        let loading = state
+        state = next(state, .matchArrived(filled: 2, of: 2))
+        #expect(state == loading, "a repeated full event restarted the load")
+    }
+
+    /// Events can arrive out of order. An older count must not drag a match
+    /// that is already loading back to waiting.
+    @Test("a stale event does not pull a loading match back to waiting")
+    func staleEventDoesNotRegress() {
+        var state = next(.matchmaking, .matchArrived(filled: 2, of: 2))
+        #expect(state == .loadingMatch)
+        state = next(state, .matchArrived(filled: 1, of: 2))
+        #expect(state == .loadingMatch, "an out-of-order event undid a completed table")
+    }
+
+    /// Somebody declined or walked away, so the table will never fill. The
+    /// count going down is real and is shown, rather than the screen claiming
+    /// progress that has been lost.
+    @Test("a participant leaving is reflected rather than hidden")
+    func participantLeft() {
+        var state = next(.matchmaking, .matchArrived(filled: 2, of: 3))
+        #expect(state == .waitingForPlayers(filled: 2, of: 3))
+        state = next(state, .matchArrived(filled: 1, of: 3))
+        #expect(state == .waitingForPlayers(filled: 1, of: 3))
+    }
+
+    /// Once the board is open the screen is idle, and a turn event for some
+    /// other match — an opponent moving in a different game — must not put a
+    /// loading state behind it.
+    @Test("a match that opened is not reopened by a later event")
+    func openedStaysOpen() {
+        var state = next(.matchmaking, .matchArrived(filled: 2, of: 2))
+        state = next(state, .matchOpened)
+        #expect(state == .idle)
+        #expect(next(state, .matchArrived(filled: 2, of: 2)) == .idle)
+    }
+
+    @Test("an event arriving while an error is shown does not replace it")
+    func eventDoesNotClearAnError() {
+        #expect(next(.failed(.network), .matchArrived(filled: 2, of: 2)) == .failed(.network))
+    }
+
     @Test("only what is actually in progress can be cancelled")
     func cancellableStates() {
         #expect(OnlineStartState.openingMatchmaker.isCancellable)

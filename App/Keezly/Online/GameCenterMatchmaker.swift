@@ -34,7 +34,17 @@ final class GameCenterMatchmaker: NSObject {
         case couldNotPresent
     }
 
+    /// The result of **one** attempt to start a match. One-shot by design: a
+    /// cancellation and a match must not both count for the same tap.
     private var onOutcome: ((Outcome) -> Void)?
+    /// Every turn event, for as long as the app is running. **Not** one-shot,
+    /// and that distinction is the whole point of having two of these.
+    ///
+    /// Routing turn events through `onOutcome` made `waitingForPlayers` a dead
+    /// end: the first event cleared the callback, so the second player joining
+    /// arrived, found nothing to call, and was dropped in silence. The match
+    /// filled up at Apple and Keezly never noticed.
+    private var onTurnEvent: ((GKTurnBasedMatch) -> Void)?
     private var isListening = false
     private weak var presented: GKTurnBasedMatchmakerViewController?
 
@@ -44,7 +54,11 @@ final class GameCenterMatchmaker: NSObject {
     /// GameKit — including one the player accepted from an invitation
     /// elsewhere, and every later turn the opponent takes. Registering twice
     /// would deliver everything twice.
-    func beginListening() {
+    func beginListening(onTurnEvent: @escaping (GKTurnBasedMatch) -> Void) {
+        // The handler is replaced even when already listening, so a second
+        // call re-points it rather than leaving a stale closure holding a
+        // released object.
+        self.onTurnEvent = onTurnEvent
         guard !isListening else { return }
         isListening = true
         GKLocalPlayer.local.register(self)
@@ -231,10 +245,21 @@ extension GameCenterMatchmaker: GKLocalPlayerListener {
             OnlineLog.step(.matchReceived, "status=\(match.status.rawValue) active=\(didBecomeActive)")
             OnlineLog.participants(filled: filled, of: match.participants.count)
 
-            // Close the matchmaker if it is still up: the player has what they
-            // came for and should be looking at the board, not at Game Center.
-            dismiss()
-            deliver(.matched(match))
+            // Two separate things, and both happen.
+            //
+            // The attempt that is waiting on an answer gets one, once — that
+            // closes the matchmaker and moves the start flow off `matchmaking`.
+            if onOutcome != nil {
+                dismiss()
+                deliver(.matched(match))
+            }
+
+            // And every event, always, goes to the standing handler. This is
+            // what a second player joining looks like: a turn event for a
+            // match Keezly is already waiting on. Dropping it because some
+            // earlier callback had been consumed is what left a filled match
+            // sitting at Apple with the app still saying "waiting".
+            onTurnEvent?(match)
         }
     }
 
@@ -242,6 +267,24 @@ extension GameCenterMatchmaker: GKLocalPlayerListener {
         nonisolated(unsafe) let match = match
         MainActor.assumeIsolated {
             OnlineLog.step(.finished, "status=\(match.status.rawValue)")
+            // A finished match is a change to the lobby like any other.
+            onTurnEvent?(match)
+        }
+    }
+
+    /// Somebody declined the invitation, or left.
+    ///
+    /// Handled rather than ignored: a two-player match whose opponent walked
+    /// away is never going to fill, and a lobby that still says "looking for
+    /// players" about it is lying.
+    nonisolated func player(
+        _ player: GKPlayer,
+        wantsToQuitMatch match: GKTurnBasedMatch
+    ) {
+        nonisolated(unsafe) let match = match
+        MainActor.assumeIsolated {
+            OnlineLog.step(.finished, "quit status=\(match.status.rawValue)")
+            onTurnEvent?(match)
         }
     }
 }

@@ -26,6 +26,13 @@ final class OnlinePlay {
     /// delegate has been deallocated reports nothing at all, and the player is
     /// left with a screen that never changes (§8).
     private let matchmaker = GameCenterMatchmaker()
+    /// Kept for the match this device is waiting on, so it can be opened when
+    /// the table fills — which happens long after the tap that started it.
+    private var onOpenWaiting: ((OnlineMatchRun) -> Void)?
+    /// What the player asked for when they started the wait. A table that
+    /// fills minutes later must use the settings they chose, not today's
+    /// default.
+    private var waitingPrefersTeams = true
     /// Where a finished online match's achievements go, and what stops the
     /// same match sending them twice. Held here rather than made per match, so
     /// every run this object hands out shares one ledger (`AchievementLedger`).
@@ -96,7 +103,9 @@ final class OnlinePlay {
         // listener registered while signed out never receives anything, and
         // this is where a turn-based match arrives from.
         if authentication.isAuthenticated {
-            matchmaker.beginListening()
+            matchmaker.beginListening { [weak self] match in
+                self?.handleTurnEvent(match)
+            }
         }
     }
 
@@ -227,6 +236,8 @@ final class OnlinePlay {
             "enabled=\(Self.isEnabled) authenticated=\(authentication.isAuthenticated)"
         )
 
+        onOpenWaiting = onOpen
+        waitingPrefersTeams = teams
         apply(.tapped(isAuthenticated: Self.isEnabled && authentication.isAuthenticated))
         guard startState == .openingMatchmaker else {
             OnlineLog.gaveUp("not signed in, or Game Center disabled in this process")
@@ -316,6 +327,86 @@ final class OnlinePlay {
             OnlineLog.failure("adopt", error)
             apply(.failed(Self.failure(for: error)))
         }
+    }
+
+    /// A match changed at Apple: somebody joined, moved, quit or finished.
+    ///
+    /// **Everything is read from the match the event carried**, never from a
+    /// participant array kept from an earlier one. A cached array is exactly
+    /// how a table that has filled up still looks half empty.
+    ///
+    /// This is what makes `waitingForPlayers` a step rather than a dead end:
+    /// the second player joining is a turn event for a match Keezly is already
+    /// waiting on, and it is this method that notices.
+    private func handleTurnEvent(_ gkMatch: GKTurnBasedMatch) {
+        let filled = gkMatch.participants.compactMap(\.player).count
+        let total = gkMatch.participants.count
+        OnlineLog.participants(filled: filled, of: total)
+
+        // The lobby is refreshed whatever the event was, so a row's state is
+        // never older than the last thing Game Center said.
+        Task { await refresh() }
+
+        guard case .waitingForPlayers = startState else { return }
+        apply(.matchArrived(filled: filled, of: total))
+        guard case .loadingMatch = startState else {
+            OnlineLog.step(.matchReceived, "still waiting: \(filled) of \(total)")
+            return
+        }
+
+        OnlineLog.step(.matchReceived, "table filled: \(filled) of \(total)")
+        Task { await openWhenFull(gkMatch) }
+    }
+
+    /// Deals a match that has just filled up, and opens it.
+    ///
+    /// Only the participant whose turn it is deals. That is not a tie-break
+    /// invented here — it is GameKit's own rule about who may write the match
+    /// data, and it means exactly one device deals however many join at once.
+    private func openWhenFull(_ gkMatch: GKTurnBasedMatch) async {
+        guard let client, let onOpenWaiting else { return }
+        let me = GKLocalPlayer.local.gamePlayerID
+
+        do {
+            if let data = gkMatch.matchData, !data.isEmpty {
+                // Somebody already dealt. Take their board, do not make one.
+                let existing = try await client.load(matchID: OnlineMatchEnvelope.load(data).matchID)
+                let run = try run(existing, client: client)
+                apply(.matchOpened)
+                onOpenWaiting(run)
+                return
+            }
+
+            guard gkMatch.currentParticipant?.player?.gamePlayerID == me else {
+                // Not ours to deal. The dealer will end their turn to us and
+                // that arrives as another event.
+                OnlineLog.step(.matchReceived, "full, waiting for the dealer")
+                apply(.matchArrived(filled: 1, of: gkMatch.participants.count))
+                return
+            }
+
+            let players = gkMatch.participants.compactMap { $0.player?.gamePlayerID }
+            let configuration = GameConfiguration(
+                seatCount: players.count,
+                teamMode: TableConfiguration.allowsTeams(seatCount: players.count) && waitingPrefersTeams
+                    ? .teamsOfTwo
+                    : .freeForAll
+            )
+            let match = try await client.create(
+                configuration: configuration,
+                seed: SeededGenerator.systemSeeded().state,
+                participants: try ParticipantMapping(seatOrder: players)
+            )
+            OnlineLog.step(.matchCreated, "seats=\(configuration.seatCount)")
+            let run = try run(match, client: client)
+            OnlineLog.step(.runOpened)
+            apply(.matchOpened)
+            onOpenWaiting(run)
+        } catch {
+            OnlineLog.failure("openWhenFull", error)
+            apply(.failed(Self.failure(for: error)))
+        }
+        await refresh()
     }
 
     /// Records that opening an existing match went wrong, so the screen can
