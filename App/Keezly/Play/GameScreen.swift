@@ -291,6 +291,20 @@ struct GameScreen: View {
             // is describing a board that no longer exists, so it closes rather
             // than offering moves nobody can make.
             showsActionList = false
+
+            // A position can arrive with **no events to animate**. Every online
+            // move does: `MatchSession.adopt` takes the whole position from
+            // Game Center and clears `pendingEvents`, because the events that
+            // produced it happened on another device — or, for this player's
+            // own move, inside the transport rather than in this session.
+            //
+            // The hand is drawn from the state and so updates immediately; the
+            // pawns are the presenter's, and it had been told nothing. The
+            // result was a card that vanished while its piece stayed exactly
+            // where it was, in every online match, for both players.
+            if session.pendingEvents.isEmpty {
+                presenter.snap(to: session.state.pawns)
+            }
         }
     }
 

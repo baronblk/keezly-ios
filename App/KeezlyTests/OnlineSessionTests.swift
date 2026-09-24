@@ -110,6 +110,56 @@ struct OnlineSessionTests {
         #expect(session.isBusy == false, "adopting must not leave the board locked")
     }
 
+    // MARK: - A position that arrives with nothing to animate
+
+    /// The defect a player saw on hardware: a card chosen, the card gone from
+    /// the hand, and the piece still sitting where it was — neither moved nor
+    /// brought out.
+    ///
+    /// `adopt` takes the whole position from Game Center and clears
+    /// `pendingEvents`, because the events that produced it happened on another
+    /// device — or, for this player's own move, inside the transport rather
+    /// than in this session. So **every** online move updates the state with no
+    /// events attached.
+    ///
+    /// The hand is drawn from the state and updates at once. The pawns belong
+    /// to the presenter, which is driven by events, and it was told nothing.
+    /// This pins the two halves of that: the state really does move, and it
+    /// really does move without events, so anything drawing pawns must take
+    /// them from the state rather than wait to be animated.
+    @Test("an adopted position changes the board and carries no events")
+    func adoptedPositionHasNoEventsToAnimate() throws {
+        var match = try OnlineMatch(
+            configuration: configuration(4),
+            seed: 2026,
+            participants: mapping(["a", "b", "c", "d"]),
+            matchID: "m"
+        )
+        let mine = match.state.currentSeat
+        let session = MatchSession(online: match, mySeat: mine)
+        let pawnsBefore = session.state.pawns
+        let revisionBefore = session.state.revision
+
+        let legal = MoveGenerator.legalMoves(in: match.state, for: match.state.currentSeat)
+        let action: PlayerAction = legal.first.map { .play($0) } ?? .foldHand(seat: match.state.currentSeat)
+        let mover = try #require(match.participants.participant(at: mine))
+        _ = match.apply(OnlineMove(expectedRevision: match.revision, action: action), from: mover)
+
+        session.adopt(match)
+
+        #expect(session.state.revision != revisionBefore, "the position did not move at all")
+        #expect(
+            session.pendingEvents.isEmpty,
+            "an adopted position must carry no events — the board cannot rely on them"
+        )
+        if legal.first != nil {
+            #expect(
+                session.state.pawns != pawnsBefore,
+                "a played move left every piece exactly where it was"
+            )
+        }
+    }
+
     // MARK: - The run, over a real transport
 
     /// One transport, one client per participant — two genuine devices that
