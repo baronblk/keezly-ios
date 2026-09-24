@@ -22,7 +22,13 @@ final class OnlineMatchRun {
     private let client: OnlineMatchClient
     private let me: String
 
-    init(match: OnlineMatch, client: OnlineMatchClient, me: String) throws {
+    init(
+        match: OnlineMatch,
+        client: OnlineMatchClient,
+        me: String,
+        achievements: (any AchievementReporting)? = nil,
+        ledger: (any AchievementLedger)? = nil
+    ) throws {
         guard let seat = match.participants.seat(of: me) else {
             throw MatchTransportError.notAParticipant(match.matchID)
         }
@@ -30,7 +36,16 @@ final class OnlineMatchRun {
         self.client = client
         self.me = me
         mySeat = seat
-        session = MatchSession(online: match, mySeat: seat)
+        session = MatchSession(
+            online: match,
+            mySeat: seat,
+            achievements: achievements,
+            ledger: ledger
+        )
+        // A match can be over before this device ever opens it — the opponent
+        // played the winning move while the app was closed. Reporting only on
+        // a later change would then report nothing at all.
+        session.reportAchievementsIfFinished()
     }
 
     var matchID: String { match.matchID }
@@ -104,6 +119,9 @@ final class OnlineMatchRun {
 
     private func adopt(_ latest: OnlineMatch) {
         match = latest
+        // `adopt` reports what the match earned, if it has just become
+        // knowable and has not been reported before. It is safe to reach here
+        // on every refresh: the ledger decides, not the call site.
         session.adopt(latest)
     }
 

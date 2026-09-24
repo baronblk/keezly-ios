@@ -119,6 +119,13 @@ final class MatchSession {
     /// Where earned achievements go. Injected so a test session reports into
     /// nothing at all rather than into Apple.
     let achievements: (any AchievementReporting)?
+    /// Identifies this match for `ledger`. Set only for an online match,
+    /// because only an online match can arrive already finished and be handed
+    /// to this device again afterwards — see `AchievementLedger`.
+    private let ledgerKey: String?
+    /// What stops an online match reporting twice. `nil` for a local match,
+    /// which reports on the edge where it finishes and cannot repeat.
+    private let ledger: (any AchievementLedger)?
     /// What the last save did, if it failed. Surfaced rather than swallowed: a
     /// match that is quietly not being saved is worse than one that says so.
     private(set) var saveFailure: String?
@@ -165,6 +172,8 @@ final class MatchSession {
         self.budget = budget
         self.store = store
         self.achievements = achievements
+        ledgerKey = nil
+        ledger = nil
 
         for (index, role) in roles.enumerated() {
             guard case .computer(let difficulty) = role else { continue }
@@ -194,6 +203,8 @@ final class MatchSession {
         self.budget = budget
         self.store = store
         self.achievements = achievements
+        ledgerKey = nil
+        ledger = nil
         // Taken from the restored position, not left at its default. A match
         // that was already won would otherwise come back reporting no result,
         // and the screen would offer moves in a finished game.
@@ -220,14 +231,20 @@ final class MatchSession {
     /// No store: the match is kept by Game Center, and persisting it locally as
     /// well would give two copies that can disagree.
     ///
-    /// No achievements either — and that one is an **omission, not a rule**.
-    /// An online seat belongs to exactly one Game Center account, so the
-    /// attribution problem that stops pass & play from reporting does not
-    /// exist here: `mySeat` *is* `GKLocalPlayer.local`. Nothing reports it
-    /// because nothing was ever written to; `OnlineMatchRun` has no
-    /// achievement code in it. Whether 1.0.0 wires this up is the owner's
-    /// call — see `GAME_CENTER_ACHIEVEMENTS_ONLINE.md`.
-    init(online match: OnlineMatch, mySeat: Seat) {
+    /// Achievements **are** reported, and only ever for `mySeat`. An online
+    /// seat belongs to exactly one Game Center account — `mySeat` *is*
+    /// `GKLocalPlayer.local` — so the attribution problem that stops pass &
+    /// play from reporting does not arise here. What does arise is repetition,
+    /// because an online match can be handed to this device again after it is
+    /// already over; `ledger` is what makes that report once and only once.
+    /// Nothing here can report for an opponent: every other seat is `.remote`,
+    /// `localSeat` is `mySeat`, and the evaluator is only ever asked about it.
+    init(
+        online match: OnlineMatch,
+        mySeat: Seat,
+        achievements: (any AchievementReporting)? = nil,
+        ledger: (any AchievementLedger)? = nil
+    ) {
         state = match.state
         record = match.record
         roles = (0..<match.state.configuration.seatCount).map {
@@ -235,7 +252,9 @@ final class MatchSession {
         }
         budget = .interactive
         store = nil
-        achievements = nil
+        self.achievements = achievements
+        ledgerKey = match.matchID
+        self.ledger = ledger
         result = match.state.result
     }
 
@@ -251,6 +270,39 @@ final class MatchSession {
         pendingEvents = []
         isBusy = false
         result = match.state.result
+        reportAchievementsIfFinished()
+    }
+
+    /// Reports what this match earned the local player — at most once, ever.
+    ///
+    /// **Level-triggered, not edge-triggered**, and that is the whole point.
+    /// `noteResult` works for a local match because this device watches it
+    /// finish, so there is a single moment to catch. An online match has no
+    /// such moment here: the winning move may be the opponent's, played while
+    /// the app was closed, so the first this device sees of it is a position
+    /// that is already over — and it will see that same position again on
+    /// every refresh, every foreground, and every time the screen is reopened.
+    /// Asking "did it just finish?" would report nothing at all; asking "is it
+    /// finished?" would report on every single one of those. So it asks "is it
+    /// finished, and has it been accounted for?", and the ledger outlives the
+    /// process so a resume tomorrow is covered too.
+    ///
+    /// Only `mySeat` is ever asked about, so an opponent's achievements cannot
+    /// be reported from here even in principle — `achievementsEarned` goes
+    /// through `localSeat`, which for an online session is the seat this
+    /// device plays and nothing else.
+    ///
+    /// A match is marked accounted for whether or not it earned anything, so
+    /// the replay is not repeated for a finished match that earned nothing.
+    func reportAchievementsIfFinished() {
+        guard result != nil, let achievements, let ledgerKey, let ledger else { return }
+        guard !ledger.hasAccountedFor(matchID: ledgerKey) else { return }
+
+        let earned = achievementsEarned
+        if !earned.isEmpty {
+            achievements.report(earned)
+        }
+        ledger.markAccountedFor(matchID: ledgerKey)
     }
 
     deinit {

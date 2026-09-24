@@ -38,6 +38,11 @@ final class OnlinePlay {
     private(set) var failure: String?
 
     private let transport = GameCenterTransport()
+    /// Where a finished online match's achievements go, and what stops the
+    /// same match sending them twice. Held here rather than made per match, so
+    /// every run this object hands out shares one ledger (`AchievementLedger`).
+    private let achievements: any AchievementReporting = GameCenterAchievements()
+    private let ledger: any AchievementLedger = StoredAchievementLedger()
 
     /// Whether this process may talk to Game Center at all.
     ///
@@ -172,7 +177,7 @@ final class OnlinePlay {
             seed: SeededGenerator.systemSeeded().state,
             participants: mapping
         )
-        return try OnlineMatchRun(match: match, client: client, me: client.participantID)
+        return try run(match, client: client)
     }
 
     func open(_ matchID: String) async throws -> OnlineMatchRun {
@@ -180,7 +185,20 @@ final class OnlinePlay {
             throw MatchTransportError.unavailable(reason: "not signed in")
         }
         let match = try await client.load(matchID: matchID)
-        return try OnlineMatchRun(match: match, client: client, me: client.participantID)
+        return try run(match, client: client)
+    }
+
+    /// The one place a run is built, so no path can be the one that forgets
+    /// the reporter. That is exactly how the achievements came to be
+    /// registered with Apple and never reported by anything.
+    private func run(_ match: OnlineMatch, client: OnlineMatchClient) throws -> OnlineMatchRun {
+        try OnlineMatchRun(
+            match: match,
+            client: client,
+            me: client.participantID,
+            achievements: achievements,
+            ledger: ledger
+        )
     }
 
     // MARK: - Words a player can act on

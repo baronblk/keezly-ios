@@ -11,6 +11,7 @@
 		05E2F7C4D915B34F8A21C6FF /* PassAndPlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */; };
 		092103484C74A862ECF89DF8 /* SuitGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E264E59919E60235F368F7F /* SuitGlyph.swift */; };
 		0D42AB3C68EDCF2430E1B48F /* StatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052D5C9C5F1E54A61C3BAB63 /* StatisticsTests.swift */; };
+		102D70EF6F205F95D69A481F /* AchievementLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B7FAE2EB5021E3B2B3F945 /* AchievementLedger.swift */; };
 		10D756531C32278F94994858 /* LessonBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462E6E6659DFE1B4E4611356 /* LessonBanner.swift */; };
 		11DFF6DA5BE0707CCDDC600D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ED8C1FD416E628043CC4D29 /* Assets.xcassets */; };
 		180EEED18A6C25123E43D24B /* CardFaceArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7A5D5762F62794C05527AF /* CardFaceArt.swift */; };
@@ -82,6 +83,7 @@
 		A6311AA31DCD1EC05D2B76A2 /* HandoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32529E7548CA1EFE9A4F729 /* HandoverView.swift */; };
 		A69D0995449BC4529D343D80 /* fold.caf in Resources */ = {isa = PBXBuildFile; fileRef = C5D5AEB8CA77D50A683BE5DD /* fold.caf */; };
 		A8F0BBF17EF0051B92A6F024 /* capture.caf in Resources */ = {isa = PBXBuildFile; fileRef = 71AC79E7E5ACF55DEC8B2C58 /* capture.caf */; };
+		AA2D75D3E342AA2F876BB082 /* OnlineAchievementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB1D06BD8D7AC60B4BE4DB8 /* OnlineAchievementTests.swift */; };
 		AA8C0EC4A91FB60B682CE35C /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EB92D3C1A47B55D665EE1FA /* MatchStore.swift */; };
 		AC8ECB0933F0C0B7913ACBEA /* TutorialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D5D72CE51529D58EA3C0DA /* TutorialTests.swift */; };
 		B2801BC0A5360759083EB63B /* BoardSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B211B18BA3B7B8B1C675010 /* BoardSurface.swift */; };
@@ -166,6 +168,7 @@
 		4F0F80DAAFFF9A71C6AC7E01 /* TableConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableConfiguration.swift; sourceTree = "<group>"; };
 		50068513035E4EC8DF323F50 /* BoardLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardLayoutTests.swift; sourceTree = "<group>"; };
 		55B365FCC4C12EE4BFF03008 /* StatisticsSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSummaryView.swift; sourceTree = "<group>"; };
+		55B7FAE2EB5021E3B2B3F945 /* AchievementLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementLedger.swift; sourceTree = "<group>"; };
 		55F880978D3865E445AA5593 /* BoardPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardPresenterTests.swift; sourceTree = "<group>"; };
 		5983C639D9EC2271A596DDFB /* DesignReviewScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignReviewScreenshots.swift; sourceTree = "<group>"; };
 		5E5674013E95C6D4890ADEAF /* GameCenterTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterTransport.swift; sourceTree = "<group>"; };
@@ -236,6 +239,7 @@
 		F9A8EFD5BD552AFCE3729032 /* PlayLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayLayout.swift; sourceTree = "<group>"; };
 		FA0BF630CB2278771597A67A /* MatchEndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEndView.swift; sourceTree = "<group>"; };
 		FA23A677A8717CF8A82512AC /* OnlineMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineMenuView.swift; sourceTree = "<group>"; };
+		FAB1D06BD8D7AC60B4BE4DB8 /* OnlineAchievementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineAchievementTests.swift; sourceTree = "<group>"; };
 		FBC05E907B3387D5470BB34B /* HintTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintTests.swift; sourceTree = "<group>"; };
 		FBCE9A9C10EA05F48B573935 /* AchievementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementTests.swift; sourceTree = "<group>"; };
 		FC827455EB8D646619E6A9E2 /* KeezlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeezlyTheme.swift; sourceTree = "<group>"; };
@@ -400,6 +404,7 @@
 		8FC222912D478002951C1887 /* Session */ = {
 			isa = PBXGroup;
 			children = (
+				55B7FAE2EB5021E3B2B3F945 /* AchievementLedger.swift */,
 				EBF95D494649C4F6D223A28C /* MatchSession.swift */,
 				2F5615D1F3AA72616536C39E /* ScreenshotMode.swift */,
 			);
@@ -547,6 +552,7 @@
 				C15557F885BA9C8BC751B2EA /* MatchFixtureTests.swift */,
 				0E189E9D5DA48881EBDBA4D2 /* MatchStoreTests.swift */,
 				317A24C86F2312B7C966802F /* MoveNarratorTests.swift */,
+				FAB1D06BD8D7AC60B4BE4DB8 /* OnlineAchievementTests.swift */,
 				2292716D33DCCC14ECF348C3 /* OnlineConfigurationTests.swift */,
 				480C5F8E3DA83579EC2B9343 /* OnlineSessionTests.swift */,
 				8CE1FDE22083E9CD313EE41D /* PlayFocusTests.swift */,
@@ -711,6 +717,7 @@
 				5C7049441C2B4D1E7EB3222D /* MatchFixtureTests.swift in Sources */,
 				9B8409EB605EA2BA02FC6073 /* MatchStoreTests.swift in Sources */,
 				4C65E6C87C4DC459E6205D37 /* MoveNarratorTests.swift in Sources */,
+				AA2D75D3E342AA2F876BB082 /* OnlineAchievementTests.swift in Sources */,
 				78F3673EDFC32178CD587F3F /* OnlineConfigurationTests.swift in Sources */,
 				CF0085147B09B96B0B2F104E /* OnlineSessionTests.swift in Sources */,
 				5843618018A82726BBC6F5FC /* PlayFocusTests.swift in Sources */,
@@ -729,6 +736,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A75C9B66EADAFAE5549AFFF /* Achievement.swift in Sources */,
+				102D70EF6F205F95D69A481F /* AchievementLedger.swift in Sources */,
 				CBA6DA54C8B5C81FC8363A8F /* ActionList.swift in Sources */,
 				385911464D67283C726D556D /* ActionListView.swift in Sources */,
 				299485F2EE880AC138E9FFE9 /* AdaptivePicker.swift in Sources */,
