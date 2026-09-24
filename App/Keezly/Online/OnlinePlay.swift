@@ -222,6 +222,13 @@ final class OnlinePlay {
     var probeSummary: String {
         var parts = ["auth=\(authentication.isAuthenticated)"]
         parts.append("matches=\(matches.count)")
+        // The breakdown, not just the total. Twice now a cleanup has reported
+        // "nothing to clean" against twenty-six matches and the total alone
+        // could not say which assumption was wrong.
+        parts.append("abandoned=\(matches.filter(\.isAbandonedSearch).count)")
+        parts.append("boards=\(matches.filter(\.hasBoard).count)")
+        parts.append("waiting=\(matches.filter(\.isWaitingForPlayers).count)")
+        parts.append("solo=\(matches.filter { $0.filledSeats <= 1 }.count)")
         if let waiting = lastMatchFacts {
             parts.append(waiting)
         }

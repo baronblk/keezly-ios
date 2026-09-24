@@ -47,6 +47,20 @@ struct OnlineMenuView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("common.done") { dismiss() }
                 }
+                // In the toolbar rather than at the foot of the list. Below
+                // twenty-six rows it was not merely hard to reach: a `List` is
+                // lazy, so it had not been built at all and nothing — a player
+                // scrolling, or a test looking — could find it.
+                ToolbarItem(placement: .primaryAction) {
+                    if online.matches.filter(\.isAbandonedSearch).count >= 3 {
+                        Button {
+                            Task { await online.removeOwnAbandonedMatches() }
+                        } label: {
+                            Label("online.cleanup", systemImage: "sparkles")
+                        }
+                        .accessibilityIdentifier("online.cleanup")
+                    }
+                }
             }
         }
         .task { await online.refresh() }
@@ -64,7 +78,6 @@ struct OnlineMenuView: View {
             progressSection
             failureSection
             matchesSection
-            cleanupSection
             if let failure = online.failure {
                 Section { Notice(text: failure) }
             }
@@ -187,29 +200,6 @@ struct OnlineMenuView: View {
         }
     }
 
-    /// A way to be rid of searches that never found anybody.
-    ///
-    /// Shown only when there are several, because one waiting search is
-    /// ordinary and a button about it would be noise. Twenty-five is not
-    /// ordinary — that is what the old start path left behind, a match per
-    /// tap, none of them ever cleaned up.
-    @ViewBuilder
-    private var cleanupSection: some View {
-        let abandoned = online.matches.filter(\.isAbandonedSearch)
-        if abandoned.count >= 3 {
-            Section {
-                Button {
-                    Task { await online.removeOwnAbandonedMatches() }
-                } label: {
-                    Label("online.cleanup", systemImage: "sparkles")
-                }
-                .accessibilityIdentifier("online.cleanup")
-            } footer: {
-                Text("online.cleanup.explain")
-            }
-        }
-    }
-
     /// Keezly's own list, grouped by what it wants from the player.
     ///
     /// Replaces showing Apple's raw matchmaker list as the online screen. That
@@ -250,6 +240,7 @@ struct OnlineMenuView: View {
                 } footer: {
                     if section.group == .waitingForPlayers {
                         Text("online.abandon.explain")
+                        Text("online.cleanup.explain")
                     }
                 }
             }
