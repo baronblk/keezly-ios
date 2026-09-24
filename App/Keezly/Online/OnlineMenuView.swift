@@ -96,6 +96,14 @@ struct OnlineMenuView: View {
             do {
                 onOpen(try await online.startMatch(seats: seats, teams: teams))
             } catch {
+                // INSTRUMENTED, NOT YET FIXED. This catch is the reason the
+                // screen shows nothing: `error` is never bound to anything a
+                // player can see, and `refresh()` then sets `online.failure`
+                // back to nil on success — so the one place a message could
+                // appear is actively cleared. The spinner stops and the screen
+                // is identical to before the tap.
+                OnlineLog.failure("startMatch", error)
+                OnlineLog.gaveUp("catch in OnlineMenuView.start discarded the error")
                 await online.refresh()
             }
         }

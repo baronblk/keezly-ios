@@ -148,7 +148,12 @@ final class OnlinePlay {
     /// is the only order every device agrees on — deriving it from anything
     /// local would give two devices two different boards (§28).
     func startMatch(seats: Int, teams: Bool) async throws -> OnlineMatchRun {
+        OnlineLog.step(.startTapped)
+        OnlineLog.table(seats: seats, teams: teams)
+        OnlineLog.step(.authenticationChecked,
+                       "enabled=\(Self.isEnabled) authenticated=\(authentication.isAuthenticated)")
         guard Self.isEnabled, let client else {
+            OnlineLog.gaveUp("not signed in, or Game Center disabled in this process")
             throw MatchTransportError.unavailable(reason: "not signed in")
         }
         isWorking = true
@@ -177,7 +182,10 @@ final class OnlinePlay {
             seed: SeededGenerator.systemSeeded().state,
             participants: mapping
         )
-        return try run(match, client: client)
+        OnlineLog.step(.matchCreated, "seats=\(configuration.seatCount)")
+        let opened = try run(match, client: client)
+        OnlineLog.step(.runOpened)
+        return opened
     }
 
     func open(_ matchID: String) async throws -> OnlineMatchRun {

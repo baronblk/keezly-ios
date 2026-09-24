@@ -39,14 +39,26 @@ struct GameCenterTransport: MatchTransport {
         request.minPlayers = seats
         request.maxPlayers = seats
         request.defaultNumberOfPlayers = seats
+        OnlineLog.step(.requestBuilt, "min=\(seats) max=\(seats)")
 
-        let match = try await GKTurnBasedMatch.find(for: request)
+        let match: GKTurnBasedMatch
+        do {
+            match = try await GKTurnBasedMatch.find(for: request)
+        } catch {
+            OnlineLog.failure("GKTurnBasedMatch.find", error)
+            throw error
+        }
+        OnlineLog.step(.matchReceived, "status=\(match.status.rawValue)")
+
         let players = match.participants.compactMap { $0.player?.gamePlayerID }
+        OnlineLog.participants(filled: players.count, of: match.participants.count)
         guard players.count == seats else {
+            OnlineLog.gaveUp("only \(players.count) of \(seats) seats have a player")
             throw MatchTransportError.unavailable(
                 reason: String(localized: "online.error.waitingForPlayers")
             )
         }
+        OnlineLog.step(.participantsResolved)
         return players
     }
 
