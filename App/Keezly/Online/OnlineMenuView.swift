@@ -318,22 +318,37 @@ private struct MatchRow: View {
 }
 
 private struct TableSeatsRow: View {
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Binding var seats: Int
     @Binding var teams: Bool
 
     var body: some View {
-        Picker(selection: $seats) {
-            ForEach(TableConfiguration.seatCounts, id: \.self) { count in
-                Text("online.seats \(count)").tag(count)
+        // The same control the local table uses, rather than a second kind of
+        // seat picker. It was a plain menu picker here, which looked different
+        // from the menu for no reason and — on a phone — opened a popup whose
+        // options could not be reached at all.
+        VStack(alignment: .leading, spacing: 4) {
+            Text("table.players").font(.footnote).foregroundStyle(.secondary)
+            Picker("table.players", selection: $seats) {
+                ForEach(TableConfiguration.seatCounts, id: \.self) { count in
+                    Text(verbatim: "\(count)").tag(count)
+                }
             }
-        } label: {
-            Text("table.seats")
+            .tableFieldPicker(accessibilitySize: typeSize.isAccessibilitySize)
+            .accessibilityIdentifier("online.seats")
         }
-        .accessibilityIdentifier("online.seats")
 
         // Dieselbe Regel wie am lokalen Tisch, nicht eine zweite davon.
         if TableConfiguration.allowsTeams(seatCount: seats) {
-            Toggle(isOn: $teams) { Text("table.sides.teams") }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("table.sides").font(.footnote).foregroundStyle(.secondary)
+                Picker("table.sides", selection: $teams) {
+                    Text("table.sides.teams").tag(true)
+                    Text("table.sides.free").tag(false)
+                }
+                .tableFieldPicker(accessibilitySize: typeSize.isAccessibilitySize)
+                .accessibilityIdentifier("online.sides")
+            }
         }
     }
 }

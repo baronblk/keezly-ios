@@ -37,10 +37,19 @@ final class QuickMatchPhysicalTests: XCTestCase {
     @MainActor
     private func launched() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = [
-            "-KEEZLY_UI_TESTING",
-            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
-        ]
+        // **No `-KEEZLY_UI_TESTING`.** That flag sets `ScreenshotMode.isActive`,
+        // which boots the app into a deterministic capture match instead of
+        // the menu *and* switches Game Center off — so passing it made this
+        // suite test a board it had not asked for, with the one service it
+        // exists to reach disabled. It was copied from the other UI tests
+        // without checking what it does.
+        //
+        // **No `-KEEZLY_NO_GAME_CENTER` either**, for the same reason in
+        // reverse: it is the half of `isRunningTests` that works for UI tests,
+        // and it is what every other suite uses to stay away from Apple.
+        //
+        // So: the real menu, the real Game Center, and a clean device.
+        app.launchArguments = ["-KEEZLY_UI_TEST_RESET_STATE", "YES"]
         app.launch()
         return app
     }
@@ -132,12 +141,19 @@ final class QuickMatchPhysicalTests: XCTestCase {
             XCTFail("the seat picker never appeared")
             return
         }
-        picker.tap()
-        // The picker presents its options; pick the one for this many seats.
-        let option = app.buttons.containing(
-            NSPredicate(format: "label CONTAINS %@", String(seats))
-        ).firstMatch
-        if option.waitForExistence(timeout: 5) { option.tap() }
+        // A segmented control, exactly like the local table's — so the option
+        // is a button that can be tapped directly. Tapping the picker first
+        // and hunting the popup is what failed on the phone: the option
+        // existed and could not be scrolled to.
+        let option = picker.buttons[String(seats)]
+        guard option.waitForExistence(timeout: 5) else {
+            XCTFail("no option for \(seats) seats in the picker")
+            return
+        }
+        option.tap()
+        // Asserted rather than hoped: silently leaving the default selected
+        // would have this test quietly measure a different table size.
+        XCTAssertTrue(option.isSelected, "the picker did not move to \(seats) seats")
     }
 
     // MARK: - The path the owner reported as broken
