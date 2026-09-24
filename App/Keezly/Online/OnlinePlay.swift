@@ -612,11 +612,66 @@ final class OnlinePlay {
         apply(.failed(.couldNotLoad))
     }
 
+    /// Opens a match from the lobby.
+    ///
+    /// A full table with no board is dealt here rather than refused. Those
+    /// exist: the device inventory holds one with three of three seats taken
+    /// and an empty payload, left from before a second player joining was
+    /// noticed at all. Without this they can never be opened — `load` wants a
+    /// payload that was never written — so a match everybody joined stays
+    /// unplayable for good.
     func open(_ matchID: String) async throws -> OnlineMatchRun {
         guard Self.isEnabled, let client else {
             throw MatchTransportError.unavailable(reason: "not signed in")
         }
+
+        if let undealt = try await fullButUndealtMatch(matchID) {
+            return try await deal(undealt, client: client)
+        }
+
         let match = try await client.load(matchID: matchID)
+        Self.logBoard(role: "opened", match)
+        return try run(match, client: client)
+    }
+
+    /// The Game Center match behind this id, when it is full and has no board.
+    private func fullButUndealtMatch(_ matchID: String) async throws -> GKTurnBasedMatch? {
+        let all: [GKTurnBasedMatch] = try await GKTurnBasedMatch.loadMatches()
+        return all.first { gk in
+            guard gk.matchID == matchID, gk.matchData?.isEmpty ?? true else { return false }
+            return gk.participants.compactMap(\.player).count == gk.participants.count
+        }
+    }
+
+    /// Deals a table that filled without anybody dealing it.
+    ///
+    /// Only the participant whose turn it is may write, which is GameKit's own
+    /// rule and means exactly one device deals however many open it at once.
+    private func deal(
+        _ gkMatch: GKTurnBasedMatch,
+        client: OnlineMatchClient
+    ) async throws -> OnlineMatchRun {
+        let players = gkMatch.participants.compactMap { $0.player?.gamePlayerID }
+        guard gkMatch.currentParticipant?.player?.gamePlayerID == GKLocalPlayer.local.gamePlayerID else {
+            OnlineLog.gaveUp("full but not ours to deal")
+            throw MatchTransportError.unavailable(
+                reason: String(localized: "online.error.waitingForPlayers")
+            )
+        }
+
+        let configuration = GameConfiguration(
+            seatCount: players.count,
+            teamMode: TableConfiguration.allowsTeams(seatCount: players.count) && waitingPrefersTeams
+                ? .teamsOfTwo
+                : .freeForAll
+        )
+        let match = try await client.create(
+            configuration: configuration,
+            seed: SeededGenerator.systemSeeded().state,
+            participants: try ParticipantMapping(seatOrder: players)
+        )
+        OnlineLog.step(.matchCreated, "dealt on open, seats=\(configuration.seatCount)")
+        Self.logBoard(role: "dealt", match)
         return try run(match, client: client)
     }
 
