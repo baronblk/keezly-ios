@@ -77,6 +77,78 @@ Open work that is not a defect belongs in `ROADMAP.md`, not here (§141).
   `App/Keezly/Replay/ReplayScreen.swift`
 - **Related tests:** `InnerFieldTests`
 
+### ISS-023 — „Neue Onlinepartie": Spinner, dann nichts — BEHOBEN
+
+- **Status:** BEHOBEN im Code, **auf Hardware noch nicht bestätigt**
+- **Schwere:** P0 / Release-Blocker. Von der Geräte-QA an TestFlight 1.0.0 (42)
+  gefunden
+- **Komponente:** `App/Keezly/Online/OnlineMenuView.swift`,
+  `App/Keezly/Online/GameCenterTransport.swift`
+
+#### Beobachtung
+
+Online öffnen → Tisch konfigurieren (2 oder 3 Spieler) → „Neue Onlinepartie" →
+Spinner ca. 2 Sekunden → **nichts**. Kein Absturz, kein Matchmaker, keine
+Einladung, kein Match, keine Navigation, **keine Fehlermeldung**.
+
+#### Zwei Defekte, ein Symptom
+
+**1. Der Fehler wurde weggeworfen.**
+
+```swift
+catch {
+    await online.refresh()      // `error` wird nie gebunden
+}
+```
+
+`refresh()` setzt bei Erfolg `online.failure = nil` — der Block **löscht** also
+genau das Feld, in dem eine Meldung erscheinen könnte. `defer` beendet den
+Spinner. Der Bildschirm ist danach identisch mit vorher.
+
+**2. `GKTurnBasedMatch.find` konnte die Prüfung nie erfüllen.**
+
+```swift
+let match = try await GKTurnBasedMatch.find(for: request)
+let players = match.participants.compactMap { $0.player?.gamePlayerID }
+guard players.count == seats else { throw … }
+```
+
+`find` ist kopfloses Automatch: Es zeigt nichts an, kann niemanden einladen und
+liefert eine Partie zurück, deren unbesetzte Plätze `player == nil` haben.
+`players.count` ist also 1 statt `seats`, und der `guard` schlägt **jedes Mal**
+fehl — deterministisch, nicht sporadisch. Genau deshalb trat es bei 2 und bei 3
+Spielern gleichermaßen auf.
+
+Bemerkenswert: Der Doc-Kommentar über `matchmake` beschrieb diese Einschränkung
+bereits wörtlich. Sie war bekannt und aufgeschrieben — gemeldet wurde sie über
+den Fehler, den der `catch` verwarf, also nie.
+
+#### Behebung
+
+| | |
+|---|---|
+| Matchmaker | `GKTurnBasedMatchmakerViewController` statt `find` — echte Game-Center-UI, Einladungen und Automatch |
+| Zustellung | `GKLocalPlayerListener.player(_:receivedTurnEventFor:didBecomeActive:)`, der tatsächliche Zustellpunkt im heutigen GameKit |
+| Delegate-Lebensdauer | Coordinator wird von `OnlinePlay` für die Sitzung gehalten, nicht am Verwendungsort erzeugt |
+| Halb besetzte Partie | **Zustand `waitingForPlayers`, kein Fehler** — die Partie existiert, steht in der Liste und öffnet sich selbst, sobald jemand beitritt |
+| Zustände | idle / authenticating / openingMatchmaker / matchmaking / waitingForPlayers / loadingMatch / failed, jeder mit eigenem Satz |
+| Fehlerbilder | sieben benannte Fälle mit Text, „Erneut versuchen" nur dort, wo es helfen kann |
+
+`OnlineStartFlowTests`, 18 Tests, prüft die Fälle, die auf einem Gerät am
+schwersten zu erreichen sind: ein Abbruch, der **nach** der Partie eintrifft;
+ein halb besetzter Tisch bei jeder Sitzzahl 2–6; ein später Fehlschlag.
+
+#### Was noch aussteht
+
+**Auf echter Hardware ist der Fix nicht bestätigt.** Die Diagnose stammt aus
+dem Quelltext und aus Apples API-Vertrag; Defekt 1 ist damit bewiesen (der
+`catch` sagt es selbst), Defekt 2 ist aus dem dokumentierten Verhalten von
+`find` abgeleitet und **nicht** an einem Gerätelog gemessen. Dafür wurde
+`OnlineLog` ergänzt — die App hatte vorher **überhaupt keine Protokollierung**,
+weshalb der Fehler von außen unerklärlich war.
+
+---
+
 ### ISS-021 — Onlinepartie stürzte bei ungerader Sitzzahl ab — BEHOBEN
 
 - **Status:** GESCHLOSSEN, 2026-09-23. Ursache bewiesen, behoben, durch Tests
