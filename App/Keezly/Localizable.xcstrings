@@ -2992,6 +2992,52 @@
         }
       }
     },
+    "online.abandon": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandon"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwerfen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weggooien"
+          }
+        }
+      }
+    },
+    "online.abandon.explain": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matches still looking for players can be abandoned. One somebody has already joined cannot — leaving it would forfeit the game."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partien, die noch Mitspieler suchen, kannst du verwerfen. Eine, der schon jemand beigetreten ist, nicht — sie zu verlassen wäre eine Aufgabe."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partijen die nog spelers zoeken kun je weggooien. Een partij waar al iemand aan meedoet niet — die verlaten zou opgeven zijn."
+          }
+        }
+      }
+    },
     "online.authenticating": {
       "extractionState": "manual",
       "localizations": {

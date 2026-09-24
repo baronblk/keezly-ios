@@ -99,6 +99,39 @@ enum OnlineLog {
         echo("\(label) FAILED domain=\(ns.domain) code=\(ns.code) type=\(type(of: error))")
     }
 
+    /// One existing match, in the only terms worth logging about it.
+    ///
+    /// A value rather than eight loose parameters, because the shape of a
+    /// match is a thing and naming it is cheaper than repeating it.
+    struct MatchFacts: Sendable {
+        let index: Int
+        /// Apple's own opaque handle. Included because two otherwise identical
+        /// rows cannot be told apart without it, and it says nothing about a
+        /// person.
+        let matchID: String
+        let status: String
+        let participants: Int
+        let filled: Int
+        let isMyTurn: Bool
+        let created: Date
+        let payloadBytes: Int
+    }
+
+    /// One line per existing match, for taking stock of what has accumulated.
+    ///
+    /// Used to inventory the orphaned matches the old start path left behind.
+    /// Deliberately shape-only: how many participants, what status, how big the
+    /// payload is. **No display names and no player identifiers** — who
+    /// somebody played against is not a diagnostic.
+    static func inventory(_ facts: MatchFacts) {
+        let stamp = ISO8601DateFormatter().string(from: facts.created)
+        let line = "inventory[\(facts.index)] id=\(facts.matchID) status=\(facts.status) "
+            + "participants=\(facts.filled)/\(facts.participants) myTurn=\(facts.isMyTurn) "
+            + "created=\(stamp) payload=\(facts.payloadBytes)B"
+        log.notice("\(line, privacy: .public)")
+        echo(line)
+    }
+
     /// A path that gave up without an error — the silent exits that hide a
     /// defect, each one named so its absence from the log means something.
     static func gaveUp(_ reason: String) {

@@ -175,9 +175,27 @@ struct OnlineMenuView: View {
                     ForEach(section.matches) { match in
                         Button { open(match) } label: { MatchRow(match: match) }
                             .accessibilityIdentifier("online.match.\(match.id)")
+                            .swipeActions(edge: .trailing) {
+                                // Only where leaving costs nobody a game. A
+                                // match somebody has joined is not tidied away
+                                // from a lobby; walking out of one is a
+                                // forfeit and belongs inside the match.
+                                if match.isWaitingForPlayers, match.filledSeats <= 1 {
+                                    Button(role: .destructive) {
+                                        Task { await online.abandonWaitingMatch(match) }
+                                    } label: {
+                                        Label("online.abandon", systemImage: "trash")
+                                    }
+                                    .accessibilityIdentifier("online.abandon")
+                                }
+                            }
                     }
                 } header: {
                     Text(LocalizedStringKey(section.group.titleKey))
+                } footer: {
+                    if section.group == .waitingForPlayers {
+                        Text("online.abandon.explain")
+                    }
                 }
             }
         }

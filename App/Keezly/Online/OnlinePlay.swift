@@ -146,6 +146,7 @@ final class OnlinePlay {
 
     func refresh() async {
         guard Self.isEnabled, authentication.isAuthenticated else { return }
+        await inventoryMatches()
         isWorking = true
         defer { isWorking = false }
         do {
@@ -202,6 +203,99 @@ final class OnlinePlay {
                 variantName: payload.flatMap { Self.variantName(for: $0) },
                 isTeamMatch: payload?.state.configuration.teamMode == .teamsOfTwo
             )
+        }
+    }
+
+    /// Abandons a match this device is still waiting on.
+    ///
+    /// Exists because the old start path left orphaned matches at Apple with
+    /// no way to be rid of them: eleven of them accumulated on one account,
+    /// invisible to the app and untouchable from it.
+    ///
+    /// **Only matches with nobody else in them.** A match somebody has already
+    /// joined is a game with another person in it, and walking out of one is a
+    /// forfeit — a decision for the player inside the match, not a tidy-up
+    /// button in a lobby. Those are left alone.
+    ///
+    /// What Apple allows depends on the match's state, so both paths are
+    /// taken: an unstarted match is removed outright, and one that has begun
+    /// is quit in turn with a loss for this seat, which is the only honest
+    /// outcome for leaving.
+    func abandonWaitingMatch(_ summary: OnlineMatchSummary) async {
+        guard Self.isEnabled else { return }
+        guard summary.isWaitingForPlayers, summary.filledSeats <= 1 else {
+            OnlineLog.gaveUp("refused to abandon a match with other players in it")
+            return
+        }
+
+        do {
+            let all: [GKTurnBasedMatch] = try await GKTurnBasedMatch.loadMatches()
+            guard let gk = all.first(where: { Self.identifies($0, summary) }) else { return }
+
+            if gk.status == .matching || (gk.matchData?.isEmpty ?? true) {
+                // Never dealt and nobody else in it. Removing leaves nothing
+                // behind for anybody.
+                try await gk.remove()
+                OnlineLog.step(.finished, "abandoned an unstarted match")
+            } else {
+                try await gk.participantQuitOutOfTurn(with: .quit)
+                OnlineLog.step(.finished, "quit a waiting match")
+            }
+            await refresh()
+        } catch {
+            OnlineLog.failure("abandon", error)
+            failure = Self.readable(error)
+        }
+    }
+
+    /// Whether this Game Center match is the one a summary describes.
+    ///
+    /// Matched on the Keezly id when there is a payload, and on Apple's own id
+    /// when there is not — which is exactly the case for the waiting matches
+    /// this is used for.
+    private static func identifies(_ gk: GKTurnBasedMatch, _ summary: OnlineMatchSummary) -> Bool {
+        if gk.matchID == summary.id { return true }
+        guard let data = gk.matchData, !data.isEmpty,
+              let match = try? OnlineMatchEnvelope.load(data) else { return false }
+        return match.matchID == summary.id
+    }
+
+    /// Writes one log line per Game Center match this account holds.
+    ///
+    /// Read-only, and it exists because the old start path left orphaned
+    /// matches at Apple that nothing in the app ever showed. Nothing is
+    /// deleted here and nothing ever will be by this method: leaving somebody
+    /// else's match is a decision, not a tidy-up.
+    func inventoryMatches() async {
+        guard Self.isEnabled else { return }
+        let me = GKLocalPlayer.local.gamePlayerID
+        do {
+            let all: [GKTurnBasedMatch] = try await GKTurnBasedMatch.loadMatches()
+            OnlineLog.step(.openRequested, "inventory of \(all.count) match(es)")
+            for (index, gk) in all.enumerated() {
+                OnlineLog.inventory(OnlineLog.MatchFacts(
+                    index: index,
+                    matchID: gk.matchID ?? "-",
+                    status: Self.describe(gk.status),
+                    participants: gk.participants.count,
+                    filled: gk.participants.compactMap(\.player).count,
+                    isMyTurn: gk.currentParticipant?.player?.gamePlayerID == me,
+                    created: gk.creationDate,
+                    payloadBytes: gk.matchData?.count ?? 0
+                ))
+            }
+        } catch {
+            OnlineLog.failure("inventory", error)
+        }
+    }
+
+    private static func describe(_ status: GKTurnBasedMatch.Status) -> String {
+        switch status {
+        case .open: "open"
+        case .ended: "ended"
+        case .matching: "matching"
+        case .unknown: "unknown"
+        @unknown default: "other"
         }
     }
 
