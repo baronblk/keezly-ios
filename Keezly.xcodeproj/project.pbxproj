@@ -97,6 +97,7 @@
 		B6C8943E27C19AA33EDE733D /* ReplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F37914BB0BDF5A835BB7FABE /* ReplayTests.swift */; };
 		B6E863B159F67DA48FB10504 /* place.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1DE00A9037ECC75C83E639DC /* place.caf */; };
 		BA343CAC76EFC06CEB83B781 /* OnlineStartFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4F6D4FB8F07BA039097255 /* OnlineStartFlowTests.swift */; };
+		BAE42B86A9517A06DB32DFC3 /* QuickMatchPhysicalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653AAD8A98BC071601253E39 /* QuickMatchPhysicalTests.swift */; };
 		BCA2289CB3E8BE37370831E2 /* OnlineMatchRun.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752DDA869A947DCCF40CD13F /* OnlineMatchRun.swift */; };
 		BE8D28189EE7D3062AAF189B /* PlayLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76701703452F573EE999F56F /* PlayLayoutTests.swift */; };
 		C04441E059560F69B6264AA1 /* SavedMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D6D99B9BC3DE3FC0DFFA5E /* SavedMatch.swift */; };
@@ -181,6 +182,7 @@
 		60E312424F2068DAD864AE22 /* Statistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistics.swift; sourceTree = "<group>"; };
 		6181BDD1F1E6EEE9241F2EF0 /* RulebookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulebookView.swift; sourceTree = "<group>"; };
 		637D076800FF212D4D9B7EB1 /* swap.caf */ = {isa = PBXFileReference; path = swap.caf; sourceTree = "<group>"; };
+		653AAD8A98BC071601253E39 /* QuickMatchPhysicalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickMatchPhysicalTests.swift; sourceTree = "<group>"; };
 		66384CC9DC067E8E22E72869 /* OnlineStartFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineStartFlow.swift; sourceTree = "<group>"; };
 		67B2FF7ADE69CBC2559C6D2B /* GameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreen.swift; sourceTree = "<group>"; };
 		68D7C8E98067716788256CDF /* OnlineGameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineGameScreen.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				27C1C6FA4C7ECD6AF5A32B37 /* MenuFlowTests.swift */,
 				F1C1945B61C0337553D9EBF8 /* PassAndPlayTests.swift */,
 				32C34A7B19CE230B87432042 /* PlayFlowTests.swift */,
+				653AAD8A98BC071601253E39 /* QuickMatchPhysicalTests.swift */,
 			);
 			path = KeezlyUITests;
 			sourceTree = "<group>";
@@ -832,6 +835,7 @@
 				1C051D284088FC2535DBECF0 /* MenuFlowTests.swift in Sources */,
 				05E2F7C4D915B34F8A21C6FF /* PassAndPlayTests.swift in Sources */,
 				30E7DB9168705F188C09987B /* PlayFlowTests.swift in Sources */,
+				BAE42B86A9517A06DB32DFC3 /* QuickMatchPhysicalTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

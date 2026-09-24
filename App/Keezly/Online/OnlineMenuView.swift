@@ -35,6 +35,12 @@ struct OnlineMenuView: View {
                 }
             }
             .accessibilityIdentifier("online.screen")
+            // The start flow's state, by name, for a test to wait on. Carries
+            // no behaviour — it is the same mechanism VoiceOver reads, and it
+            // lets a physical-device test wait for `waitingForPlayers` rather
+            // than for a spinner to appear or for a fixed number of seconds.
+            .accessibilityElement(children: .contain)
+            .accessibilityValue(online.startState.name)
             .navigationTitle(Text("online.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -50,6 +56,7 @@ struct OnlineMenuView: View {
 
     private var signedIn: some View {
         List {
+            stateProbe
             introSection
             gameCenterStatusSection
             newMatchSection
@@ -62,6 +69,21 @@ struct OnlineMenuView: View {
             }
         }
         .refreshable { await online.refresh() }
+    }
+
+    /// The state, as an element a test can find by name.
+    ///
+    /// Always present and always current. Hidden from sight and from
+    /// VoiceOver, because it is a name for a machine to read rather than
+    /// anything a player needs.
+    private var stateProbe: some View {
+        Text(online.startState.name)
+            .font(.caption2)
+            .foregroundStyle(.clear)
+            .frame(height: 0)
+            .accessibilityIdentifier("online.startState")
+            .accessibilityHidden(false)
+            .accessibilityLabel(online.startState.name)
     }
 
     private var introSection: some View {

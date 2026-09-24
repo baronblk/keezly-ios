@@ -83,11 +83,7 @@ final class GameCenterMatchmaker: NSObject {
     func present(seats: Int, kind: Kind, onOutcome: @escaping (Outcome) -> Void) {
         self.onOutcome = onOutcome
 
-        let request = GKMatchRequest()
-        request.minPlayers = seats
-        request.maxPlayers = seats
-        request.defaultNumberOfPlayers = seats
-        OnlineLog.step(.requestBuilt, "min=\(seats) max=\(seats) default=\(seats)")
+        let request = Self.makeRequest(seats: seats, kind: kind)
 
         guard kind == .inviteFriends else {
             // Automatch has no interface of its own: Game Center looks in the
@@ -126,6 +122,43 @@ final class GameCenterMatchmaker: NSObject {
         }
     }
 
+    /// The match request, built the same way every time and logged in full.
+    ///
+    /// For **quick match** every matchmaking field is left at its default.
+    /// That is deliberate and load-bearing: Apple only automatches requests
+    /// that agree, and `recipients` in particular switches automatch off for
+    /// the seats it names — a request with recipients invites those players
+    /// instead of filling the table from the queue. Friend invitations and
+    /// automatch therefore cannot share a configuration, and do not.
+    ///
+    /// `playerGroup` and `playerAttributes` stay 0. Keezly has no use for
+    /// them, and a value set on one device but not the other silently prevents
+    /// the two requests from ever meeting.
+    private static func makeRequest(seats: Int, kind: Kind) -> GKMatchRequest {
+        let request = GKMatchRequest()
+        request.minPlayers = seats
+        request.maxPlayers = seats
+        request.defaultNumberOfPlayers = seats
+
+        // Named rather than left implicit, so the log can prove it. GameKit
+        // defaults these to 0/nil already; writing them down is what makes
+        // "both devices sent the same request" checkable instead of assumed.
+        request.playerGroup = 0
+        request.playerAttributes = 0
+        request.recipients = nil
+
+        OnlineLog.request(
+            kind: kind == .quickMatch ? "quickMatch" : "inviteFriends",
+            description: "min=\(request.minPlayers) max=\(request.maxPlayers) "
+                + "default=\(request.defaultNumberOfPlayers) "
+                + "playerGroup=\(request.playerGroup) "
+                + "playerAttributes=\(request.playerAttributes) "
+                + "recipients=\(request.recipients?.count.description ?? "nil") "
+                + "seats=\(seats)"
+        )
+        return request
+    }
+
     /// Automatch, without a screen.
     ///
     /// `GKTurnBasedMatch.find` **creates** a match rather than only looking for
@@ -138,12 +171,32 @@ final class GameCenterMatchmaker: NSObject {
         do {
             let match = try await GKTurnBasedMatch.find(for: request)
             let filled = match.participants.compactMap(\.player).count
-            OnlineLog.step(.matchReceived, "automatch status=\(match.status.rawValue)")
-            OnlineLog.participants(filled: filled, of: match.participants.count)
+            // The match id is what tells "the two devices met" from "each got
+            // its own match". Without it, everything after this is guesswork.
+            OnlineLog.matched(
+                matchID: match.matchID ?? "-",
+                status: Self.describe(match.status),
+                filled: filled,
+                of: match.participants.count,
+                // `find` returns a match the player is *already in* when one
+                // fits, rather than queueing. A match with a payload, or one
+                // created before this search began, was not made for us now.
+                wasExisting: !(match.matchData?.isEmpty ?? true)
+            )
             deliver(.matched(match))
         } catch {
             OnlineLog.failure("automatch", error)
             deliver(.failed(error))
+        }
+    }
+
+    static func describe(_ status: GKTurnBasedMatch.Status) -> String {
+        switch status {
+        case .open: "open"
+        case .ended: "ended"
+        case .matching: "matching"
+        case .unknown: "unknown"
+        @unknown default: "other"
         }
     }
 

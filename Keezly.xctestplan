@@ -1,41 +1,42 @@
 {
-  "configurations" : [
+  "configurations": [
     {
-      "id" : "5B1E1F2A-0000-4000-8000-000000000001",
-      "name" : "Configuration 1",
-      "options" : { }
+      "id": "5B1E1F2A-0000-4000-8000-000000000001",
+      "name": "Configuration 1",
+      "options": {}
     }
   ],
-  "defaultOptions" : {
-    "codeCoverage" : {
-      "targets" : [
+  "defaultOptions": {
+    "codeCoverage": {
+      "targets": [
         {
-          "containerPath" : "container:Keezly.xcodeproj",
-          "identifier" : "Keezly",
-          "name" : "Keezly"
+          "containerPath": "container:Keezly.xcodeproj",
+          "identifier": "Keezly",
+          "name": "Keezly"
         }
       ]
     },
-    "testTimeoutsEnabled" : true
+    "testTimeoutsEnabled": true
   },
-  "testTargets" : [
+  "testTargets": [
     {
-      "target" : {
-        "containerPath" : "container:Keezly.xcodeproj",
-        "identifier" : "KeezlyTests",
-        "name" : "KeezlyTests"
+      "target": {
+        "containerPath": "container:Keezly.xcodeproj",
+        "identifier": "KeezlyTests",
+        "name": "KeezlyTests"
       }
     },
     {
-      "skippedTests" : [
-        "DesignReviewScreenshots"
+      "skippedTests": [
+        "DesignReviewScreenshots",
+        "QuickMatchPhysicalTests"
       ],
-      "target" : {
-        "containerPath" : "container:Keezly.xcodeproj",
-        "identifier" : "KeezlyUITests",
-        "name" : "KeezlyUITests"
+      "target": {
+        "containerPath": "container:Keezly.xcodeproj",
+        "identifier": "KeezlyUITests",
+        "name": "KeezlyUITests"
       }
     }
   ],
-  "version" : 1
+  "version": 1
 }

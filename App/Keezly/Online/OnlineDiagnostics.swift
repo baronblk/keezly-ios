@@ -164,6 +164,32 @@ enum OnlineLog {
         echo(line)
     }
 
+    /// Everything about a match request that could affect whether two
+    /// devices find each other.
+    ///
+    /// Logged in full because "the requests must be identical" is not
+    /// something to assert from reading the code — two devices have to be
+    /// compared line by line. None of it identifies anybody: seat counts and
+    /// matchmaking flags only.
+    static func request(kind: String, description: String) {
+        let line = "request kind=\(kind) \(description)"
+        log.notice("\(line, privacy: .public)")
+        echo(line)
+    }
+
+    /// Which match Game Center actually handed back.
+    ///
+    /// **The single most important line for automatch.** If two devices
+    /// searching at the same time report different match ids, they were never
+    /// matched with each other, and the problem is the request or the queue
+    /// rather than anything that happens afterwards.
+    static func matched(matchID: String, status: String, filled: Int, of total: Int, wasExisting: Bool) {
+        let line = "matched id=\(matchID) status=\(status) seats=\(filled)/\(total) "
+            + "existing=\(wasExisting)"
+        log.notice("\(line, privacy: .public)")
+        echo(line)
+    }
+
     /// A path that gave up without an error — the silent exits that hide a
     /// defect, each one named so its absence from the log means something.
     static func gaveUp(_ reason: String) {

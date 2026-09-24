@@ -45,6 +45,28 @@ enum OnlineStartState: Hashable, Sendable {
         }
     }
 
+    /// A stable name for this state, for a test to wait on.
+    ///
+    /// Published as an accessibility value so `XCUITest` can wait for a
+    /// *semantic* state rather than for a spinner to appear or a fixed number
+    /// of seconds to pass. Waiting on pixels is how a test ends up asserting
+    /// that something looked right while the thing underneath had failed.
+    ///
+    /// This changes no behaviour: it is a name for what the screen is already
+    /// doing, readable by the accessibility system, which is the same
+    /// mechanism VoiceOver uses.
+    var name: String {
+        switch self {
+        case .idle: "idle"
+        case .authenticating: "authenticating"
+        case .openingMatchmaker: "openingMatchmaker"
+        case .matchmaking: "matchmaking"
+        case .waitingForPlayers: "waitingForPlayers"
+        case .loadingMatch: "loadingMatch"
+        case .failed(let failure): "failed.\(failure)"
+        }
+    }
+
     /// The line to show while this is happening. Never a bare spinner: a
     /// spinner with no sentence is the thing that made this defect invisible.
     var progressKey: String? {
