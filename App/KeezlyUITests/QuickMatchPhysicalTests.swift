@@ -23,10 +23,24 @@ final class QuickMatchPhysicalTests: XCTestCase {
 
     /// Launched **without** `-KEEZLY_NO_GAME_CENTER`, unlike every other UI
     /// test: the whole point is to reach the real service.
+    ///
+    /// State *is* reset, and that is not optional here. These devices are used
+    /// for playing as well as testing, so the app resumes whatever match was
+    /// left open and never shows the menu at all — which is exactly how this
+    /// suite first failed, with "the menu never offered online play" while the
+    /// board sat there in the hierarchy.
+    ///
+    /// Resetting clears what this device remembers locally. It does **not**
+    /// touch the online matches: those are kept by Game Center, not in the
+    /// local store, which is why an online session is built with no store at
+    /// all. So the thing under test survives the reset.
     @MainActor
     private func launched() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-KEEZLY_UI_TESTING"]
+        app.launchArguments = [
+            "-KEEZLY_UI_TESTING",
+            "-KEEZLY_UI_TEST_RESET_STATE", "YES",
+        ]
         app.launch()
         return app
     }
@@ -38,6 +52,20 @@ final class QuickMatchPhysicalTests: XCTestCase {
     @MainActor
     private func state(in app: XCUIApplication) -> String {
         app.descendants(matching: .any)["online.startState"].label
+    }
+
+    /// Everything the gate is decided on, printed into **this** run's output.
+    ///
+    /// The app logs to the device console; `xcodebuild` captures its own
+    /// output and not that. Printing here puts the facts in the one place the
+    /// runner is already reading, instead of correlating two channels by
+    /// timestamp afterwards.
+    @MainActor
+    private func report(_ app: XCUIApplication, _ note: String) {
+        let probe = app.descendants(matching: .any)["online.probe"].label
+        let line = "E2E \(note) state=\(state(in: app)) \(probe)"
+        print(line)
+        XCTContext.runActivity(named: line) { _ in }
     }
 
     @MainActor
@@ -69,7 +97,11 @@ final class QuickMatchPhysicalTests: XCTestCase {
     private func openOnline(_ app: XCUIApplication) -> Bool {
         let online = app.descendants(matching: .any)["menu.online"]
         guard online.waitForExistence(timeout: 30) else {
-            XCTFail("the menu never offered online play")
+            // What was on screen instead. Without this the failure says only
+            // that something was missing, which is the least useful thing a
+            // test can tell you about a screen it could not read.
+            print("E2E HIERARCHY\n\(app.debugDescription)")
+            XCTFail("the menu never offered online play — hierarchy printed above")
             return false
         }
         online.tap()
@@ -121,6 +153,7 @@ final class QuickMatchPhysicalTests: XCTestCase {
     func testQuickMatchTwoPlayers() throws {
         let app = launched()
         guard openOnline(app) else { return }
+        report(app, "opened")
 
         chooseSeats(2, in: app)
 
@@ -132,12 +165,20 @@ final class QuickMatchPhysicalTests: XCTestCase {
         // Every outcome is named. `waitingForPlayers` is a pass for this test:
         // one device cannot fill a two-seat table on its own, and calling that
         // a failure is what the original defect did.
+        report(app, "tapped")
+
         let settled = waitForState(
             ["waitingForPlayers", "loadingMatch", "idle"],
             in: app,
             timeout: 90,
             "quick match never reached a settled state"
         )
+        report(app, "settled")
+
+        // A second look after a pause: the other device may still be joining,
+        // and the whole question is whether this one notices when it does.
+        Thread.sleep(forTimeInterval: 25)
+        report(app, "after-wait")
 
         guard let settled else { return }
         XCTAssertFalse(

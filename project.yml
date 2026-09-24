@@ -161,10 +161,17 @@ schemes:
       # lane: `-only-testing` cannot re-enable something a plan has skipped, so
       # the run reported "Executed 0 tests" and succeeded, which is the worst
       # possible way to produce no screenshots.
+      # A third plan, for the same reason there is a second one. The physical
+      # suite needs a real Game Center account, a network and Apple's service,
+      # so it cannot be in the default plan — and skipping it there and
+      # reaching it with `-only-testing` does not work either: a plan's skip
+      # list wins, and the run reports "Executed 0 tests" and *succeeds*. That
+      # trap has now caught this project twice.
       testPlans:
         - path: Keezly.xctestplan
           defaultPlan: true
         - path: Keezly-Screenshots.xctestplan
+        - path: Keezly-Physical.xctestplan
       targets:
         - KeezlyTests
         - KeezlyUITests

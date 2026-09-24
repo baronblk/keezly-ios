@@ -33,6 +33,10 @@ final class OnlinePlay {
     /// fills minutes later must use the settings they chose, not today's
     /// default.
     private var waitingPrefersTeams = true
+    /// The last thing Game Center said about the match being started, in the
+    /// same shape the log uses, so a test reads exactly what a log reader
+    /// would.
+    private(set) var lastMatchFacts: String?
     /// Where a finished online match's achievements go, and what stops the
     /// same match sending them twice. Held here rather than made per match, so
     /// every run this object hands out shares one ledger (`AchievementLedger`).
@@ -204,6 +208,23 @@ final class OnlinePlay {
                 isTeamMatch: payload?.state.configuration.teamMode == .teamsOfTwo
             )
         }
+    }
+
+    /// The facts a physical test needs, in one readable line.
+    ///
+    /// The app's diagnostics go to the device console; `xcodebuild` captures
+    /// its own output and not that. Rather than stitch two channels together
+    /// afterwards, the handful of facts that decide the gate are published
+    /// where a test can read them directly.
+    ///
+    /// Seat counts, a match handle and a checksum. No account, no name.
+    var probeSummary: String {
+        var parts = ["auth=\(authentication.isAuthenticated)"]
+        parts.append("matches=\(matches.count)")
+        if let waiting = lastMatchFacts {
+            parts.append(waiting)
+        }
+        return parts.joined(separator: " ")
     }
 
     /// The board's checksum, for comparing two devices.
@@ -453,6 +474,7 @@ final class OnlinePlay {
         let filled = gkMatch.participants.compactMap(\.player).count
         let total = gkMatch.participants.count
         OnlineLog.participants(filled: filled, of: total)
+        lastMatchFacts = "match=\(gkMatch.matchID ?? "-") filled=\(filled)/\(total)"
 
         // The lobby is refreshed whatever the event was, so a row's state is
         // never older than the last thing Game Center said.

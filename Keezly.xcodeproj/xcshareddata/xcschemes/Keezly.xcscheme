@@ -66,6 +66,9 @@
          <TestPlanReference
             reference = "container:Keezly-Screenshots.xctestplan">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Keezly-Physical.xctestplan">
+         </TestPlanReference>
       </TestPlans>
       <MacroExpansion>
          <BuildableReference

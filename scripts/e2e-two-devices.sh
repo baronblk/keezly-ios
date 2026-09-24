@@ -30,33 +30,64 @@ say() { printf '%s\n' "$*" | tee -a "$REPORT"; }
 
 xcrun devicectl list devices --json-output "$OUT/devices.json" >/dev/null 2>&1
 
-read -r A_ID A_NAME < <(python3 - "$OUT/devices.json" iPhone <<'PY'
+# KEEZLY_DEVICE_A / KEEZLY_DEVICE_B pin the run to particular devices. Worth
+# having: which devices are wired changes between sessions, and an automatch
+# test that silently swapped in a third device would be measuring nothing.
+
+read -r A_ID A_NAME A_LINK < <(python3 - "$OUT/devices.json" iPhone <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1]))
-want = sys.argv[2]
+want = sys.argv[2].lower()
+
+# Wired first. A device on localNetwork can be picked up, but it is slower and
+# drops out mid-run, and a test that dies halfway proves nothing. Reported
+# either way so the run says which link it used.
+candidates = []
 for dev in data.get("result", {}).get("devices", []):
-    hw, cp, dp = dev.get("hardwareProperties", {}), dev.get("connectionProperties", {}), dev.get("deviceProperties", {})
+    hw, cp = dev.get("hardwareProperties", {}), dev.get("connectionProperties", {})
     if hw.get("reality") != "physical" or cp.get("tunnelState") != "connected":
         continue
-    if want.lower() in (hw.get("marketingName") or "").lower():
-        print(dev["identifier"], hw.get("marketingName"))
-        break
+    name = (hw.get("marketingName") or "")
+    if want not in name.lower():
+        continue
+    wired = cp.get("transportType") == "wired"
+    candidates.append((0 if wired else 1, dev["identifier"], name, cp.get("transportType") or "?"))
+
+if candidates:
+    candidates.sort()
+    _, ident, name, transport = candidates[0]
+    print(ident, name, transport)
 PY
 )
 
-read -r B_ID B_NAME < <(python3 - "$OUT/devices.json" iPad <<'PY'
+read -r B_ID B_NAME B_LINK < <(python3 - "$OUT/devices.json" iPad <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1]))
-want = sys.argv[2]
+want = sys.argv[2].lower()
+
+# Wired first. A device on localNetwork can be picked up, but it is slower and
+# drops out mid-run, and a test that dies halfway proves nothing. Reported
+# either way so the run says which link it used.
+candidates = []
 for dev in data.get("result", {}).get("devices", []):
-    hw, cp, dp = dev.get("hardwareProperties", {}), dev.get("connectionProperties", {}), dev.get("deviceProperties", {})
+    hw, cp = dev.get("hardwareProperties", {}), dev.get("connectionProperties", {})
     if hw.get("reality") != "physical" or cp.get("tunnelState") != "connected":
         continue
-    if want.lower() in (hw.get("marketingName") or "").lower():
-        print(dev["identifier"], hw.get("marketingName"))
-        break
+    name = (hw.get("marketingName") or "")
+    if want not in name.lower():
+        continue
+    wired = cp.get("transportType") == "wired"
+    candidates.append((0 if wired else 1, dev["identifier"], name, cp.get("transportType") or "?"))
+
+if candidates:
+    candidates.sort()
+    _, ident, name, transport = candidates[0]
+    print(ident, name, transport)
 PY
 )
+
+A_ID="${KEEZLY_DEVICE_A:-${A_ID:-}}"
+B_ID="${KEEZLY_DEVICE_B:-${B_ID:-}}"
 
 if [ -z "${A_ID:-}" ] || [ -z "${B_ID:-}" ]; then
   say "BLOCKED: need one physical iPhone and one physical iPad, both wired."
@@ -69,22 +100,64 @@ say "=============================================================="
 say "KEEZLY PHYSICAL E2E — quick match, ${SEATS} seats"
 say "$(date '+%Y-%m-%d %H:%M:%S')"
 say "=============================================================="
-say "DEVICE A  $A_NAME"
-say "DEVICE B  $B_NAME"
+say "DEVICE A  $A_NAME  (${A_LINK:-?})"
+say "DEVICE B  $B_NAME  (${B_LINK:-?})"
 say ""
 
 # ------------------------------------------------------------------- run ---
 
-run_on() {                       # $1 = udid, $2 = logfile, $3 = label
-  xcodebuild test \
+
+# Each device gets its own DerivedData. Two concurrent xcodebuilds sharing one
+# lock the build database and the second dies with "database is locked" — which
+# looks like a test failure and is not one.
+dd_for() { echo "$OUT/dd-$1"; }
+
+prebuild() {                     # $1 = udid, $2 = logfile, $3 = label
+  say "Building for device $3 …"
+  xcodebuild build-for-testing \
     -project Keezly.xcodeproj -scheme Keezly \
     -destination "platform=iOS,id=$1" \
-    -only-testing:KeezlyUITests/QuickMatchPhysicalTests/testQuickMatchTwoPlayers \
-    -allowProvisioningUpdates \
+    -derivedDataPath "$(dd_for "$3")" \
+    -testPlan Keezly-Physical \
+    -allowProvisioningUpdates -quiet \
     > "$2" 2>&1
+  local status=$?
+  echo "BUILD EXIT $status" >> "$2"
+  return $status
+}
+
+run_on() {                       # $1 = udid, $2 = logfile, $3 = label
+  xcodebuild test-without-building \
+    -project Keezly.xcodeproj -scheme Keezly \
+    -destination "platform=iOS,id=$1" \
+    -derivedDataPath "$(dd_for "$3")" \
+    -testPlan Keezly-Physical \
+    >> "$2" 2>&1
   echo "EXIT $?" >> "$2"
 }
 
+# Built one at a time, on purpose: building is slow and uneven, and if it
+# happened inside the parallel phase the two devices would start searching
+# minutes apart — which is exactly the thing automatch cannot survive.
+prebuild "$A_ID" "$A_LOG" A
+A_BUILD=$?
+prebuild "$B_ID" "$B_LOG" B
+B_BUILD=$?
+
+if [ "$A_BUILD" -ne 0 ] || [ "$B_BUILD" -ne 0 ]; then
+  say ""
+  if grep -qh "Unlock .* to Continue" "$A_LOG" "$B_LOG"; then
+    say "OWNER STEP REQUIRED: a device is locked. Unlock it and re-run — nothing"
+    say "about matchmaking has been tested."
+    grep -hoE "Unlock [^\"]+ to Continue" "$A_LOG" "$B_LOG" | sort -u | tee -a "$REPORT"
+    exit 4
+  fi
+  say "BLOCKED: could not build for one of the devices (A=$A_BUILD B=$B_BUILD)."
+  grep -hE "error:" "$A_LOG" "$B_LOG" | sort -u | head -5 | tee -a "$REPORT"
+  exit 3
+fi
+
+say ""
 say "Running on both devices at once — automatch needs them searching together."
 run_on "$A_ID" "$A_LOG" A &
 PID_A=$!
@@ -112,8 +185,8 @@ print("GATE                     RESULT       DETAIL")
 print("-" * 78)
 
 # Authentication, from the app's own log rather than from an assumption.
-a_auth = "authenticated=true" in a_log
-b_auth = "authenticated=true" in b_log
+a_auth = "auth=true" in a_log
+b_auth = "auth=true" in b_log
 gate("AUTH A", a_auth or None, "" if a_auth else "no authenticated=true line; device may be signed out")
 gate("AUTH B", b_auth or None, "" if b_auth else "no authenticated=true line; device may be signed out")
 
@@ -129,8 +202,8 @@ else:
     gate("MATCH REQUEST", None, "no quickMatch request logged on one or both devices")
 
 # The line that decides it.
-a_match = find(a_log, r"matched id=(\S+)")
-b_match = find(b_log, r"matched id=(\S+)")
+a_match = find(a_log, r"match=(\S+) filled=")
+b_match = find(b_log, r"match=(\S+) filled=")
 if a_match and b_match:
     same = a_match[-1] == b_match[-1]
     gate("SAME MATCH", same,
@@ -141,7 +214,7 @@ else:
 
 # Seats filled.
 def filled(text):
-    got = find(text, r"participants filled=(\d+) of=(\d+)")
+    got = find(text, r"filled=(\d+)/(\d+)")
     return (int(got[-1][0]), int(got[-1][1])) if got else None
 
 a_fill, b_fill = filled(a_log), filled(b_log)

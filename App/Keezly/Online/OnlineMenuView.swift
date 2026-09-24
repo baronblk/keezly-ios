@@ -77,13 +77,22 @@ struct OnlineMenuView: View {
     /// VoiceOver, because it is a name for a machine to read rather than
     /// anything a player needs.
     private var stateProbe: some View {
-        Text(online.startState.name)
-            .font(.caption2)
-            .foregroundStyle(.clear)
-            .frame(height: 0)
-            .accessibilityIdentifier("online.startState")
-            .accessibilityHidden(false)
-            .accessibilityLabel(online.startState.name)
+        VStack(spacing: 0) {
+            Text(online.startState.name)
+                .accessibilityIdentifier("online.startState")
+                .accessibilityLabel(online.startState.name)
+            // What a test needs that it cannot otherwise see. The app's own
+            // log goes to the device console, which is a different channel
+            // from the one `xcodebuild` captures — so the facts that decide
+            // the gate are published here, where a test can read them and put
+            // them in its own output.
+            Text(online.probeSummary)
+                .accessibilityIdentifier("online.probe")
+                .accessibilityLabel(online.probeSummary)
+        }
+        .font(.caption2)
+        .foregroundStyle(.clear)
+        .frame(height: 0)
     }
 
     private var introSection: some View {
