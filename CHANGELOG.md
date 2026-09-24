@@ -156,6 +156,23 @@ Versioning.
   the engine's own events. Nothing reports them to Game Center yet.
 - **German, Dutch and English** throughout, with one word per thing in each.
 
+### Added
+
+- **Achievements in a Game Center match.** An online match now reports the same
+  achievements a local one does, for the local player's own seat and no other.
+  It did not before, and the reason given for that — a shared device has no
+  single owner — was pass & play's reasoning, which never applied online: an
+  online seat *is* `GKLocalPlayer.local`.
+
+  Reporting once is the hard part. A local match finishes while the device
+  watches, so there is a single moment to catch. An online match arrives
+  already finished, because the winning move may be the opponent's played while
+  the app was closed, and it is then handed to the device again on every
+  refresh, foreground and reopen. So it asks "is it over, and has it been
+  accounted for?" instead, and the answer is kept on disk so resuming tomorrow
+  is covered too. No leaderboards, and no claim about a modified client
+  (DEC-025).
+
 ### Fixed
 
 - **Starting an online match with an odd number of seats crashed the app**

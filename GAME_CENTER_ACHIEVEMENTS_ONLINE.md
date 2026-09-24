@@ -1,7 +1,12 @@
-# Achievements in Onlinepartien — Befund und offene Entscheidung
+# Achievements in Onlinepartien — Befund und getroffene Entscheidung
 
 **Anlass:** die Annahme „Onlinepartien bringen nie Erfolge" wurde hinterfragt.
 Sie hält der Prüfung nicht stand, und das ist hier belegt statt behauptet.
+
+**Entscheidung des Owners vom 2026-09-24: B.** Onlinepartien melden dieselben
+passenden Achievements wie lokale Partien, ausschliesslich für den eigenen Sitz.
+Keine Bestenlisten, DEC-025 bleibt vollständig bestehen. Umgesetzt in `b03ed53`,
+enthalten ab **Build 43**.
 
 ---
 
@@ -79,31 +84,64 @@ falsch** und muss so nicht stehen bleiben.
 
 ---
 
-## Entscheidung liegt beim Owner
+## Entscheidung: B — umgesetzt
 
-Build 41 wurde inzwischen von der Geräte-QA abgelehnt und durch **Build 42**
-ersetzt (`RELEASE_CANDIDATE.md`). Das ändert an dieser Entscheidung nichts: Der
-neue Build behebt ISS-021 und enthält **kein** Online-Achievement-Reporting, weil
-das eine Produktentscheidung ist und keine Fehlerbehebung. Ob dies ein Defekt
-ist, entscheidet der Owner:
+Der Owner hat B gewählt: Onlinepartien melden Achievements.
 
-**A — als bewusste 1.0-Grenze dokumentieren.**
-Erfolge werden nur in lokalen Partien gegen den Computer vergeben. Nichts im
-Store-Text und nichts auf der Website verspricht etwas anderes; beide nennen
-„zehn Erfolge", ohne den Modus zu nennen. Kein neuer Build.
+| | |
+|---|---|
+| Gemeldet wird | ausschliesslich `mySeat` |
+| Zuordnung | `mySeat` **ist** `GKLocalPlayer.local` — siehe die Kette oben |
+| Bedingungen | dieselben wie lokal; **ein** Evaluator, keine Online-Sonderregel |
+| Für den Gegner | **nie** — jeder andere Sitz ist `.remote`, `localSeat` ist `mySeat` |
+| Bestenlisten | **keine**, und es bleibt dabei (DEC-025) |
+| Competitive-Integrity | **keine Behauptung**. Ohne Server gibt es keine |
 
-**B — als Defekt behandeln.**
-Ein Online-Spieler kann die zehn beworbenen Erfolge nicht erreichen, obwohl die
-Zuordnung eindeutig ist. Dann: Reporting ergänzen, neuer Build, erneute QA.
+### Das eigentliche Problem war nicht das Melden, sondern das Doppelmelden
 
-**Unabhängig von A oder B zu korrigieren:** die TestFlight-Notiz und der
-Code-Kommentar behaupteten eine Begründung, die für Online nicht zutrifft.
-**Erledigt am 2026-09-23.** `TESTFLIGHT.md`, `APP_STORE.md` und die
-Dokumentationskommentare in `MatchSession.swift` sagen jetzt, was zutrifft: die
-Meldung fehlt, weil sie nie verdrahtet wurde, nicht weil die Zuordnung unklar
-wäre. Die Kommentare bei `init(online:)`, `noteResult` und `achievementsEarned`
-sagen das jeweils an ihrer eigenen Stelle.
+Eine lokale Partie endet, während dieses Gerät zusieht — genau einmal. Daran
+kann `noteResult` hängen. Eine Onlinepartie hat diese Flanke nicht: Der
+entscheidende Zug kann der des Gegners sein, gespielt während die App
+geschlossen war. Das Gerät sieht also als Erstes eine Stellung, die bereits
+vorbei ist — und sieht dieselbe Stellung danach bei jedem Refresh, bei jedem
+Wechsel in den Vordergrund und bei jedem erneuten Öffnen wieder.
+
+| Frage | Ergebnis |
+|---|---|
+| „Ist sie gerade zu Ende gegangen?" | meldet **gar nichts** |
+| „Ist sie zu Ende?" | meldet bei **jedem** dieser Ereignisse |
+| „Ist sie zu Ende und schon abgerechnet?" | meldet **genau einmal** |
+
+Die dritte Frage wird gestellt. `AchievementLedger` beantwortet sie und liegt
+auf der Platte, damit auch ein Fortsetzen am nächsten Tag abgedeckt ist.
+
+Game Center ignoriert eine Wiederholung ebenfalls — `GKAchievement` behält das
+erste Abschlussdatum. Der Ledger ist also die zweite von zwei Absicherungen und
+nicht eine Wette auf Apples Verhalten.
+
+### Nachweis
+
+16 Tests in zwei Suites. **Beide Negativkontrollen wurden gefahren, nicht
+angenommen:**
+
+| Kontrolle | Erwartung | Ergebnis |
+|---|---|---|
+| Ledger abgeschaltet | nur die beiden Doppelmelde-Tests fallen | genau diese beiden, sonst keiner |
+| Meldung ganz abgeschaltet | alle positiven Tests fallen | alle gefallen |
+
+Geprüft wird unter anderem: jeder der vier Sitze bekommt genau seine eigene
+Menge; nur ein tatsächlich gewinnender Sitz bekommt „Gewonnen"; eine beim
+Öffnen bereits beendete Partie meldet trotzdem; zehnmaliges `adopt` meldet
+einmal; ein neuer Prozess über demselben Ledger meldet nicht erneut; eine
+**andere** Partie wird sehr wohl noch gemeldet.
+
+### Was auf Hardware noch offen ist
+
+Die Tests beweisen die Logik, nicht die Zustellung an Apple. Schritte 27–32 der
+`GAME_CENTER_E2E_CHECKLIST.md` prüfen das echte Verhalten, und 30–32 sind die
+wichtigen: Doppelvergabe ist der wahrscheinlichste Fehlermodus und sie ist
+unsichtbar, solange niemand eine beendete Partie absichtlich erneut öffnet.
 
 ```
-ENTSCHEIDUNG:  ☐ A — dokumentierte 1.0-Grenze   ☐ B — Defekt, neuer Build
+ENTSCHEIDUNG:  ☑ B — Reporting ergänzt, Build 43, erneute QA
 ```
