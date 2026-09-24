@@ -79,20 +79,28 @@ final class GameCenterMatchmaker: NSObject {
 
     /// Shows the matchmaker for a table of this size.
     ///
+    /// **Both kinds go through Apple's matchmaker**, and that is a change made
+    /// on evidence rather than preference. Quick match used
+    /// `GKTurnBasedMatch.find`, which in this environment never pairs two
+    /// devices: with two accounts, identical requests, cleaned orphans, both a
+    /// simultaneous and a staggered start, and ninety seconds of watching, each
+    /// device got its own match at 1/2. It also creates a new match on every
+    /// call rather than ever returning a joinable one — it will not reuse even
+    /// the calling device's own pending matches, so it was never going to find
+    /// anybody else's. Every tap left another empty match behind; twenty-six
+    /// accumulated on one account.
+    ///
+    /// The matchmaker, by contrast, is shown to present correctly on hardware
+    /// (`matchmaker.presented onScreen=true`) and is the route Apple supports.
+    ///
+    /// The two remain separate actions in Keezly's own interface, with their
+    /// own wording and their own state — what they share is the substrate.
+    ///
     /// The callback is called exactly once, whichever way it ends.
     func present(seats: Int, kind: Kind, onOutcome: @escaping (Outcome) -> Void) {
         self.onOutcome = onOutcome
 
         let request = Self.makeRequest(seats: seats, kind: kind)
-
-        guard kind == .inviteFriends else {
-            // Automatch has no interface of its own: Game Center looks in the
-            // background and the match arrives through the listener, possibly
-            // minutes later. The screen says so rather than opening an Apple
-            // sheet that would only show a spinner.
-            Task { await self.findQuietly(request) }
-            return
-        }
 
         let controller = GKTurnBasedMatchmakerViewController(matchRequest: request)
         controller.turnBasedMatchmakerDelegate = self
@@ -162,37 +170,6 @@ final class GameCenterMatchmaker: NSObject {
                 + "seats=\(seats)"
         )
         return request
-    }
-
-    /// Automatch, without a screen.
-    ///
-    /// `GKTurnBasedMatch.find` **creates** a match rather than only looking for
-    /// one, and returns it with its empty seats unfilled. That is not a
-    /// failure and is no longer treated as one — the match is real, it belongs
-    /// to this player, and it is handed back so Keezly can show it waiting.
-    /// Refusing it and throwing is what left eleven orphaned matches at Apple
-    /// with nothing on screen to explain them.
-    private func findQuietly(_ request: GKMatchRequest) async {
-        do {
-            let match = try await GKTurnBasedMatch.find(for: request)
-            let filled = match.participants.compactMap(\.player).count
-            // The match id is what tells "the two devices met" from "each got
-            // its own match". Without it, everything after this is guesswork.
-            OnlineLog.matched(
-                matchID: match.matchID ?? "-",
-                status: Self.describe(match.status),
-                filled: filled,
-                of: match.participants.count,
-                // `find` returns a match the player is *already in* when one
-                // fits, rather than queueing. A match with a payload, or one
-                // created before this search began, was not made for us now.
-                wasExisting: !(match.matchData?.isEmpty ?? true)
-            )
-            deliver(.matched(match))
-        } catch {
-            OnlineLog.failure("automatch", error)
-            deliver(.failed(error))
-        }
     }
 
     static func describe(_ status: GKTurnBasedMatch.Status) -> String {

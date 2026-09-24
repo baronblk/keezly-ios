@@ -21,6 +21,7 @@
   "testTargets": [
     {
       "selectedTests": [
+        "OnlineTurnPhysicalTests",
         "QuickMatchPhysicalTests"
       ],
       "target": {
