@@ -12,7 +12,6 @@ struct OnlineMenuView: View {
     /// Called with a match the player chose to open.
     var onOpen: (OnlineMatchRun) -> Void
 
-    @State private var starting = false
     @State private var seats = 4
     @State private var teams = true
 
@@ -48,40 +47,11 @@ struct OnlineMenuView: View {
 
     private var signedIn: some View {
         List {
-            Section {
-                Text("online.subtitle")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section {
-                TableSeatsRow(seats: $seats, teams: $teams)
-                Button {
-                    start()
-                } label: {
-                    HStack {
-                        Label("online.new", systemImage: "person.2.badge.plus")
-                        Spacer()
-                        if starting { ProgressView() }
-                    }
-                }
-                .disabled(starting || online.isWorking)
-                .accessibilityIdentifier("online.new")
-            }
-
-            Section {
-                if online.matches.isEmpty {
-                    Text("online.empty")
-                        .foregroundStyle(.secondary)
-                        .accessibilityIdentifier("online.empty")
-                } else {
-                    ForEach(online.matches) { match in
-                        Button { open(match) } label: { MatchRow(match: match) }
-                            .accessibilityIdentifier("online.match.\(match.id)")
-                    }
-                }
-            }
-
+            introSection
+            newMatchSection
+            progressSection
+            failureSection
+            matchesSection
             if let failure = online.failure {
                 Section { Notice(text: failure) }
             }
@@ -89,29 +59,112 @@ struct OnlineMenuView: View {
         .refreshable { await online.refresh() }
     }
 
-    private func start() {
-        starting = true
-        Task {
-            defer { starting = false }
-            do {
-                onOpen(try await online.startMatch(seats: seats, teams: teams))
-            } catch {
-                // INSTRUMENTED, NOT YET FIXED. This catch is the reason the
-                // screen shows nothing: `error` is never bound to anything a
-                // player can see, and `refresh()` then sets `online.failure`
-                // back to nil on success — so the one place a message could
-                // appear is actively cleared. The spinner stops and the screen
-                // is identical to before the tap.
-                OnlineLog.failure("startMatch", error)
-                OnlineLog.gaveUp("catch in OnlineMenuView.start discarded the error")
-                await online.refresh()
+    private var introSection: some View {
+        Section {
+            Text("online.subtitle")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var newMatchSection: some View {
+        Section {
+            TableSeatsRow(seats: $seats, teams: $teams)
+            Button(action: start) {
+                HStack {
+                    Label("online.new", systemImage: "person.2.badge.plus")
+                    Spacer()
+                    if online.startState.isBusy { ProgressView() }
+                }
+            }
+            .disabled(online.startState.isBusy)
+            .accessibilityIdentifier("online.new")
+        } footer: {
+            // What the button will actually do, said before it is tapped.
+            Text("online.new.explain")
+        }
+    }
+
+    /// Whatever is happening, in words. The defect this replaces was a spinner
+    /// that explained nothing and then simply stopped.
+    @ViewBuilder
+    private var progressSection: some View {
+        if let progressKey = online.startState.progressKey {
+            Section {
+                StartProgress(
+                    messageKey: progressKey,
+                    detail: waitingDetail,
+                    isCancellable: online.startState.isCancellable,
+                    cancel: online.resetStart
+                )
             }
         }
     }
 
+    @ViewBuilder
+    private var failureSection: some View {
+        if case .failed(let failure) = online.startState {
+            Section {
+                StartFailure(
+                    failure: failure,
+                    retry: retryAction(for: failure),
+                    dismiss: online.resetStart
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var matchesSection: some View {
+        Section {
+            if online.matches.isEmpty {
+                Text("online.empty")
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("online.empty")
+            } else {
+                ForEach(online.matches) { match in
+                    Button { open(match) } label: { MatchRow(match: match) }
+                        .accessibilityIdentifier("online.match.\(match.id)")
+                }
+            }
+        } header: {
+            Text("online.running")
+        }
+    }
+
+    /// Retrying is offered only where it could help: not for being signed
+    /// out, which is fixed in Settings, and not for Game Center being
+    /// unavailable, which cannot be fixed at all (§26).
+    private func retryAction(for failure: OnlineStartFailure) -> (() -> Void)? {
+        guard failure.isWorthRetrying else { return nil }
+        return { start() }
+    }
+
+    /// How many seats are still empty, when that is what is happening.
+    private var waitingDetail: String? {
+        guard case .waitingForPlayers(let filled, let total) = online.startState else { return nil }
+        return String(localized: "online.state.waitingForPlayers.detail \(filled) \(total)")
+    }
+
+    /// No `do`/`catch` here any more, and nothing to swallow.
+    ///
+    /// Every outcome — cancelled, failed, waiting, opened — moves
+    /// `online.startState`, and every one of those states is drawn above. The
+    /// old version caught the error, bound it to nothing, and then called
+    /// `refresh()`, which cleared the only field a message could have appeared
+    /// in. That is why the button looked dead.
+    private func start() {
+        online.startMatch(seats: seats, teams: teams, onOpen: onOpen)
+    }
+
     private func open(_ summary: OnlineMatchSummary) {
         Task {
-            if let run = try? await online.open(summary.id) { onOpen(run) }
+            do {
+                onOpen(try await online.open(summary.id))
+            } catch {
+                OnlineLog.failure("open", error)
+                online.noteOpenFailure(error)
+            }
         }
     }
 }
@@ -215,6 +268,62 @@ private struct Failed: View {
         } actions: {
             Button("online.retry", action: retry)
         }
+    }
+}
+
+/// What is happening, in a sentence, with a way out where one makes sense.
+private struct StartProgress: View {
+    let messageKey: String
+    let detail: String?
+    let isCancellable: Bool
+    let cancel: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                ProgressView()
+                Text(LocalizedStringKey(messageKey))
+            }
+            if let detail {
+                Text(detail)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            if isCancellable {
+                Button("common.cancel", action: cancel)
+                    .accessibilityIdentifier("online.cancel")
+            }
+        }
+        .accessibilityIdentifier("online.progress")
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// A failure the player can read and act on. Never an error code.
+private struct StartFailure: View {
+    let failure: OnlineStartFailure
+    let retry: (() -> Void)?
+    let dismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label {
+                Text(LocalizedStringKey(failure.messageKey))
+            } icon: {
+                Image(systemName: "exclamationmark.triangle")
+                    .foregroundStyle(.orange)
+            }
+            HStack(spacing: 16) {
+                if let retry {
+                    Button("online.retry", action: retry)
+                        .accessibilityIdentifier("online.retry")
+                }
+                Button("common.back", action: dismiss)
+                    .accessibilityIdentifier("online.dismissError")
+            }
+            .font(.callout)
+        }
+        .accessibilityIdentifier("online.failure")
     }
 }
 

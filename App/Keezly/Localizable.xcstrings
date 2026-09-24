@@ -1428,6 +1428,52 @@
         }
       }
     },
+    "common.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terug"
+          }
+        }
+      }
+    },
+    "common.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuleer"
+          }
+        }
+      }
+    },
     "common.done": {
       "extractionState": "manual",
       "localizations": {
@@ -3130,6 +3176,167 @@
         }
       }
     },
+    "online.fail.cancelled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelled."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgebrochen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geannuleerd."
+          }
+        }
+      }
+    },
+    "online.fail.couldNotCreate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The match could not be created."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Partie konnte nicht erstellt werden."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De partij kon niet worden aangemaakt."
+          }
+        }
+      }
+    },
+    "online.fail.couldNotLoad": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The match could not be loaded."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Partie konnte nicht geladen werden."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De partij kon niet worden geladen."
+          }
+        }
+      }
+    },
+    "online.fail.matchmakingFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center could not find a match."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center konnte keine Partie finden."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center kon geen partij vinden."
+          }
+        }
+      }
+    },
+    "online.fail.network": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No connection to Game Center. Check your network and try again."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Verbindung zu Game Center. Prüfe dein Netzwerk und versuche es erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen verbinding met Game Center. Controleer je netwerk en probeer het opnieuw."
+          }
+        }
+      }
+    },
+    "online.fail.notSignedIn": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are not signed in to Game Center. Sign in under Settings › Game Center."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du bist nicht bei Game Center angemeldet. Melde dich unter Einstellungen › Game Center an."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je bent niet aangemeld bij Game Center. Meld je aan via Instellingen › Game Center."
+          }
+        }
+      }
+    },
+    "online.fail.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center is not available on this device."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center ist auf diesem Gerät nicht verfügbar."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center is niet beschikbaar op dit apparaat."
+          }
+        }
+      }
+    },
     "online.lostBanner": {
       "extractionState": "manual",
       "localizations": {
@@ -3176,25 +3383,25 @@
         }
       }
     },
-    "online.new.finding": {
+    "online.new.explain": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Finding players…"
+            "value": "Opens Game Center, where you can invite someone or be matched with another player."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mitspieler werden gesucht …"
+            "value": "Öffnet Game Center. Dort kannst du jemanden einladen oder mit einer anderen Spielerin oder einem anderen Spieler zusammengebracht werden."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Spelers zoeken …"
+            "value": "Opent Game Center. Daar kun je iemand uitnodigen of aan een andere speler worden gekoppeld."
           }
         }
       }
@@ -3337,6 +3544,29 @@
         }
       }
     },
+    "online.running": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your matches"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Partien"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je partijen"
+          }
+        }
+      }
+    },
     "online.seats %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -3402,6 +3632,144 @@
           "stringUnit": {
             "state": "translated",
             "value": "Onlinepartijen lopen via Apples Game Center. Al het andere in Keezly werkt ook zonder."
+          }
+        }
+      }
+    },
+    "online.state.authenticating": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in to Game Center …"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei Game Center anmelden …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aanmelden bij Game Center …"
+          }
+        }
+      }
+    },
+    "online.state.loadingMatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the match …"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie wird vorbereitet …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partij wordt voorbereid …"
+          }
+        }
+      }
+    },
+    "online.state.matchmaking": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose or invite a player in Game Center."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle in Game Center jemanden aus oder lade jemanden ein."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies of nodig iemand uit in Game Center."
+          }
+        }
+      }
+    },
+    "online.state.openingMatchmaker": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opening Game Center …"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center wird geöffnet …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center wordt geopend …"
+          }
+        }
+      }
+    },
+    "online.state.waitingForPlayers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for players to join."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es wird noch auf Mitspieler gewartet."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er wordt nog op medespelers gewacht."
+          }
+        }
+      }
+    },
+    "online.state.waitingForPlayers.detail %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld of %2$lld seats taken. The match is in your list and starts by itself once it is full."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld von %2$lld Plätzen besetzt. Die Partie steht in deiner Liste und beginnt von selbst, sobald sie voll ist."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld van %2$lld plaatsen bezet. De partij staat in je lijst en begint vanzelf zodra die vol is."
           }
         }
       }

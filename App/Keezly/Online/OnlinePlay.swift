@@ -37,7 +37,15 @@ final class OnlinePlay {
     /// The last thing that went wrong, in words a player can act on.
     private(set) var failure: String?
 
+    /// Where the start flow stands. Drawn by the screen, so a player is never
+    /// looking at an unexplained spinner (`OnlineStartFlow`).
+    private(set) var startState: OnlineStartState = .idle
+
     private let transport = GameCenterTransport()
+    /// Held for the session, not made at the point of use. A matchmaker whose
+    /// delegate has been deallocated reports nothing at all, and the player is
+    /// left with a screen that never changes (§8).
+    private let matchmaker = GameCenterMatchmaker()
     /// Where a finished online match's achievements go, and what stops the
     /// same match sending them twice. Held here rather than made per match, so
     /// every run this object hands out shares one ledger (`AchievementLedger`).
@@ -104,6 +112,45 @@ final class OnlinePlay {
 
     private func apply(_ event: AuthenticationEvent) {
         authentication = GameCenterAuthenticator.next(from: authentication, on: event)
+        // Listening has to start once the player is known, and only then: a
+        // listener registered while signed out never receives anything, and
+        // this is where a turn-based match arrives from.
+        if authentication.isAuthenticated {
+            matchmaker.beginListening()
+        }
+    }
+
+    /// The one place the start flow moves.
+    private func apply(_ event: OnlineStartEvent) {
+        let before = startState
+        startState = OnlineStartFlow.next(from: startState, on: event)
+        if before != startState {
+            OnlineLog.step(.startTapped, "state \(before) -> \(startState)")
+        }
+    }
+
+    /// Puts the flow back to idle — closing the screen, or dismissing an error.
+    func resetStart() {
+        matchmaker.dismiss()
+        apply(.dismissed)
+    }
+
+    /// Turns whatever GameKit handed back into one of the failures the screen
+    /// knows how to draw. A raw `GKError` is never shown to a player (§70).
+    static func failure(for error: any Error) -> OnlineStartFailure {
+        if let transport = error as? MatchTransportError {
+            switch transport {
+            case .unavailable: return .unavailable
+            default: return .couldNotCreate
+            }
+        }
+        switch GKError.Code(rawValue: (error as NSError).code) {
+        case .notAuthenticated: return .notSignedIn
+        case .gameUnrecognized, .notSupported: return .unavailable
+        case .cancelled: return .cancelled
+        case .communicationsFailure, .unknown: return .network
+        default: return .matchmakingFailed
+        }
     }
 
     // MARK: - The list
@@ -142,50 +189,123 @@ final class OnlinePlay {
 
     // MARK: - Starting and opening
 
-    /// Starts a match against whoever Game Center finds.
+    /// Starts a match through Apple's own matchmaker.
     ///
-    /// Seats are assigned in the order Game Center returns participants, which
-    /// is the only order every device agrees on — deriving it from anything
-    /// local would give two devices two different boards (§28).
-    func startMatch(seats: Int, teams: Bool) async throws -> OnlineMatchRun {
+    /// **Not** `GKTurnBasedMatch.find`, which is what this used to call. That
+    /// is headless automatch: it shows the player nothing, gives them no way to
+    /// invite anybody, and hands back a match whose empty seats have no player
+    /// in them. The old code then refused that match and threw, and the throw
+    /// was discarded by its caller — so the only possible outcome of tapping
+    /// the button was a two-second spinner and silence.
+    ///
+    /// Every way this can end now moves `startState`, and every one of those
+    /// states has a sentence attached. Nothing returns quietly to idle.
+    func startMatch(seats: Int, teams: Bool, onOpen: @escaping (OnlineMatchRun) -> Void) {
         OnlineLog.step(.startTapped)
         OnlineLog.table(seats: seats, teams: teams)
-        OnlineLog.step(.authenticationChecked,
-                       "enabled=\(Self.isEnabled) authenticated=\(authentication.isAuthenticated)")
-        guard Self.isEnabled, let client else {
-            OnlineLog.gaveUp("not signed in, or Game Center disabled in this process")
-            throw MatchTransportError.unavailable(reason: "not signed in")
-        }
-        isWorking = true
-        defer { isWorking = false }
+        OnlineLog.step(
+            .authenticationChecked,
+            "enabled=\(Self.isEnabled) authenticated=\(authentication.isAuthenticated)"
+        )
 
-        // Die Teamregel kommt aus `TableConfiguration` und wird hier nicht
-        // noch einmal formuliert. Eine zweite Fassung war genau der Defekt:
-        // der Online-Bildschirm prüfte `seats % 2 == 0`, behielt `teams = true`
-        // beim Wechsel auf drei oder fünf Sitze, und
-        // `GameConfiguration(seatCount: 3, teamMode: .teamsOfTwo)` brach mit
-        // einer precondition — die App stürzte beim Tippen auf „Neue
-        // Onlinepartie" ab, noch bevor GameKit gerufen wurde.
-        //
-        // `allowsTeams` ist ausserdem strenger als „gerade": bei zwei Sitzen
-        // stünden beide Spieler auf derselben Seite.
-        let configuration = GameConfiguration(
-            seatCount: seats,
-            teamMode: TableConfiguration.allowsTeams(seatCount: seats) && teams
-                ? .teamsOfTwo
-                : .freeForAll
-        )
-        let participants = try await transport.matchmake(seats: seats)
-        let mapping = try ParticipantMapping(seatOrder: participants)
-        let match = try await client.create(
-            configuration: configuration,
-            seed: SeededGenerator.systemSeeded().state,
-            participants: mapping
-        )
-        OnlineLog.step(.matchCreated, "seats=\(configuration.seatCount)")
-        let opened = try run(match, client: client)
-        OnlineLog.step(.runOpened)
-        return opened
+        apply(.tapped(isAuthenticated: Self.isEnabled && authentication.isAuthenticated))
+        guard startState == .openingMatchmaker else {
+            OnlineLog.gaveUp("not signed in, or Game Center disabled in this process")
+            return
+        }
+
+        matchmaker.present(seats: seats) { [weak self] outcome in
+            guard let self else { return }
+            switch outcome {
+            case .cancelled:
+                self.apply(.matchmakerCancelled)
+            case .failed(let error):
+                OnlineLog.failure("matchmaker", error)
+                self.apply(.failed(Self.failure(for: error)))
+            case .couldNotPresent:
+                self.apply(.failed(.matchmakingFailed))
+            case .matched(let gkMatch):
+                Task { await self.adopt(gkMatch, seats: seats, teams: teams, onOpen: onOpen) }
+            }
+        }
+        apply(.matchmakerShown)
+    }
+
+    /// Turns a Game Center match into a Keezly one, once it is full.
+    ///
+    /// A turn-based match can exist before it is full — Game Center fills the
+    /// empty seats as people accept — and Keezly cannot deal into one, because
+    /// a seat with nobody in it cannot be mapped and a board dealt now would
+    /// have to be re-dealt. That wait is **not a failure**, and is no longer
+    /// reported as one: the match exists, it is in the list, and it opens by
+    /// itself when somebody joins, because the listener delivers that too.
+    private func adopt(
+        _ gkMatch: GKTurnBasedMatch,
+        seats: Int,
+        teams: Bool,
+        onOpen: @escaping (OnlineMatchRun) -> Void
+    ) async {
+        let players = gkMatch.participants.compactMap { $0.player?.gamePlayerID }
+        apply(.matchArrived(filled: players.count, of: gkMatch.participants.count))
+
+        guard case .loadingMatch = startState else {
+            // Waiting for players. The match is real and will come back
+            // through the listener; nothing more to do and nothing to report.
+            await refresh()
+            return
+        }
+        guard let client else {
+            apply(.failed(.notSignedIn))
+            return
+        }
+
+        do {
+            // An existing match already carries a board. Only a brand-new one
+            // is dealt, and only once — dealing again would replace a match in
+            // progress with a fresh position.
+            let run: OnlineMatchRun
+            if let data = gkMatch.matchData, !data.isEmpty {
+                let existing = try await client.load(matchID: OnlineMatchEnvelope.load(data).matchID)
+                run = try self.run(existing, client: client)
+            } else {
+                // Die Teamregel kommt aus `TableConfiguration` und wird hier
+                // nicht noch einmal formuliert. Eine zweite Fassung war genau
+                // der Defekt hinter ISS-021: der Online-Bildschirm prüfte
+                // `seats % 2 == 0`, behielt `teams = true` beim Wechsel auf
+                // drei oder fünf Sitze, und `GameConfiguration(seatCount: 3,
+                // teamMode: .teamsOfTwo)` brach mit einer precondition.
+                let configuration = GameConfiguration(
+                    seatCount: seats,
+                    teamMode: TableConfiguration.allowsTeams(seatCount: seats) && teams
+                        ? .teamsOfTwo
+                        : .freeForAll
+                )
+                let mapping = try ParticipantMapping(seatOrder: players)
+                let match = try await client.create(
+                    configuration: configuration,
+                    seed: SeededGenerator.systemSeeded().state,
+                    participants: mapping
+                )
+                OnlineLog.step(.matchCreated, "seats=\(configuration.seatCount)")
+                run = try self.run(match, client: client)
+            }
+            OnlineLog.step(.runOpened)
+            apply(.matchOpened)
+            onOpen(run)
+            await refresh()
+        } catch {
+            OnlineLog.failure("adopt", error)
+            apply(.failed(Self.failure(for: error)))
+        }
+    }
+
+    /// Records that opening an existing match went wrong, so the screen can
+    /// say so. Opening used to be `try?`, which discarded the reason.
+    func noteOpenFailure(_ error: any Error) {
+        // Always `couldNotLoad`: whatever the underlying reason, what the
+        // player asked for was to open a match that is already theirs, and
+        // that is the sentence that fits. The real domain and code go to the log.
+        apply(.failed(.couldNotLoad))
     }
 
     func open(_ matchID: String) async throws -> OnlineMatchRun {
