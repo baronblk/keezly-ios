@@ -244,6 +244,67 @@ final class QuickMatchPhysicalTests: XCTestCase {
         )
     }
 
+    /// Apple's own matchmaker, driven as far as it can be driven.
+    ///
+    /// The programmatic path — `GKTurnBasedMatch.find` — does not pair two
+    /// devices here: each gets its own match, clean accounts or not, staggered
+    /// or not, and it creates a new match on every call rather than ever
+    /// returning a joinable one. `GKTurnBasedMatchmakerViewController` is the
+    /// route Apple actually supports for turn-based matchmaking, and this
+    /// finds out whether it behaves differently.
+    ///
+    /// Apple's sheet is a remote view. Its buttons are sometimes reachable
+    /// from a test and sometimes not; when they are not, that is reported as an
+    /// owner step rather than a failure, because a sheet this test cannot tap
+    /// is not a defect in Keezly.
+    @MainActor
+    func testAppleMatchmakerSheet() throws {
+        let app = launched()
+        guard openOnline(app) else { return }
+        chooseSeats(2, in: app)
+
+        let invite = app.descendants(matching: .any)["online.invite"]
+        XCTAssertTrue(invite.waitForExistence(timeout: 10), "no invite button")
+        invite.tap()
+        report(app, "invite-tapped")
+
+        // The sheet is GameKit's, so it is looked for by what it shows rather
+        // than by an identifier Keezly could have set.
+        let arrived = app.staticTexts["Game Center"].waitForExistence(timeout: 20)
+            || app.buttons["Auto-Match"].waitForExistence(timeout: 5)
+            || app.buttons["Play Now"].waitForExistence(timeout: 5)
+            || app.navigationBars.count > 1
+
+        print("E2E MATCHMAKER-SHEET arrived=\(arrived)")
+        print("E2E MATCHMAKER-HIERARCHY\n\(app.debugDescription)")
+
+        guard arrived else {
+            XCTContext.runActivity(named: "OWNER STEP REQUIRED") { _ in
+                XCTFail("""
+                    OWNER STEP: Apple's matchmaker sheet did not appear, or is \
+                    not readable from a test. Hierarchy printed above.
+                    """)
+            }
+            return
+        }
+        report(app, "sheet-open")
+
+        for label in ["Auto-Match", "Play Now", "Automatch", "Jetzt spielen"] {
+            let button = app.buttons[label]
+            if button.exists, button.isHittable {
+                button.tap()
+                report(app, "sheet-\(label)")
+                break
+            }
+        }
+
+        for tick in 1...6 {
+            Thread.sleep(forTimeInterval: 15)
+            report(app, "sheet-wait-\(tick * 15)s")
+            if state(in: app) == "loadingMatch" { break }
+        }
+    }
+
     /// A second tap while a search is running must not start a second search.
     ///
     /// This is what left eleven orphaned matches on one account: every tap
