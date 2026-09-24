@@ -74,6 +74,11 @@ final class QuickMatchPhysicalTests: XCTestCase {
         let probe = app.descendants(matching: .any)["online.probe"].label
         let line = "E2E \(note) state=\(state(in: app)) \(probe)"
         print(line)
+        // What the app itself logged. Its console does not reach xcodebuild,
+        // so without this every diagnosis is guesswork about a process we
+        // cannot hear.
+        let log = app.descendants(matching: .any)["keezly.onlineLog"].label
+        if !log.isEmpty { print("E2E LOG \(note): \(log)") }
         XCTContext.runActivity(named: line) { _ in }
     }
 

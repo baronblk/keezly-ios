@@ -125,6 +125,16 @@ struct RootView: View {
                     onOpen: open,
                     onOnline: online.map { _ in { showsOnline = true } }
                 )
+                // The online diagnostics, where a test can read them whatever
+                // screen is showing. On the menu rather than inside the online
+                // sheet on purpose: the thing most worth explaining is why the
+                // sheet is no longer there.
+                .background(
+                    Text(OnlineLogBuffer.shared.joined)
+                        .frame(width: 0, height: 0)
+                        .accessibilityIdentifier("keezly.onlineLog")
+                        .accessibilityLabel(OnlineLogBuffer.shared.joined)
+                )
                 .sheet(isPresented: $showsOnline) {
                     if let online {
                         OnlineMenuView(online: online) { run in

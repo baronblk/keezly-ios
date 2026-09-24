@@ -26,6 +26,33 @@ import OSLog
 /// or afterwards, from the device's own store:
 ///
 ///     log collect --device --last 10m
+/// The last few diagnostic lines, kept in memory so a test can read them.
+///
+/// `OnlineLog` writes to `os_log` and to standard error. Neither reaches an
+/// `XCUITest`: the app is a separate process and `xcodebuild` captures its own
+/// output, not the device console. Diagnosing the online path from a test has
+/// therefore been blind guesswork, and several runs were spent on hypotheses a
+/// single log line would have settled.
+///
+/// Capped, and carrying exactly what `OnlineLog` already writes — which is
+/// shapes and counts, never an account, a name or a hand.
+@MainActor
+@Observable
+final class OnlineLogBuffer {
+    static let shared = OnlineLogBuffer()
+    private(set) var lines: [String] = []
+
+    private init() {}
+
+    func append(_ line: String) {
+        lines.append(line)
+        if lines.count > 24 { lines.removeFirst(lines.count - 24) }
+    }
+
+    /// One string, for an accessibility label a test can read in one go.
+    var joined: String { lines.joined(separator: " | ") }
+}
+
 enum OnlineLog {
     private static let log = Logger(subsystem: "de.gcng.keezly", category: "online")
 
@@ -55,6 +82,11 @@ enum OnlineLog {
     /// unexplained. `os_log` remains the one that survives into a sysdiagnose.
     private static func echo(_ line: String) {
         FileHandle.standardError.write(Data("[keezly.online] \(line)\n".utf8))
+        // And into the in-memory buffer, which is the only one of the three a
+        // UI test can actually read.
+        if Thread.isMainThread {
+            MainActor.assumeIsolated { OnlineLogBuffer.shared.append(line) }
+        }
     }
 
     static func step(_ step: Step, _ detail: String = "") {
