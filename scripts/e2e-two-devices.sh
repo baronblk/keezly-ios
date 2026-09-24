@@ -157,10 +157,27 @@ if [ "$A_BUILD" -ne 0 ] || [ "$B_BUILD" -ne 0 ]; then
   exit 3
 fi
 
+# How long B waits before it starts searching.
+#
+# Simultaneous is the obvious choice and is probably wrong. `GKTurnBasedMatch
+# .find` does not queue and wait: it looks for a joinable match and otherwise
+# creates one there and then. Two devices calling it in the same instant cannot
+# see each other's match yet, so both create their own — which is exactly what
+# the first clean-account run showed, two different ids at 1/2 each.
+#
+# A stagger gives A's match time to exist before B goes looking for one.
+# Set KEEZLY_E2E_STAGGER=0 to go back to simultaneous and compare.
+STAGGER="${KEEZLY_E2E_STAGGER:-20}"
+
 say ""
-say "Running on both devices at once — automatch needs them searching together."
+if [ "$STAGGER" -gt 0 ]; then
+  say "A starts now; B follows after ${STAGGER}s, so A's match exists to be found."
+else
+  say "Both devices start at once."
+fi
 run_on "$A_ID" "$A_LOG" A &
 PID_A=$!
+if [ "$STAGGER" -gt 0 ]; then sleep "$STAGGER"; fi
 run_on "$B_ID" "$B_LOG" B &
 PID_B=$!
 wait $PID_A; wait $PID_B

@@ -223,10 +223,15 @@ final class QuickMatchPhysicalTests: XCTestCase {
         )
         report(app, "settled")
 
-        // A second look after a pause: the other device may still be joining,
-        // and the whole question is whether this one notices when it does.
-        Thread.sleep(forTimeInterval: 25)
-        report(app, "after-wait")
+        // Long enough for the other device to start, search, and join — and
+        // for this one to be told about it. The question this answers is not
+        // "did it settle" but "did it notice somebody arriving afterwards",
+        // which is a different thing and the one that was broken.
+        for tick in 1...6 {
+            Thread.sleep(forTimeInterval: 15)
+            report(app, "wait-\(tick * 15)s")
+            if state(in: app) == "loadingMatch" || state(in: app) == "idle" { break }
+        }
 
         guard let settled else { return }
         XCTAssertFalse(
