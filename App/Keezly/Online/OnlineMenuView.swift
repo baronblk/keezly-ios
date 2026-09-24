@@ -14,6 +14,9 @@ struct OnlineMenuView: View {
 
     @State private var seats = 4
     @State private var teams = true
+    /// Which way in was chosen, so "Try again" repeats that rather than
+    /// silently switching the player to the other one.
+    @State private var lastKind: GameCenterMatchmaker.Kind = .quickMatch
 
     var body: some View {
         NavigationStack {
@@ -48,7 +51,9 @@ struct OnlineMenuView: View {
     private var signedIn: some View {
         List {
             introSection
+            gameCenterStatusSection
             newMatchSection
+            howSection
             progressSection
             failureSection
             matchesSection
@@ -67,21 +72,57 @@ struct OnlineMenuView: View {
         }
     }
 
+    /// Where this device stands with Game Center, said at the top rather than
+    /// discovered by tapping something and having it not work.
+    private var gameCenterStatusSection: some View {
+        Section {
+            Label {
+                Text("online.gameCenter.connected")
+            } icon: {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+            }
+            .font(.footnote)
+            .accessibilityIdentifier("online.gameCenter.status")
+        }
+    }
+
     private var newMatchSection: some View {
         Section {
             TableSeatsRow(seats: $seats, teams: $teams)
-            Button(action: start) {
-                HStack {
-                    Label("online.new", systemImage: "person.2.badge.plus")
-                    Spacer()
-                    if online.startState.isBusy { ProgressView() }
-                }
+        } header: {
+            Text("online.start.table")
+        }
+    }
+
+    /// The two ways in, each saying what it will do **before** it does it.
+    ///
+    /// The old screen had one button that opened Apple's matchmaker with no
+    /// warning. Being dropped into a system screen without knowing why is most
+    /// of what made the flow bewildering, and it also hid the difference
+    /// between picking somebody and being matched with anybody.
+    private var howSection: some View {
+        Section {
+            Button { start(kind: .inviteFriends) } label: {
+                StartChoice(
+                    titleKey: "online.start.inviteFriends",
+                    detailKey: "online.start.inviteFriends.why",
+                    symbol: "person.2.badge.plus"
+                )
+            }
+            .disabled(online.startState.isBusy)
+            .accessibilityIdentifier("online.invite")
+
+            Button { start(kind: .quickMatch) } label: {
+                StartChoice(
+                    titleKey: "online.start.quickMatch",
+                    detailKey: "online.start.quickMatch.why",
+                    symbol: "bolt.horizontal"
+                )
             }
             .disabled(online.startState.isBusy)
             .accessibilityIdentifier("online.new")
-        } footer: {
-            // What the button will actually do, said before it is tapped.
-            Text("online.new.explain")
+        } header: {
+            Text("online.start.how")
         }
     }
 
@@ -147,7 +188,8 @@ struct OnlineMenuView: View {
     /// unavailable, which cannot be fixed at all (§26).
     private func retryAction(for failure: OnlineStartFailure) -> (() -> Void)? {
         guard failure.isWorthRetrying else { return nil }
-        return { start() }
+        // Retrying repeats the choice the player made, not a default one.
+        return { start(kind: lastKind) }
     }
 
     /// How many seats are still empty, when that is what is happening.
@@ -163,8 +205,9 @@ struct OnlineMenuView: View {
     /// old version caught the error, bound it to nothing, and then called
     /// `refresh()`, which cleared the only field a message could have appeared
     /// in. That is why the button looked dead.
-    private func start() {
-        online.startMatch(seats: seats, teams: teams, onOpen: onOpen)
+    private func start(kind: GameCenterMatchmaker.Kind) {
+        lastKind = kind
+        online.startMatch(seats: seats, teams: teams, kind: kind, onOpen: onOpen)
     }
 
     private func open(_ summary: OnlineMatchSummary) {
@@ -355,6 +398,31 @@ private struct StartFailure: View {
             .font(.callout)
         }
         .accessibilityIdentifier("online.failure")
+    }
+}
+
+/// One of the two ways into a match, with its own explanation.
+private struct StartChoice: View {
+    let titleKey: LocalizedStringKey
+    let detailKey: LocalizedStringKey
+    let symbol: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 28)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(titleKey)
+                Text(detailKey)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

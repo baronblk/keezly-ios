@@ -3337,6 +3337,29 @@
         }
       }
     },
+    "online.gameCenter.connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed in to Game Center"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei Game Center angemeldet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aangemeld bij Game Center"
+          }
+        }
+      }
+    },
     "online.lobby.finished": {
       "extractionState": "manual",
       "localizations": {
@@ -3494,52 +3517,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deze partij is afgelopen."
-          }
-        }
-      }
-    },
-    "online.new": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New online match"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Neue Onlinepartie"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nieuwe onlinepartij"
-          }
-        }
-      }
-    },
-    "online.new.explain": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opens Game Center, where you can invite someone or be matched with another player."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Öffnet Game Center. Dort kannst du jemanden einladen oder mit einer anderen Spielerin oder einem anderen Spieler zusammengebracht werden."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opent Game Center. Daar kun je iemand uitnodigen of aan een andere speler worden gekoppeld."
           }
         }
       }
@@ -3770,6 +3747,144 @@
           "stringUnit": {
             "state": "translated",
             "value": "Onlinepartijen lopen via Apples Game Center. Al het andere in Keezly werkt ook zonder."
+          }
+        }
+      }
+    },
+    "online.start.how": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do you want to play?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie möchtest du spielen?"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoe wil je spelen?"
+          }
+        }
+      }
+    },
+    "online.start.inviteFriends": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite friends"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freunde einladen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vrienden uitnodigen"
+          }
+        }
+      }
+    },
+    "online.start.inviteFriends.why": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens Game Center so you can pick who to play against."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnet Game Center, damit du auswählen kannst, gegen wen du spielst."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opent Game Center zodat je kunt kiezen tegen wie je speelt."
+          }
+        }
+      }
+    },
+    "online.start.quickMatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quick match"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schnelles Spiel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snel spelen"
+          }
+        }
+      }
+    },
+    "online.start.quickMatch.why": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center looks for other players. The match starts as soon as the table is full."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center sucht andere Spieler. Die Partie beginnt, sobald der Tisch voll ist."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Center zoekt andere spelers. De partij begint zodra de tafel vol is."
+          }
+        }
+      }
+    },
+    "online.start.table": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The table"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Tisch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De tafel"
           }
         }
       }

@@ -214,7 +214,12 @@ final class OnlinePlay {
     ///
     /// Every way this can end now moves `startState`, and every one of those
     /// states has a sentence attached. Nothing returns quietly to idle.
-    func startMatch(seats: Int, teams: Bool, onOpen: @escaping (OnlineMatchRun) -> Void) {
+    func startMatch(
+        seats: Int,
+        teams: Bool,
+        kind: GameCenterMatchmaker.Kind,
+        onOpen: @escaping (OnlineMatchRun) -> Void
+    ) {
         OnlineLog.step(.startTapped)
         OnlineLog.table(seats: seats, teams: teams)
         OnlineLog.step(
@@ -228,7 +233,7 @@ final class OnlinePlay {
             return
         }
 
-        matchmaker.present(seats: seats) { [weak self] outcome in
+        matchmaker.present(seats: seats, kind: kind) { [weak self] outcome in
             guard let self else { return }
             switch outcome {
             case .cancelled:
