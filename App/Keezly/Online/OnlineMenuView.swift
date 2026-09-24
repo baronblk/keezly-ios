@@ -195,7 +195,7 @@ struct OnlineMenuView: View {
     /// tap, none of them ever cleaned up.
     @ViewBuilder
     private var cleanupSection: some View {
-        let abandoned = online.matches.filter { $0.isWaitingForPlayers && $0.filledSeats <= 1 }
+        let abandoned = online.matches.filter(\.isAbandonedSearch)
         if abandoned.count >= 3 {
             Section {
                 Button {
@@ -235,7 +235,7 @@ struct OnlineMenuView: View {
                                 // match somebody has joined is not tidied away
                                 // from a lobby; walking out of one is a
                                 // forfeit and belongs inside the match.
-                                if match.isWaitingForPlayers, match.filledSeats <= 1 {
+                                if match.isAbandonedSearch {
                                     Button(role: .destructive) {
                                         Task { await online.abandonWaitingMatch(match) }
                                     } label: {

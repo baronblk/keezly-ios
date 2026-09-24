@@ -26,7 +26,8 @@ struct OnlineLobbyTests {
         invitation: Bool = false,
         ago: TimeInterval = 0,
         variant: String? = nil,
-        teams: Bool = false
+        teams: Bool = false,
+        hasBoard: Bool = true
     ) -> OnlineMatchSummary {
         OnlineMatchSummary(
             id: id,
@@ -35,6 +36,7 @@ struct OnlineLobbyTests {
             filledSeats: filled,
             isMyTurn: myTurn,
             isOver: over,
+            hasBoard: hasBoard,
             isWaitingForPlayers: waiting,
             isInvitation: invitation,
             lastActivity: Date(timeIntervalSince1970: 1_000_000 - ago),
@@ -188,10 +190,47 @@ struct OnlineLobbyTests {
         #expect(summary(opponents: [], filled: 1, waiting: true).group == .waitingForPlayers)
     }
 
+    /// The screen the owner photographed: eleven rows, every one of them
+    /// "Dein Zug", none of them playable. GameKit does say it is your turn in
+    /// a match you created and nobody joined — there is simply nothing to take
+    /// a turn with.
+    @Test("a search nobody joined is not 'your turn'")
+    func emptySearchIsNotYourTurn() {
+        let orphan = summary(opponents: [], filled: 1, myTurn: true, hasBoard: false)
+        #expect(orphan.group == .waitingForPlayers, "an empty search was listed as a playable turn")
+        #expect(OnlineLobby.waitingOnYou(in: [orphan]) == 0, "an empty search was counted as needing the player")
+    }
+
+    @Test("a dealt match with my turn really is my turn")
+    func dealtMatchIsYourTurn() {
+        #expect(summary(myTurn: true, hasBoard: true).group == .yourTurn)
+    }
+
+    /// What may be tidied away, and what may never be.
+    @Test("only a search with nobody in it and nothing played is removable")
+    func removableSearches() {
+        #expect(summary(opponents: [], filled: 1, hasBoard: false).isAbandonedSearch)
+        // Somebody joined: that is a game, and leaving it is a forfeit.
+        #expect(summary(opponents: ["Anna"], filled: 2, hasBoard: false).isAbandonedSearch == false)
+        // A board was dealt: there is a position, and it is somebody's.
+        #expect(summary(opponents: [], filled: 1, hasBoard: true).isAbandonedSearch == false)
+    }
+
+    @Test("twenty-six empty searches all land in one group, not in 'your turn'")
+    func manyEmptySearches() {
+        let orphans = (0..<26).map {
+            summary(id: "m\($0)", opponents: [], filled: 1, myTurn: true, hasBoard: false)
+        }
+        let sections = OnlineLobby.sections(for: orphans)
+        #expect(sections.map(\.group) == [.waitingForPlayers])
+        #expect(OnlineLobby.waitingOnYou(in: orphans) == 0)
+        #expect(orphans.allSatisfy { $0.isAbandonedSearch })
+    }
+
     @Test("the count waiting on you counts turns and invitations, nothing else")
     func waitingOnYouCount() {
         let matches = [
-            summary(id: "1", myTurn: true),
+            summary(id: "1", myTurn: true, hasBoard: true),
             summary(id: "2", invitation: true),
             summary(id: "3", myTurn: false),
             summary(id: "4", over: true),

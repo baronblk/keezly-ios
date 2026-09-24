@@ -21,6 +21,15 @@ struct OnlineMatchSummary: Identifiable, Hashable, Sendable {
     let filledSeats: Int
     let isMyTurn: Bool
     let isOver: Bool
+    /// Whether a board has been dealt at all.
+    ///
+    /// A turn-based match exists at Apple from the moment it is created, before
+    /// anybody has been found and before there is anything to play. Without
+    /// this the lobby cannot tell a real game from an empty search, and it did
+    /// not: twenty-six searches with nobody in them were all listed as "your
+    /// turn", because GameKit does say it is your turn — there is simply
+    /// nothing to take a turn with.
+    let hasBoard: Bool
     /// Waiting on Game Center to find somebody, rather than on a player.
     let isWaitingForPlayers: Bool
     /// An invitation this player has not answered yet.
@@ -60,9 +69,17 @@ struct OnlineMatchSummary: Identifiable, Hashable, Sendable {
     var group: OnlineLobby.Group {
         if isInvitation { return .invitations }
         if isOver { return .finished }
-        if isWaitingForPlayers { return .waitingForPlayers }
+        // No board means there is nothing to play, whatever GameKit says about
+        // whose turn it is. This is checked before `isMyTurn` on purpose.
+        if isWaitingForPlayers || !hasBoard { return .waitingForPlayers }
         return isMyTurn ? .yourTurn : .theirTurn
     }
+
+    /// A search this device started and nobody ever joined.
+    ///
+    /// Safe to remove: nobody else is in it and nothing was ever played, so
+    /// there is no game for anybody to lose.
+    var isAbandonedSearch: Bool { !hasBoard && filledSeats <= 1 }
 }
 
 /// How Keezly arranges its own online matches.

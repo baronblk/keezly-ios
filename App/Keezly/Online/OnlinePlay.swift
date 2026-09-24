@@ -198,6 +198,7 @@ final class OnlinePlay {
                 isOver: gk.status == .ended || payload?.state.result != nil,
                 // Automatch has not finished filling the table. Not an error
                 // and not somebody's turn — its own thing, said as itself.
+                hasBoard: payload != nil,
                 isWaitingForPlayers: gk.status == .matching || named.count < gk.participants.count,
                 isInvitation: mine?.status == .invited,
                 // The most recent turn anybody took, or the match's own age
