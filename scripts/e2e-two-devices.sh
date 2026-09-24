@@ -201,6 +201,20 @@ def gate(name, ok, detail=""):
 print("GATE                     RESULT       DETAIL")
 print("-" * 78)
 
+# First, and hardest: did anything run at all?
+#
+# Three times now this project has produced a green run that tested nothing —
+# a plan that skipped the suite, an `-only-testing` that matched no method, and
+# an edit that never reached the file. Each time xcodebuild reported success.
+# A gate table full of NOT TESTED is too easy to skim past, so the executed
+# count is checked first and fails loudly.
+for label, log in (("A", a_log), ("B", b_log)):
+    ran = re.findall(r"Executed (\d+) tests?", log)
+    count = max((int(n) for n in ran), default=0)
+    gate(f"TESTS RAN {label}", count > 0,
+         f"{count} test(s) executed" if count else "NOTHING RAN — every gate below is meaningless")
+
+
 # Authentication, from the app's own log rather than from an assumption.
 a_auth = "auth=true" in a_log
 b_auth = "auth=true" in b_log
