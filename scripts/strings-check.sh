@@ -115,18 +115,37 @@ def is_noise(text, match, line):
     """Dotted lowercase strings that are not text anybody reads."""
     # An SF Symbol name, read from the argument it is passed to rather than
     # from the whole line — a Label carries a key *and* a symbol.
-    before = text[max(0, match.start() - 80):match.start()]
+    before = text[max(0, match.start() - 200):match.start()]
     # Up to the end of that argument: a symbol name may be picked by a
     # ternary, so the quote before it is not the boundary — the bracket is.
-    if re.search(r"(systemImage:|systemName:)[^)\n]*$", before):
+    #
+    # `icon:` is here because Keezly's own row views take a symbol under that
+    # name, and a ternary choosing between two symbols pushed the argument
+    # label further back than the old 80-character window could see. The five
+    # it was missing were all real symbols and identifiers, never missing
+    # translations: inventing catalogue entries for them would have been the
+    # wrong repair entirely.
+    if re.search(r"(systemImage:|systemName:|\bicon:)[^)\n]*$", before):
+        return True
+    # An identifier argument, whatever it is spelled: `accessibilityIdentifier`
+    # as a modifier, or `identifier:` on one of the app's own views.
+    if re.search(r"\bidentifier:\s*$", before):
         return True
     if any(marker in line for marker in ("accessibilityIdentifier", "forResource", "forKey")):
         return True
     # UserDefaults keys, which share the shape and are never shown.
     return match.group(1).startswith("keezly.")
 
+# Files whose dotted strings are never shown to anybody. `OnlineDiagnostics`
+# is the log channel: its step names (`match.received`, `start.tapped`) have
+# exactly the shape of a localisation key and are read only by a developer
+# looking at a device log.
+NOT_USER_FACING = {"OnlineDiagnostics.swift"}
+
 used = set()
 for source in pathlib.Path("App/Keezly").rglob("*.swift"):
+    if source.name in NOT_USER_FACING:
+        continue
     text = source.read_text()
     for match in KEY.finditer(text):
         line_start = text.rfind("\n", 0, match.start()) + 1
