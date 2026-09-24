@@ -94,6 +94,7 @@ final class OnlineMatchRun {
 
             switch outcome {
             case .accepted:
+                OnlineLog.step(.finished, "move accepted, revision=\(match.revision)")
                 notice = nil
 
             case .duplicate:
@@ -119,6 +120,18 @@ final class OnlineMatchRun {
 
     private func adopt(_ latest: OnlineMatch) {
         match = latest
+        // Every position this device holds, by checksum. Two devices at the
+        // same revision must show the same number; if they ever diverge, this
+        // is the line that says when.
+        if let checksum = try? GameStateCoding.checksum(of: latest.state) {
+            OnlineLog.board(
+                role: "adopted",
+                matchID: latest.matchID,
+                revision: latest.state.revision,
+                checksum: checksum,
+                seats: latest.state.configuration.seatCount
+            )
+        }
         // `adopt` reports what the match earned, if it has just become
         // knowable and has not been reported before. It is safe to reach here
         // on every refresh: the ledger decides, not the call site.

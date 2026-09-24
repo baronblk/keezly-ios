@@ -206,6 +206,23 @@ final class OnlinePlay {
         }
     }
 
+    /// The board's checksum, for comparing two devices.
+    ///
+    /// `dealt` appears exactly once per match across both devices; `received`
+    /// on the others. Two `dealt` lines for one match would be a double deal,
+    /// and two different checksums at the same revision would mean the two
+    /// devices are playing different games.
+    private static func logBoard(role: String, _ match: OnlineMatch) {
+        guard let checksum = try? GameStateCoding.checksum(of: match.state) else { return }
+        OnlineLog.board(
+            role: role,
+            matchID: match.matchID,
+            revision: match.state.revision,
+            checksum: checksum,
+            seats: match.state.configuration.seatCount
+        )
+    }
+
     /// Abandons a match this device is still waiting on.
     ///
     /// Exists because the old start path left orphaned matches at Apple with
@@ -441,6 +458,12 @@ final class OnlinePlay {
         // never older than the last thing Game Center said.
         Task { await refresh() }
 
+        OnlineLog.accounts(
+            authenticated: authentication.isAuthenticated,
+            filled: filled,
+            of: total
+        )
+
         guard case .waitingForPlayers = startState else { return }
         apply(.matchArrived(filled: filled, of: total))
         guard case .loadingMatch = startState else {
@@ -465,6 +488,7 @@ final class OnlinePlay {
             if let data = gkMatch.matchData, !data.isEmpty {
                 // Somebody already dealt. Take their board, do not make one.
                 let existing = try await client.load(matchID: OnlineMatchEnvelope.load(data).matchID)
+                Self.logBoard(role: "received", existing)
                 let run = try run(existing, client: client)
                 apply(.matchOpened)
                 onOpenWaiting(run)
@@ -492,6 +516,7 @@ final class OnlinePlay {
                 participants: try ParticipantMapping(seatOrder: players)
             )
             OnlineLog.step(.matchCreated, "seats=\(configuration.seatCount)")
+            Self.logBoard(role: "dealt", match)
             let run = try run(match, client: client)
             OnlineLog.step(.runOpened)
             apply(.matchOpened)

@@ -132,6 +132,38 @@ enum OnlineLog {
         echo(line)
     }
 
+    /// The board itself, by its checksum — the evidence that two devices hold
+    /// the same position.
+    ///
+    /// `role` says how this device came by it: `dealt` for the one that
+    /// created the opening position, `received` for one that took somebody
+    /// else's. Exactly one device may ever log `dealt` for a given match; two
+    /// would mean a double deal, and two different checksums at the same
+    /// revision would mean the devices are playing different games.
+    ///
+    /// A checksum is a number over the position. It carries no cards, no
+    /// names and nothing about a person.
+    static func board(role: String, matchID: String, revision: Int, checksum: UInt64, seats: Int) {
+        let line = "board \(role) match=\(matchID) revision=\(revision) "
+            + "checksum=\(String(checksum, radix: 16)) seats=\(seats)"
+        log.notice("\(line, privacy: .public)")
+        echo(line)
+    }
+
+    /// Whether this device is genuinely playing somebody else.
+    ///
+    /// Derived, never identified: a turn-based match with every seat filled
+    /// holds that many **distinct** Game Center accounts, because GameKit will
+    /// not seat one account twice. So a full table is itself the confirmation,
+    /// and no account identifier is read, logged or compared to get it.
+    static func accounts(authenticated: Bool, filled: Int, of total: Int) {
+        let confirmed = total >= 2 && filled == total
+        let line = "accounts authenticated=\(authenticated) "
+            + "differentAccountConfirmed=\(confirmed) (\(filled)/\(total) seats filled)"
+        log.notice("\(line, privacy: .public)")
+        echo(line)
+    }
+
     /// A path that gave up without an error — the silent exits that hide a
     /// defect, each one named so its absence from the log means something.
     static func gaveUp(_ reason: String) {
