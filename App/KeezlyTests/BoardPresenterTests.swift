@@ -184,6 +184,52 @@ struct BoardPresenterTests {
         #expect(presenter.displayedPawns == final)
     }
 
+    // MARK: - A position with nothing to animate
+
+    /// The rule the online board broke: whatever arrives, the pieces on screen
+    /// must end up exactly where the state says.
+    ///
+    /// Every online move reaches the session through `adopt`, which carries no
+    /// events at all — the events happened on another device, or inside the
+    /// transport. The screen animated on events, so it animated nothing and
+    /// left every piece where it was while the card vanished from the hand.
+    ///
+    /// This pins the repair at the level it was made: given a position and no
+    /// events, the presenter shows that position, piece for piece.
+    @Test("snapping shows the given position exactly, piece for piece")
+    func snapShowsExactlyTheState() {
+        let before = Self.startingPawns()
+        let presenter = BoardPresenter(pawns: before, timing: .instant)
+
+        // A different position, reached without any event describing how.
+        var after = before
+        after[0].position = .track(index: 11)
+        after[1].position = .track(index: 4)
+
+        presenter.snap(to: after)
+
+        #expect(presenter.displayedPawns == after, "the board is not showing the position it was given")
+        #expect(presenter.displayedPawns != before, "the board is still showing the old position")
+    }
+
+    @Test("snapping to a position a pawn entered from its waiting area shows it out")
+    func snapShowsAPawnBroughtOut() throws {
+        let before = Self.startingPawns()
+        let presenter = BoardPresenter(pawns: before, timing: .instant)
+        let waiting = try #require(
+            before.first { if case .waiting = $0.position { return true } else { return false } },
+            "the opening position should have pawns waiting"
+        )
+
+        var after = before
+        let index = try #require(after.firstIndex { $0.id == waiting.id })
+        after[index].position = .track(index: 0)
+        presenter.snap(to: after)
+
+        let shown = presenter.displayedPawns.first { $0.id == waiting.id }
+        #expect(shown?.position == .track(index: 0), "a piece brought out was still shown waiting")
+    }
+
     // MARK: - Timing
 
     @Test("the animation speed setting scales every duration")

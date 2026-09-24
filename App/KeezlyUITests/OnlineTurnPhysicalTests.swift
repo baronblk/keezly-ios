@@ -83,6 +83,31 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         return false
     }
 
+    /// Every card in the hand, by identifier.
+    @MainActor
+    private func cardIdentifiers(in app: XCUIApplication) -> [String] {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'hand.card.'"))
+            .allElementsBoundByIndex
+            .map(\.identifier)
+    }
+
+    /// Where every piece is drawn, by identifier.
+    ///
+    /// Read from the screen rather than from the model on purpose: the defect
+    /// was that the model moved and the screen did not, so a check that asked
+    /// the model would have passed while the board sat there unchanged.
+    @MainActor
+    private func pawnPositions(in app: XCUIApplication) -> [String: CGRect] {
+        var positions: [String: CGRect] = [:]
+        for pawn in app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'pawn.'"))
+            .allElementsBoundByIndex where pawn.exists {
+            positions[pawn.identifier] = pawn.frame
+        }
+        return positions
+    }
+
     // MARK: - One turn
 
     /// Opens a match and, if it is this device's turn, plays one legal move.
@@ -117,6 +142,10 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         // A card, then a square it may go to. The same shape the pass-and-play
         // suite uses, and deliberately not `target.leg.` — tapping one leg of a
         // Seven commits half a move and leaves the turn open.
+        // Recorded before the move so the two can be compared afterwards.
+        let handBefore = cardIdentifiers(in: app)
+        let pawnsBefore = pawnPositions(in: app)
+
         var played = false
         let cards = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH 'hand.card.'"))
@@ -144,6 +173,21 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         }
 
         XCTAssertTrue(played, "this hand offered no move at all, which a forced-move rule forbids")
+
+        // The defect this run exists to disprove: the card leaves the hand and
+        // the piece stays where it was. Both halves are checked, because only
+        // checking the card is what let it ship.
+        let handAfter = cardIdentifiers(in: app)
+        XCTAssertLessThan(
+            handAfter.count, handBefore.count,
+            "the card was never taken out of the hand"
+        )
+        let pawnsAfter = pawnPositions(in: app)
+        XCTAssertNotEqual(
+            pawnsAfter, pawnsBefore,
+            "the card went but every piece stayed exactly where it was — the card/pawn desync"
+        )
+        print("TURN PAWNS moved=\(pawnsAfter.filter { pawnsBefore[$0.key] != $0.value }.count)")
         log(app, "played")
 
         // The move has to leave the device, not merely be accepted locally.
