@@ -138,14 +138,67 @@ den Fehler, den der `catch` verwarf, also nie.
 schwersten zu erreichen sind: ein Abbruch, der **nach** der Partie eintrifft;
 ein halb besetzter Tisch bei jeder Sitzzahl 2–6; ein später Fehlschlag.
 
+#### Der Beweis kam aus einem Screenshot, nicht aus dem Log
+
+Die Geräte-QA zeigte Apples Matchmaker-Liste mit **elf** Einträgen, alle
+„Auto-Match-Game", alle „Dein Zug".
+
+Das sind die fehlgeschlagenen Versuche selbst. `GKTurnBasedMatch.find`
+**erzeugt** eine Partie, statt nur zu suchen. Jeder Tippen auf „Neue
+Onlinepartie" legte also eine echte Game-Center-Partie an; der `guard` verwarf
+sie als nicht voll, der `catch` schluckte den Fehler, und die Partie blieb als
+Waise ohne Keezly-Payload zurück. Elf Versuche, elf Waisen.
+
+Sichtbar war davon nichts, weil `loadSummaries` jede Partie ohne Payload
+verwarf — genau die Partien, um die es ging.
+
+Damit ist auch Defekt 2 an echter Hardware belegt und nicht mehr nur aus
+Apples API-Vertrag abgeleitet.
+
 #### Was noch aussteht
 
-**Auf echter Hardware ist der Fix nicht bestätigt.** Die Diagnose stammt aus
-dem Quelltext und aus Apples API-Vertrag; Defekt 1 ist damit bewiesen (der
-`catch` sagt es selbst), Defekt 2 ist aus dem dokumentierten Verhalten von
-`find` abgeleitet und **nicht** an einem Gerätelog gemessen. Dafür wurde
-`OnlineLog` ergänzt — die App hatte vorher **überhaupt keine Protokollierung**,
-weshalb der Fehler von außen unerklärlich war.
+**Dass die Behebung funktioniert, ist auf Hardware noch nicht bestätigt.** Eine
+echte Partie muss zustande kommen. `OnlineLog` wurde ergänzt — die App hatte
+vorher **überhaupt keine Protokollierung**, weshalb der Fehler von außen
+unerklärlich war.
+
+---
+
+### ISS-024 — Apples Matchliste war die gesamte Online-Oberfläche — BEHOBEN
+
+- **Status:** BEHOBEN im Code, **auf Hardware noch nicht gesichtet**
+- **Schwere:** P1 — kein Defekt der Funktion, aber der Online-Bereich war für
+  normale Spieler unbrauchbar
+- **Komponente:** `App/Keezly/Online/GameCenterMatchmaker.swift`,
+  `App/Keezly/Online/OnlineMenuView.swift`
+
+`showExistingMatches = true` führte dazu, dass Apples eigene Matchliste als
+komplette Keezly-Online-Oberfläche erschien: elf identische Zeilen
+„Auto-Match-Game", ein `+`, ein `i`, ein „Fertig". Technisch funktionsfähig,
+als Oberfläche von einem Debug-Bildschirm nicht zu unterscheiden.
+
+Ein Spieler konnte daraus nicht beantworten: Gegen wen spiele ich? Welche
+Partie gehört zu welchem Tisch? Was macht das `+`? Wo erstelle ich eine neue
+Partie?
+
+„Auto-Match-Game" stammt **nicht** aus diesem Projekt — es ist GameKits
+Standardname für jede per Automatch erzeugte Partie und für alle gleich. Er
+wird in Keezlys Oberfläche nirgends verwendet.
+
+#### Behebung
+
+| | |
+|---|---|
+| `showExistingMatches` | **`false`** — der Matchmaker ist ein Schritt, keine Oberfläche |
+| Liste | Keezly zeichnet sie selbst aus `GKTurnBasedMatch.loadMatches()` |
+| Gruppen | Einladungen · Du bist am Zug · Die anderen sind dran · Mitspieler werden gesucht · Beendet |
+| Leere Gruppen | werden nicht gezeichnet |
+| Reihenfolge | innerhalb einer Gruppe zuletzt bewegt zuerst; Beendetes zuletzt |
+| Zeile | Wer am Tisch sitzt · Tischgröße · Regelvariante · wann zuletzt gezogen |
+| Interne IDs | erscheinen nirgends |
+| Einstieg | „Freunde einladen" und „Schnelles Spiel", jeweils mit Erklärung **vor** dem Apple-Bildschirm |
+
+`OnlineLobbyTests`, 17 Tests, alle ohne GameKit.
 
 ---
 
