@@ -155,12 +155,39 @@ verwarf — genau die Partien, um die es ging.
 Damit ist auch Defekt 2 an echter Hardware belegt und nicht mehr nur aus
 Apples API-Vertrag abgeleitet.
 
+#### Gemessen auf dem Gerät
+
+`OnlineLog` wurde ergänzt — die App hatte vorher **überhaupt keine
+Protokollierung**, weshalb der Fehler von außen unerklärlich war. Vom iPhone
+12 Pro, iOS 26.6:
+
+```
+table seats=3 teams=true
+auth.checked enabled=true authenticated=true
+request.built min=3 max=3 default=3
+matchmaker.presented
+match.received status=1 active=true
+participants filled=1 of=3
+state matchmaking -> waitingForPlayers(filled: 1, of: 3)
+```
+
+und zuvor bei zwei Sitzen: `participants filled=1 of=2`.
+
+**`filled=1`, jedes Mal.** Automatch liefert eine Partie zurück, in der nur der
+lokale Spieler sitzt. Die alte Prüfung `players.count == seats` konnte damit
+nie erfüllt werden — 1 ≠ 2 und 1 ≠ 3 — also warf sie bei **jedem** Versuch,
+und zwar in den `catch`, der den Fehler verwarf. Genau deshalb trat der Fehler
+bei zwei und bei drei Spielern gleichermaßen auf.
+
+Die letzte Zeile ist die Behebung auf derselben Hardware: statt zu werfen,
+wechselt der Ablauf jetzt nach `waitingForPlayers(filled: 1, of: 3)` — ein
+Zustand, der auf dem Bildschirm auch etwas sagt.
+
 #### Was noch aussteht
 
-**Dass die Behebung funktioniert, ist auf Hardware noch nicht bestätigt.** Eine
-echte Partie muss zustande kommen. `OnlineLog` wurde ergänzt — die App hatte
-vorher **überhaupt keine Protokollierung**, weshalb der Fehler von außen
-unerklärlich war.
+**Eine tatsächlich zustande gekommene Partie.** Der Weg dorthin ist bis
+`waitingForPlayers` belegt; dass ein zweiter Spieler beitritt und das Brett
+sich öffnet, ist noch nicht gesehen worden.
 
 ---
 
