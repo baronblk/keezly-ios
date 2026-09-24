@@ -58,10 +58,23 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         return true
     }
 
-    /// Opens the first match that has a board, whoever is on turn.
+    /// The match this run is bound to, if one was named.
     ///
-    /// A row without a board is a search, not a game — those are what the
-    /// twenty-six orphans were — so they are skipped rather than tapped.
+    /// Passed as `TEST_RUNNER_KEEZLY_MATCH=<id>` on the `xcodebuild` command.
+    private var targetMatch: String? {
+        let value = ProcessInfo.processInfo.environment["KEEZLY_MATCH"]
+        return (value?.isEmpty ?? true) ? nil : value
+    }
+
+    /// Opens the match this run is about.
+    ///
+    /// **Never substitutes.** When a match is named and cannot be found, the
+    /// run fails and says so rather than opening a different one. A result from
+    /// some other match is not a result about the one under test, and a device
+    /// carrying several would otherwise report a pass for the wrong game.
+    ///
+    /// Only when no match is named does it take the first that opens onto a
+    /// board; a row without one is a search, not a game.
     @MainActor
     private func openAMatch(_ app: XCUIApplication) -> Bool {
         let rows = app.descendants(matching: .any)
@@ -71,9 +84,25 @@ final class OnlineTurnPhysicalTests: XCTestCase {
             return false
         }
 
+        if let targetMatch {
+            let wanted = rows.allElementsBoundByIndex.first { $0.identifier.hasSuffix(targetMatch) }
+            guard let wanted else {
+                let found = rows.allElementsBoundByIndex.map(\.identifier).joined(separator: ", ")
+                XCTFail("the match under test is not here: " + targetMatch
+                    + ". Rows: [" + found + "]. Not substituting another match.")
+                return false
+            }
+            print("TURN TARGET " + wanted.identifier)
+            wanted.tap()
+            guard app.descendants(matching: .any)["board.status"].waitForExistence(timeout: 30) else {
+                XCTFail("the match under test did not open onto a board")
+                return false
+            }
+            return true
+        }
+
         for row in rows.allElementsBoundByIndex where row.isHittable {
             row.tap()
-            // The board arrives, or this was a search and the screen stays.
             if app.descendants(matching: .any)["board.status"].waitForExistence(timeout: 25) {
                 return true
             }
@@ -81,6 +110,27 @@ final class OnlineTurnPhysicalTests: XCTestCase {
         }
         XCTFail("no row opened onto a board")
         return false
+    }
+
+    // MARK: - Taking stock
+
+    /// Lists what this device holds, without opening anything.
+    ///
+    /// Used to find the match an invitation created: it is the one that appears
+    /// on **both** devices with two of two seats filled. Identifying it that way
+    /// needs no snapshot taken beforehand, and cannot be confused with the
+    /// three-seat table or with any of the one-seat searches.
+    @MainActor
+    func testListMatches() throws {
+        let app = launched()
+        guard openOnline(app) else { return }
+        let rows = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'online.match.'"))
+        _ = rows.firstMatch.waitForExistence(timeout: 20)
+        for row in rows.allElementsBoundByIndex {
+            print("TURN ROW " + row.identifier + " :: " + row.label)
+        }
+        log(app, "inventory")
     }
 
     /// Every card in the hand, by identifier.
