@@ -229,6 +229,69 @@ wird in Keezlys Oberfläche nirgends verwendet.
 
 ---
 
+### ISS-025 — Ein beitretender zweiter Spieler wurde verworfen — BEHOBEN
+
+- **Status:** BEHOBEN im Code, **auf Hardware noch nicht bestätigt**
+- **Schwere:** P0 — ohne dies kann keine Onlinepartie je zustande kommen
+- **Komponente:** `App/Keezly/Online/GameCenterMatchmaker.swift`
+- **Gefunden:** beim Audit, den der Owner nach der Behebung von ISS-023
+  verlangte („waitingForPlayers darf kein Endzustand sein")
+
+Der Zustand `waitingForPlayers` war eine Sackgasse.
+
+```swift
+private func deliver(_ outcome: Outcome) {
+    guard let onOutcome else { return }   // beim zweiten Ereignis: nil
+    self.onOutcome = nil                  // einmalig, absichtlich
+    onOutcome(outcome)
+}
+```
+
+`deliver` ist bewusst einmalig — ein Abbruch und eine Partie dürfen nicht
+beide für denselben Tipp zählen. Aber **jedes** Turn-Ereignis lief durch diese
+Funktion. Das erste verbrauchte den Callback; der beitretende zweite Spieler
+traf danach auf `nil` und wurde **stillschweigend verworfen**. Die Partie füllte
+sich bei Apple, und Keezly sagte weiter „Es werden noch Mitspieler gesucht".
+
+#### Behebung
+
+Zwei Callbacks, weil es zwei Lebensdauern gibt:
+
+| | |
+|---|---|
+| `onOutcome` | einmalig — das Ergebnis **eines** Startversuchs |
+| `onTurnEvent` | dauerhaft — jedes Turn-Ereignis, solange die App läuft |
+
+Der dauerhafte Handler liest die Teilnehmer **aus der Partie, die das Ereignis
+mitbrachte** — nie aus einem zwischengespeicherten Array. Ein solches Array ist
+genau der Grund, aus dem ein voll gewordener Tisch weiter halb leer aussieht.
+
+Wird der Tisch voll, gibt **der Teilnehmer aus, der am Zug ist**. Das ist keine
+hier erfundene Regel, sondern GameKits eigene darüber, wer die Matchdaten
+schreiben darf — also gibt genau ein Gerät aus, egal wie viele gleichzeitig
+beitreten. Die übrigen übernehmen das erscheinende Brett.
+
+Ebenfalls behandelt: `matchEnded` und ein austretender Teilnehmer, beides als
+Änderung der Lobby statt als nichts.
+
+#### Zwei Tests widersprachen einander
+
+Ein sinkender Zähler muss sichtbar sein, solange noch gewartet wird — darf aber
+eine bereits ausgebende Partie **nicht** nach „wartend" zurückziehen. Der
+Widerspruch zeigte, dass die Regel nicht zu Ende gedacht war. Aufgelöst im
+Zustandsautomaten: `.loadingMatch` fällt nicht zurück, und `.idle` bzw.
+`.failed` ignorieren Ereignisse fremder Partien vollständig.
+
+26 Tests decken jetzt ab: 1/2 → 2/2, 1/3 → 2/3 → 3/3, jede Sitzzahl 2–6,
+doppeltes Ereignis, verspätetes Ereignis, austretender Teilnehmer.
+
+#### Was noch aussteht
+
+**Eine tatsächlich geöffnete Partie auf zwei echten Geräten.** Bis dahin wird
+kein Build > 42 geschnitten.
+
+---
+
 ### ISS-021 — Onlinepartie stürzte bei ungerader Sitzzahl ab — BEHOBEN
 
 - **Status:** GESCHLOSSEN, 2026-09-23. Ursache bewiesen, behoben, durch Tests
