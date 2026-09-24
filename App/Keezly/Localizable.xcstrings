@@ -3027,13 +3027,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch keine Onlinepartien. Starten Sie eine, dann sucht Game Center jemanden für Sie."
+            "value": "Noch keine Onlinepartien. Starte eine, dann sucht Game Center jemanden für dich."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nog geen onlinepartijen. Start er een, dan zoekt Game Center iemand voor u."
+            "value": "Nog geen onlinepartijen. Start er een, dan zoekt Game Center iemand voor je."
           }
         }
       }
@@ -3119,13 +3119,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keine Verbindung zu Game Center. Ihr Zug ist nicht verloren — versuchen Sie es erneut, sobald Sie wieder online sind."
+            "value": "Keine Verbindung zu Game Center. Dein Zug ist nicht verloren — versuche es erneut, sobald du wieder online bist."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Geen verbinding met Game Center. Uw zet is niet verloren — probeer het opnieuw zodra u weer online bent."
+            "value": "Geen verbinding met Game Center. Je zet is niet verloren — probeer het opnieuw zodra je weer online bent."
           }
         }
       }
@@ -3142,13 +3142,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie sind nicht mehr bei Game Center angemeldet."
+            "value": "Du bist nicht mehr bei Game Center angemeldet."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "U bent niet meer aangemeld bij Game Center."
+            "value": "Je bent niet meer aangemeld bij Game Center."
           }
         }
       }
@@ -3441,13 +3441,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie gehören nicht zu dieser Partie."
+            "value": "Du gehörst nicht zu dieser Partie."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "U hoort niet bij deze partij."
+            "value": "Je hoort niet bij deze partij."
           }
         }
       }
@@ -3464,13 +3464,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie sind nicht am Zug."
+            "value": "Du bist nicht am Zug."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "U bent niet aan de beurt."
+            "value": "Je bent niet aan de beurt."
           }
         }
       }
@@ -3586,6 +3586,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld spelers"
+          }
+        }
+      }
+    },
+    "online.sendingBanner": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending your move …"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Zug wird gesendet …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je zet wordt verstuurd …"
           }
         }
       }
@@ -3832,13 +3855,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie sind dran"
+            "value": "Du bist dran"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "U bent aan de beurt"
+            "value": "Jij bent aan de beurt"
           }
         }
       }
@@ -3855,13 +3878,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zug um Zug über Game Center. Spielen Sie, wann es Ihnen passt — die anderen sind dran, sobald sie die App öffnen."
+            "value": "Zug um Zug über Game Center. Spiel, wann es dir passt — die anderen sind dran, sobald sie die App öffnen."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beurt om beurt via Game Center. Speel wanneer het u uitkomt — de anderen zijn aan de beurt zodra ze de app openen."
+            "value": "Beurt om beurt via Game Center. Speel wanneer het jou uitkomt — de anderen zijn aan de beurt zodra ze de app openen."
           }
         }
       }
@@ -3924,13 +3947,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die anderen sind am Zug. Sie können Keezly schließen — Ihr Zug kommt zurück."
+            "value": "Die anderen sind am Zug. Du kannst Keezly schließen — dein Zug kommt zurück."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "De anderen zijn aan zet. U kunt Keezly sluiten — uw beurt komt terug."
+            "value": "De anderen zijn aan zet. Je kunt Keezly sluiten — je beurt komt terug."
           }
         }
       }
@@ -3947,13 +3970,36 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie haben diese Partie gewonnen."
+            "value": "Du hast diese Partie gewonnen."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "U hebt deze partij gewonnen."
+            "value": "Je hebt deze partij gewonnen."
+          }
+        }
+      }
+    },
+    "online.yourTurnBanner": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your turn."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du bist am Zug."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jij bent aan zet."
           }
         }
       }

@@ -33,7 +33,13 @@ struct OnlineGameScreen: View {
         }
     }
 
-    /// One line, and only when there is something to say.
+    /// One line, and always one when the match is waiting on something.
+    ///
+    /// The order matters and is not arbitrary: a problem outranks the result,
+    /// the result outranks whose turn it is, and a move in flight outranks
+    /// "your turn" — otherwise a player who has just tapped is still told it
+    /// is their turn while the move is being sent, which reads as though the
+    /// tap was ignored.
     @ViewBuilder
     private var banner: some View {
         if let notice = run.notice {
@@ -44,8 +50,16 @@ struct OnlineGameScreen: View {
                 icon: run.didWin == true ? "trophy" : "flag.checkered",
                 identifier: "online.result"
             )
+        } else if run.isSending {
+            Line(text: String(localized: "online.sendingBanner"),
+                 icon: "arrow.up.circle", identifier: "online.sending")
         } else if !run.isMyTurn {
             Line(text: String(localized: "online.waitingBanner"), icon: "hourglass", identifier: "online.waiting")
+        } else {
+            // Said rather than left blank. On a board that looks identical
+            // whoever is on turn, silence is not the same as "it is you".
+            Line(text: String(localized: "online.yourTurnBanner"),
+                 icon: "play.circle", identifier: "online.yourTurn")
         }
     }
 }
