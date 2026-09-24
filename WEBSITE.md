@@ -1,8 +1,18 @@
 # Keezly — Website
 
-**Status: GENERATED / DEPLOYABLE.** Not live. It becomes `LIVE VERIFIED` only
-after the owner has uploaded it and the HTTP check below has actually returned
-200s — not before, and not because the build succeeded.
+**Status: GENERATED / DEPLOYABLE. NOT LIVE.**
+
+Measured, not assumed — `scripts/website-live-check.py` on **2026-09-24**:
+
+```
+checking 15 pages under https://gcng.de/KEEZLY/
+all 15 -> HTTP 404
+WEBSITE LIVE CHECK: FAILED — 15 fault(s)
+The site is NOT LIVE VERIFIED.
+```
+
+Nothing anywhere in this repository claims the site is live, and nothing will
+until that command exits 0.
 
 | | |
 |---|---|
@@ -11,11 +21,43 @@ after the owner has uploaded it and the HTTP check below has actually returned
 | Artifact | `website/website-keezly-1.0.0.zip` (904 KB) |
 | Target | `https://gcng.de/KEEZLY/` |
 | Build | `python3 website/build.py` |
-| Check | `python3 scripts/website-check.py website/dist` |
+| Check (files) | `python3 scripts/website-check.py website/dist` |
+| Check (published) | `python3 scripts/website-live-check.py` |
 | Deploy | `website/DEPLOY.md` |
 
 15 pages: home, support, accessibility, privacy and imprint, in German, Dutch
 and English.
+
+---
+
+## After the owner uploads it
+
+One command, and it decides:
+
+```bash
+python3 scripts/website-live-check.py
+```
+
+It fetches every one of the 15 pages over HTTPS at the real address and checks,
+per page: served with HTTP 200, served as HTML, `lang` matching the section it
+is in (`de`, `en`, `nl`), the word Keezly actually present — which catches a
+host that answers a missing page with a 200 — and none of `DRAFT`, `ENTWURF`,
+`LEGAL REVIEW REQUIRED`, `OWNER ACTION`, `TODO`, `FIXME`, `PLACEHOLDER` or
+`Lorem ipsum`. It then follows every off-site link the pages declare, including
+the two to `support.gcng.de`, and fails on any that does not answer.
+
+That covers what was asked for: all DE/NL/EN pages, and specifically privacy,
+imprint and support in each of the three.
+
+**App Store URLs.** There are none on the site today, and that is correct — the
+app is not released, so a link to its product page would lead nowhere. The
+check says so rather than passing silently. Once 1.0.0 is on the store and the
+links are added, the same command verifies each one resolves and names either
+`de.gcng.keezly` or `6814932630`, so a link cannot quietly point at somebody
+else's app.
+
+The status line at the top of this file is updated from that command's output
+and from nothing else.
 
 ---
 
