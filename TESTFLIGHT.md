@@ -1,9 +1,31 @@
 # TestFlight — internal testing
 
-**Status: Build 42 ist auf TestFlight.** 1.0.0 (42), lokal archiviert und
-signiert, von Apple validiert, `processingState = VALID`, der Version 1.0.0
-zugeordnet. Build 41 wurde von der Geräte-QA abgelehnt und ist überholt
-(`RELEASE_CANDIDATE.md`).
+**Status: Build 43 ist auf TestFlight.** 1.0.0 (43), am 2026-09-25 lokal
+archiviert, signiert, von Apple validiert und hochgeladen.
+`processingState = VALID`, `internalBuildState = IN_BETA_TESTING` — für interne
+Tester sofort verfügbar.
+
+Build 43 ist **nicht** an die App-Store-Version 1.0.0 gehängt; dort hängt
+weiterhin 42. Das ist eine eigene Entscheidung und keine Folge des Uploads.
+
+Vorgänger: 42 (2026-09-23), der Version 1.0.0 zugeordnet. 41 wurde von der
+Geräte-QA abgelehnt und ist überholt (`RELEASE_CANDIDATE.md`).
+
+### Was 43 gegenüber 42 bringt
+
+41 Commits, praktisch vollständig Game-Center-Online-Arbeit. Die beiden
+Fehler, die ein Online-Spiel vorher unbrauchbar machten:
+
+- **Eine gespielte Karte bewegte keine Figur.** Jede Online-Stellung kommt
+  ohne abzuspielende Ereignisse an — sie stammt vom anderen Gerät. Die Hand
+  zeichnete sich sofort neu, die Figuren nicht: Karte weg, Figur stehen
+  geblieben, bei beiden Spielern, in jedem Online-Zug.
+- **Eine Game-Center-Match-ID und eine Keezly-Partie sind nicht dieselbe
+  Kennung.** Beide wurden vermischt.
+
+Am Brett, am Menü und an den Karten hat sich nichts geändert:
+`MainMenuView.swift` ist seit 42 unverändert, und die einzige Änderung an
+`GameScreen.swift` ist der Animations-Bugfix oben.
 
 **Der Build ist nicht Internal Only.** `externalBuildState` ist
 `READY_FOR_BETA_SUBMISSION`, der Export lief mit
@@ -15,14 +37,14 @@ Eigentümerentscheidung und wird nicht im Vorbeigehen getroffen.
 
 ## How a build gets there
 
-Für 1.0.0 (42) **nicht** über Xcode Cloud, sondern lokal:
+Für 1.0.0 (42) und (43) **nicht** über Xcode Cloud, sondern lokal:
 
 ```
 xcodebuild archive      Release, generic/platform=iOS
 xcodebuild -exportArchive   app-store-connect, signingStyle=automatic
 altool --validate-app   VERIFY SUCCEEDED with no errors
-altool --upload-app     Delivery UUID 890a4995-…
-App Store Connect       processingState VALID, an Version 1.0.0 gehängt
+altool --upload-app     Delivery UUID e00555f2-… (43)
+App Store Connect       processingState VALID, IN_BETA_TESTING
 ```
 
 Der Cloud-Weg endet weiterhin an einem Apple-seitigen Signaturfehler (90035,

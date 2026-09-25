@@ -22,9 +22,19 @@ Counts read out of the result bundles, not off the console summary:
 | SwiftLint `--strict`, SwiftFormat | clean |
 | `xcodebuild build` | exit 0 |
 
-**1.0.0 (42)** was built from `20f6225`, three commits back; everything since is
-documentation and doc comments. Build 41 was rejected by device QA
-(`RELEASE_CANDIDATE.md`).
+**1.0.0 (43)** was built from `6a2de37` and uploaded on 2026-09-25:
+`processingState VALID`, `internalBuildState IN_BETA_TESTING`. It is **not**
+attached to the App Store version — 42 still is, and attaching a build is a
+separate decision.
+
+What 43 adds over 42 is forty-one commits of Game Center work, including the
+two faults that made an online match unusable: a played card that moved no
+piece on either device, and a Game Center match identifier being treated as a
+Keezly match identifier. Nothing that a local match draws changed —
+`MainMenuView.swift` is untouched since 42, and the one change to
+`GameScreen.swift` is that animation fix.
+
+Build 41 was rejected by device QA (`RELEASE_CANDIDATE.md`).
 
 ---
 
@@ -562,8 +572,10 @@ Recorded per environment; never merged (§167, §175).
 | Xcode Cloud — Build / Test / Analyze | **VERIFIED** | 2026-09-23 | `087d873` |
 | Xcode Cloud — Archive / distribution | **FAILED** — artefact is signed but invalid (90035, NFC/NFD); upload additionally blocked by a session proxy | 2026-09-23 | `087d873` |
 | Local distribution build 1.0.0 (42) | **VERIFIED** — `codesign --strict` and `altool --validate-app` both pass, ASC `processingState=VALID` | 2026-09-23 | `20f6225` |
+| Local distribution build 1.0.0 (43) | **VERIFIED** — `codesign --verify --deep --strict` satisfies its Designated Requirement, `get-task-allow=false`, `beta-reports-active=true`, `altool --validate-app` → VERIFY SUCCEEDED, upload → `processingState VALID`, `IN_BETA_TESTING` | 2026-09-25 | `6a2de37` |
 | Physical device — build 41 | **REJECTED** — online crash (ISS-021, fixed) and a reported backward move (ISS-022, unreproduced) | 2026-09-23 | `087d873` |
 | Physical device — build 42 | **OUTSTANDING** | — | — |
+| Physical device — build 43 | **OUTSTANDING** — on TestFlight, nobody has played it | — | — |
 | Game Center multi-device | **OUTSTANDING** — implemented, needs two real devices and two accounts | — | — |
 
 Device availability is re-checked with `./scripts/devices.sh` before every
@@ -667,7 +679,7 @@ in a document.
 | MAN-04 | Authorise GitHub ↔ Xcode Cloud, enable Xcode Cloud | **DONE** — initialised 2026-09-23. Build, Test and Analyze verified in the cloud; Archive produces an artefact Apple rejects (90035) and the cloud upload is blocked by a session proxy, so distribution is done locally (`XCODE_CLOUD.md`) |
 | MAN-05 | Enable Game Center for the bundle id | **DONE** — enabled on the App ID; `App/Keezly/Keezly.entitlements` carries the capability |
 | MAN-06 | Create Game Center achievements | **DONE** — all ten created through the REST API and read back (`APP_STORE.md`). **No leaderboards, ever** (DEC-025). The app now reports them, which it did not until 2026-09-22 |
-| MAN-07 | Configure TestFlight testers | OPEN — 1.0.0 (42) is processed and available; adding a tester sends them an invitation, so it stays the owner's action |
+| MAN-07 | Configure TestFlight testers | OPEN — 1.0.0 (43) is processed and in internal beta testing; adding a tester sends them an invitation, so it stays the owner's action |
 | MAN-08 | App Store Connect API key | **DONE & VERIFIED** — outside the repo; `fastlane asc_check` authenticates |
 | MAN-09 | Pair a physical iPhone | **DONE** — iPhone 17 Pro, Developer Mode on |
 | MAN-10 | Pair a physical iPad | **DONE & VERIFIED** — iPad (A16), iOS 27.0, gate green 2026-09-20 |

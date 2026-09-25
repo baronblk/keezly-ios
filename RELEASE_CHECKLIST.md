@@ -10,7 +10,7 @@ Status vocabulary, kept strictly apart:
 | **OWNER ACTION** | A declaration or an account setting only the owner may make |
 | **BLOCKED** | Cannot proceed, with the reason named |
 
-Nothing here says "probably fine". Last updated **2026-09-23**, for build 42.
+Nothing here says "probably fine". Last updated **2026-09-25**, for build 43.
 
 ---
 
@@ -73,7 +73,7 @@ Apple, processed and attached to version 1.0.0.
 | Cloud ARCHIVE | **PRODUCES AN INVALID ARTEFACT** | The .ipa is signed, but `codesign --strict` and Apple's own validator both reject it: 90035. Cause is Apple's cloud-managed certificate writing the CN into the Designated Requirement as NFD while the certificate carries NFC |
 | Cloud distribution signing | **FAILED** | An earlier "VERIFIED" here was wrong — only the authority line and the entitlements had been checked, never a strict verification and never Apple's validator |
 | Cloud TestFlight upload | **BLOCKED** | Session proxy provider. Not attempted again |
-| **Local distribution build** | **VERIFIED** | 1.0.0 (42): `codesign --verify --deep --strict` satisfied, certificate CN and requirement CN both NFC, `altool --validate-app` → VERIFY SUCCEEDED, upload → `processingState VALID`, attached to version 1.0.0 |
+| **Local distribution build** | **VERIFIED** | 1.0.0 (43), 2026-09-25: `codesign --verify --deep --strict` satisfies its Designated Requirement, `get-task-allow=false`, `beta-reports-active=true`, Apple Distribution authority, `altool --validate-app` → VERIFY SUCCEEDED, upload → `processingState VALID`, `internalBuildState IN_BETA_TESTING`. Build 42 verified the same way on 2026-09-23 and is the one attached to version 1.0.0 |
 | Workflows CI / Main / Release | **VERIFIED** | Created and read back |
 | Release toolchain pinned | **VERIFIED** | Xcode 27 (27A266a) |
 
@@ -89,7 +89,7 @@ Apple, processed and attached to version 1.0.0.
 | Export compliance | **VERIFIED** | No crypto, no own networking; only GameKit |
 | Privacy manifest | **VERIFIED** | One required-reason API, re-checked after the online work |
 | Screenshots | **ASC UPLOADED** | **45** images at Apple (7 per iPhone set, 8 per iPad set, 3 locales); count, order and COMPLETE read back per set. **Not HUMAN REVIEWED** — that needs the owner's sign-off in `SCREENSHOT_SIGNOFF.md` |
-| Screenshots still match build 42 | **VERIFIED, NOT REGENERATED** | The only files changed between 41 and 42 are `Online/OnlineMenuView.swift` and `Online/OnlinePlay.swift`. No uploaded screenshot shows either screen — the online captures were excluded before upload and stay excluded (`scripts/screenshot-select.py`), because in a simulator that screen can only show a Game Center authentication failure. A happy-path online shot needs a real account on real hardware |
+| Screenshots still match build 43 | **VERIFIED, NOT REGENERATED** | Checked against the diff rather than assumed. `MainMenuView.swift` is unchanged since 42, so the menu in the uploaded shots is the menu that ships — including the online button, which reached the menu at 07:17 on 2026-09-23, before 42 was uploaded at 22:09. The one change to `GameScreen.swift` is the animation fix for online moves and alters nothing that is drawn in a local match. Everything else between 42 and 43 is under `Online/`, and no uploaded screenshot shows an online screen: those captures are excluded before upload (`scripts/screenshot-select.py`), because in a simulator that screen can only show a Game Center authentication failure. A happy-path online shot needs a real account on real hardware |
 | App Privacy declaration | **OWNER ACTION** | `APP_PRIVACY_OWNER_CHECKLIST.md` |
 | Age rating | **OWNER ACTION** | Reads back as `FOUR_PLUS`, which is right; one answer behind it is wrong — Contests → None. `AGE_RATING_OWNER_CHECKLIST.md` |
 | Content rights | **OWNER ACTION** | `CONTENT_RIGHTS_OWNER_CHECKLIST.md` |
